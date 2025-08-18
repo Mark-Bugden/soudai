@@ -43,7 +43,7 @@ This repository relies on one external data file, namely the `processed_decision
 
 ## Model training workflow
 
-The model training pipeline consists of modular components which handle input and encoding, data loading, model definition, and training. The training entry point is the script `scripts/train.py` (or alternatively the notebook `notebooks/train_notebook.ipynb` for more interactive training). The various components of the training pipeline are defined in `src/training`. Configurable parameters for training are stored in `src/training_config.py` and can be adjusted prior to training. Each training run produces a timestamped run directory containing trained models, logs, and configuration snapshots.
+The model training pipeline consists of modular components which handle input and encoding, data loading, model definition, and training. The training entry point is the script `scripts/train.py` (or alternatively the notebook `notebooks/train_notebook.ipynb` for more interactive training). The various components of the training pipeline are defined in `src/training`. Configurable parameters for training are stored in `src/training/training_config.py` and can be adjusted prior to training. Each training run produces a timestamped run directory containing trained models, logs, and configuration snapshots.
 
 High level flow:
 1. Configuration and Logging
@@ -52,6 +52,8 @@ High level flow:
 4. Training setup
 5. Training loop
   
+## Hyperparameter tuning
+For running multiple training runs in order to determine optimum model hyperparameters, we use Optuna. The entrypoint for hyperparameter tuning is the script `scripts/tuning.py`. Configurable elements for hyperparameter tunings are stored in `src/tuning/tuning_config.py` and can be adjusted prior to tuning. 
 
 ## Contributing
 

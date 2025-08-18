@@ -65,6 +65,7 @@ def _normalize_list_column(df: pd.DataFrame, col: str) -> None:
 
 def load_or_prepare_encoded(
     force_rebuild: bool = False,
+    seed: int = 42,
     logger: logging.Logger | None = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, Dict[str, int]]:
     """Load or build encoded datasets for model training.
@@ -119,10 +120,10 @@ def load_or_prepare_encoded(
         df["zminenaUstanoveni"] = df["zminenaUstanoveni"].apply(_ensure_list_raw)
 
         df_train_raw, df_remaining = train_test_split(
-            df, test_size=0.3, random_state=42
+            df, test_size=0.3, random_state=seed
         )
         df_test_raw, df_eval_raw = train_test_split(
-            df_remaining, test_size=0.5, random_state=42
+            df_remaining, test_size=0.5, random_state=seed
         )
 
         # Fit encoders on train
@@ -132,10 +133,10 @@ def load_or_prepare_encoded(
         autor_encoder = SingleLabelEncoder()
         autor_encoder.fit(df_train_raw["autor"])
 
-        kw_encoder = MultiLabelEncoder(max_vocab_size=5000)
+        kw_encoder = MultiLabelEncoder(max_vocab_size=2500)
         kw_encoder.fit(df_train_raw["klicovaSlova"])
 
-        ust_encoder = MultiLabelEncoder(max_vocab_size=5000)
+        ust_encoder = MultiLabelEncoder(max_vocab_size=2500)
         ust_encoder.fit(df_train_raw["zminenaUstanoveni"])
 
         def _transform(dfx: pd.DataFrame) -> pd.DataFrame:

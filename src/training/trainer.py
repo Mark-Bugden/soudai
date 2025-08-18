@@ -40,6 +40,7 @@ class Trainer:
         *,
         lr: float = 1e-3,
         weight_decay: float = 1e-4,
+        patience: int = 5,
         device: Literal["auto", "cpu", "cuda"] = "auto",
         use_huber: bool = False,
         logger: logging.Logger = None,
@@ -56,6 +57,7 @@ class Trainer:
             lr=lr,
             weight_decay=weight_decay,
         )
+        self.patience = patience
 
         self.logger = logger
         self.run_dir = Path(run_dir) if run_dir is not None else None
@@ -149,7 +151,12 @@ class Trainer:
         for ep in range(1, epochs + 1):
             self.model.train()
 
-            # reset inner bar for this epoch (same line, no new bar)
+            # Early stopping setup
+            best_val = float("inf")
+            patience = self.patience
+            epochs_no_improve = 0
+
+            # reset inner progress bar for this epoch (same line, no new bar)
             inner.reset(total=len(train_dl))
             inner.set_description(f"Epoch {ep}/{epochs}")
 
@@ -176,15 +183,19 @@ class Trainer:
 
             # validation and final postfix for this epoch
             v_loss, v_rmse, v_mae = self.evaluate(val_dl)
+            _, tr_rmse, tr_mae = self.evaluate(train_dl)
             inner.set_postfix(
                 {
-                    "train": f"{train_loss:.4f}",
-                    "val": f"{v_loss:.4f}",
-                    "rmse": f"{v_rmse:.4f}",
-                    "mae": f"{v_mae:.4f}",
+                    "train_loss": f"{train_loss:.4f}",
+                    "train_rmse": f"{tr_rmse:.4f}",
+                    "train_mae": f"{tr_mae:.4f}",
+                    "val_loss": f"{v_loss:.4f}",
+                    "val_rmse": f"{v_rmse:.4f}",
+                    "val_mae": f"{v_mae:.4f}",
                 }
             )
 
+            # Update the model if required
             self._maybe_update_best(v_rmse, save_now=True)
 
             # record metrics row
@@ -192,6 +203,8 @@ class Trainer:
                 {
                     "epoch": ep,
                     "train_loss": train_loss,
+                    "train_rmse": tr_rmse,
+                    "train_mae": tr_mae,
                     "val_loss": v_loss,
                     "val_rmse": v_rmse,
                     "val_mae": v_mae,
@@ -200,6 +213,18 @@ class Trainer:
 
             # advance outer bar by one epoch
             outer.update(1)
+
+            # Early stopping check
+            if v_rmse < best_val:
+                best_val = v_rmse
+                epochs_no_improve = 0
+
+            else:
+                epochs_no_improve += 1
+
+            if epochs_no_improve >= patience:
+                print(f"Early stopping at epoch {ep + 1}")
+                break
 
         inner.close()
         outer.close()
@@ -216,6 +241,8 @@ class Trainer:
                     fieldnames=[
                         "epoch",
                         "train_loss",
+                        "train_rmse",
+                        "train_mae",
                         "val_loss",
                         "val_rmse",
                         "val_mae",

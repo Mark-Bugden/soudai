@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import argparse
 import json
 import logging
+import random
 import time
+import types
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
+import numpy as np
+import torch
+import yaml
 from tqdm.auto import tqdm
 
 
@@ -59,11 +65,16 @@ def get_logger(
     return logger
 
 
-def prepare_run_dir(base_path: Path) -> Path:
+def prepare_run_dir(
+    base_path: Path,
+    logger: logging.Logger | None = None,
+) -> Path:
     """Create a timestamped run directory under the given base path.
 
     Args:
         base_path (Path): Directory under which the new run directory will be created.
+        logger (logging.Logger): Logger instance for status messages.
+            If None, logging is skipped.
 
     Returns:
         Path: The created run directory path.
@@ -71,6 +82,10 @@ def prepare_run_dir(base_path: Path) -> Path:
     ts = time.strftime("%Y%m%d-%H%M%S")
     run_dir = base_path / ts
     run_dir.mkdir(parents=True, exist_ok=False)
+
+    if logger:
+        logger.info("Run directory: %s", str(run_dir))
+
     return run_dir
 
 
@@ -99,3 +114,45 @@ def load_json(path: Path) -> Union[Dict[str, Any], list, str, int, float, bool, 
     """
     with open(path, "r") as f:
         return json.load(f)
+
+
+def save_config_snapshot(cfg_module: types.ModuleType, run_dir: Path) -> None:
+    """Extract ALLCAPS constants from training_config module and save to run_dir."""
+
+    # Extract only public ALLCAPS attributes
+    config_dict = {
+        k: (list(v) if isinstance(v, tuple) else v)
+        for k, v in vars(cfg_module).items()
+        if k.isupper() and not k.startswith("_")
+    }
+
+    with open(run_dir / "config.yaml", "w", encoding="utf-8") as f:
+        yaml.safe_dump(config_dict, f, sort_keys=True, allow_unicode=True)
+
+
+def set_random_seeds(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    # Make CUDA deterministic (slower, but exact reproducibility)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=str, default=None, help="Path to config JSON")
+    return parser.parse_args()
+
+
+def load_config_dict(args) -> dict:
+    import training.training_config as cfg
+
+    cfg_dict = {k: getattr(cfg, k) for k in dir(cfg) if k.isupper()}
+    if args.config:
+        with open(args.config) as f:
+            overrides = json.load(f)
+        cfg_dict.update(overrides)
+    return cfg_dict

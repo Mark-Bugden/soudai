@@ -145,6 +145,7 @@ def make_dataloaders(
     num_workers: int = 0,
     pin_memory: bool = False,
     cols: FeatureCols | None = None,
+    seed: int = 42,
     logger: Optional[logging.Logger] = None,
 ) -> Tuple[DataLoader, DataLoader, DataLoader]:
     """Create train/val/test DataLoaders.
@@ -162,6 +163,7 @@ def make_dataloaders(
         pin_memory (bool): If True, enables faster transfer to GPU. Defaults to False.
         cols (FeatureCols, optional): Column selector for the dataset. If None, uses
             FeatureCols().
+        seed (int): Random seed for reproducibility
         logger (Optional[logging.Logger]): Logger for status messages. If None, logging
             is skipped.
 
@@ -182,6 +184,11 @@ def make_dataloaders(
     eval_ds = DecisionDataset(df_eval, cols=cols)
     test_ds = DecisionDataset(df_test, cols=cols)
 
+    # Use generators for reproducibility
+    train_gen = torch.Generator().manual_seed(seed)
+    eval_gen = torch.Generator().manual_seed(seed + 1)
+    test_gen = torch.Generator().manual_seed(seed + 2)
+
     train_dl = DataLoader(
         train_ds,
         batch_size=batch_size,
@@ -189,6 +196,7 @@ def make_dataloaders(
         num_workers=num_workers,
         pin_memory=pin_memory,
         collate_fn=_collate,
+        generator=train_gen,
     )
     eval_dl = DataLoader(
         eval_ds,
@@ -197,6 +205,7 @@ def make_dataloaders(
         num_workers=num_workers,
         pin_memory=pin_memory,
         collate_fn=_collate,
+        generator=eval_gen,
     )
     test_dl = DataLoader(
         test_ds,
@@ -205,6 +214,7 @@ def make_dataloaders(
         num_workers=num_workers,
         pin_memory=pin_memory,
         collate_fn=_collate,
+        generator=test_gen,
     )
 
     return train_dl, eval_dl, test_dl

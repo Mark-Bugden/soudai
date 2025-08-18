@@ -1,83 +1,96 @@
-import training.training_config as cfg
+import json
+from dataclasses import asdict
+
+import training.training_config as cfg_defaults
 from config import RUNS_PATH
 from training.data import make_dataloaders
 from training.io import load_or_prepare_encoded
 from training.models import DecisionRegressor
 from training.trainer import Trainer
-from utils import get_logger, prepare_run_dir, save_json
+from training.training_config_schema import training_config_from_dict
+from utils import get_logger, parse_args, prepare_run_dir, save_json, set_random_seeds
 
 
-def main():
+def main() -> None:
     """ """
-    logger = get_logger("train", cfg.LOG_LEVEL, cfg.USE_LOGGING)
+
+    # Parse arguments for config override
+    args = parse_args()
+
+    # Load defaults
+    cfg_dict = {k: getattr(cfg_defaults, k) for k in dir(cfg_defaults) if k.isupper()}
+
+    # Apply overrides if provided
+    if args.config:
+        with open(args.config) as f:
+            overrides = json.load(f)
+        cfg_dict.update(overrides)
+
+    # Build structured config
+    cfg = training_config_from_dict(cfg_dict)
+
+    # Set random seeds for training
+    set_random_seeds(cfg.seed)
+
+    # Prepare the logger
+    logger = get_logger("train", cfg.log_level, cfg.use_logging)
 
     # Prepare a timestamped run directory under the global RUNS_DIR
-    run_dir = prepare_run_dir(RUNS_PATH)
-    if logger:
-        logger.info("Run directory: %s", str(run_dir))
+    run_dir = prepare_run_dir(base_path=RUNS_PATH, logger=logger)
 
     # Data
     df_train, df_eval, df_test, vocab_sizes = load_or_prepare_encoded(
-        force_rebuild=cfg.FORCE_REBUILD,
+        force_rebuild=cfg.force_rebuild,
+        seed=cfg.seed,
         logger=logger,
     )
     train_dl, eval_dl, _ = make_dataloaders(
         df_train=df_train,
         df_eval=df_eval,
         df_test=df_test,
-        batch_size=cfg.BATCH_SIZE,
-        num_workers=cfg.NUM_WORKERS,
-        pin_memory=cfg.PIN_MEMORY,
+        batch_size=cfg.batch_size,
+        num_workers=cfg.num_workers,
+        pin_memory=cfg.pin_memory,
+        seed=cfg.seed,
         logger=logger,
     )
 
-    # Model
+    # Instantiate model
     model = DecisionRegressor(
         vocab_sizes=vocab_sizes,
-        embed_dim_single=cfg.EMBED_DIM_SINGLE,
-        embed_dim_multi=cfg.EMBED_DIM_MULTI,
-        hidden=cfg.HIDDEN,
-        dropout=cfg.DROPOUT,
+        embed_dim_single=cfg.embed_dim_single,
+        embed_dim_multi=cfg.embed_dim_multi,
+        hidden=cfg.hidden,
+        dropout=cfg.dropout,
     )
 
-    # Save a minimal config snapshot for reproducibility
-    cfg_snapshot = {
-        "batch_size": cfg.BATCH_SIZE,
-        "num_workers": cfg.NUM_WORKERS,
-        "pin_memory": cfg.PIN_MEMORY,
-        "epochs": cfg.EPOCHS,
-        "lr": cfg.LR,
-        "weight_decay": cfg.WEIGHT_DECAY,
-        "device": cfg.DEVICE,
-        "use_huber": cfg.USE_HUBER,
-        "embed_dim_single": cfg.EMBED_DIM_SINGLE,
-        "embed_dim_multi": cfg.EMBED_DIM_MULTI,
-        "hidden": list(cfg.HIDDEN),
-        "dropout": cfg.DROPOUT,
-        "vocab_sizes": vocab_sizes,
-    }
-    save_json(run_dir / "config_snapshot.json", cfg_snapshot)
+    # Save a config snapshot for reproducibility
+    save_json(
+        run_dir / "config_snapshot.json", {**asdict(cfg), "vocab_sizes": vocab_sizes}
+    )
 
     # Trainer
     trainer = Trainer(
         model,
-        lr=cfg.LR,
-        weight_decay=cfg.WEIGHT_DECAY,
-        device=cfg.DEVICE,
-        use_huber=cfg.USE_HUBER,
+        lr=cfg.lr,
+        weight_decay=cfg.weight_decay,
+        patience=cfg.patience,
+        device=cfg.device,
+        use_huber=cfg.use_huber,
         logger=logger,
         run_dir=run_dir,
-        save_best=cfg.SAVE_BEST,
+        save_best=cfg.save_best,
     )
 
     # Train
     metrics = trainer.fit(
         train_dl=train_dl,
         val_dl=eval_dl,
-        epochs=cfg.EPOCHS,
+        epochs=cfg.epochs,
     )
 
-    print("Finished training", metrics)
+    if logger:
+        logger.info("Finished training", metrics)
 
 
 if __name__ == "__main__":

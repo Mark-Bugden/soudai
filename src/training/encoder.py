@@ -98,7 +98,7 @@ class MultiLabelEncoder:
         unknown_id (int): Reserved ID for unknown and padding values (always 0).
     """
 
-    def __init__(self, max_vocab_size: int = 5000) -> None:
+    def __init__(self, max_vocab_size: int = 2500) -> None:
         self.vocab = {}
         self.max_vocab_size = max_vocab_size
         self.unknown_id = 0  # reserve 0 for unknowns and padding
