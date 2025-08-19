@@ -52,8 +52,12 @@ High level flow:
 4. Training setup
 5. Training loop
   
-## Hyperparameter tuning
-For running multiple training runs in order to determine optimum model hyperparameters, we use Optuna. The entrypoint for hyperparameter tuning is the script `scripts/tuning.py`. Configurable elements for hyperparameter tunings are stored in `src/tuning/tuning_config.py` and can be adjusted prior to tuning. 
+## Experiment tracking and hyperparameter tuning
+We use MLFlow for experiment tracking. The entrypoint for hyperparameter tuning is the script `scripts/tuning.py`. Configurable elements for hyperparameter tunings are stored in `src/tuning/tuning_config.py` and can be adjusted prior to tuning. All relevant experiment details are logged during training, and these can be browsed using the mlflow ui by running the following command:
+```bash
+poetry run mlflow ui --port 5000
+```
+and then accessing the ui through a web browser at [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ## Contributing
 

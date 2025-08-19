@@ -1,14 +1,21 @@
 import json
+import logging
 from dataclasses import asdict
 
+import mlflow
+import mlflow.pytorch
+
 import training.training_config as cfg_defaults
-from config import RUNS_PATH
+from config import MLFLOW_TRACKING_DIR
 from training.data import make_dataloaders
 from training.io import load_or_prepare_encoded
 from training.models import DecisionRegressor
 from training.trainer import Trainer
 from training.training_config_schema import training_config_from_dict
-from utils import get_logger, parse_args, prepare_run_dir, save_json, set_random_seeds
+from utils import get_logger, parse_args, set_random_seeds
+
+# Silence mlflow signature warnings
+logging.getLogger("mlflow.models.model").setLevel(logging.ERROR)
 
 
 def main() -> None:
@@ -34,9 +41,6 @@ def main() -> None:
 
     # Prepare the logger
     logger = get_logger("train", cfg.log_level, cfg.use_logging)
-
-    # Prepare a timestamped run directory under the global RUNS_DIR
-    run_dir = prepare_run_dir(base_path=RUNS_PATH, logger=logger)
 
     # Data
     df_train, df_eval, df_test, vocab_sizes = load_or_prepare_encoded(
@@ -64,33 +68,41 @@ def main() -> None:
         dropout=cfg.dropout,
     )
 
-    # Save a config snapshot for reproducibility
-    save_json(
-        run_dir / "config_snapshot.json", {**asdict(cfg), "vocab_sizes": vocab_sizes}
-    )
+    # Point MLflow at the local tracking directory
+    mlflow.set_tracking_uri(f"file://{MLFLOW_TRACKING_DIR.resolve()}")
+    mlflow.set_experiment(cfg.experiment_name)
 
-    # Trainer
-    trainer = Trainer(
-        model,
-        lr=cfg.lr,
-        weight_decay=cfg.weight_decay,
-        patience=cfg.patience,
-        device=cfg.device,
-        use_huber=cfg.use_huber,
-        logger=logger,
-        run_dir=run_dir,
-        save_best=cfg.save_best,
-    )
+    # Start MLflow run
+    with mlflow.start_run():
+        # log hyperparameters
+        mlflow.log_params(asdict(cfg))
 
-    # Train
-    metrics = trainer.fit(
-        train_dl=train_dl,
-        val_dl=eval_dl,
-        epochs=cfg.epochs,
-    )
+        # Trainer
+        trainer = Trainer(
+            model,
+            lr=cfg.lr,
+            weight_decay=cfg.weight_decay,
+            patience=cfg.patience,
+            device=cfg.device,
+            use_huber=cfg.use_huber,
+            logger=logger,
+        )
 
-    if logger:
-        logger.info("Finished training", metrics)
+        # Train
+        metrics = trainer.fit(
+            train_dl=train_dl,
+            val_dl=eval_dl,
+            epochs=cfg.epochs,
+        )
+
+        # log final metrics
+        mlflow.log_metrics(metrics)
+
+        # Log the model
+        mlflow.pytorch.log_model(model, name="model")
+
+        if logger:
+            logger.info("Finished training", metrics)
 
 
 if __name__ == "__main__":

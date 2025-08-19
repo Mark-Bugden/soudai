@@ -8,6 +8,9 @@ from tuning.tuning_config import ARCHITECTURES
 class TrainingConfig:
     """Full training configuration snapshot."""
 
+    # MLFLOW
+    experiment_name: str
+
     # Logging
     use_logging: bool
     log_level: str
@@ -33,9 +36,6 @@ class TrainingConfig:
     dropout: float
     weight_decay: float
 
-    # Checkpoints
-    save_best: bool
-
 
 def resolve_hidden(spec: object) -> tuple[int]:
     """Normalize different hidden layer specifications into a tuple of ints."""
@@ -51,6 +51,7 @@ def resolve_hidden(spec: object) -> tuple[int]:
 def training_config_from_dict(cfg_dict: dict) -> TrainingConfig:
     d = {k.upper(): v for k, v in cfg_dict.items()}
     return TrainingConfig(
+        experiment_name=d["EXPERIMENT_NAME"],
         use_logging=d["USE_LOGGING"],
         log_level=d["LOG_LEVEL"],
         batch_size=d["BATCH_SIZE"],
@@ -68,5 +69,4 @@ def training_config_from_dict(cfg_dict: dict) -> TrainingConfig:
         embed_dim_multi=d["EMBED_DIM_MULTI"],
         hidden=resolve_hidden(d["HIDDEN"]),
         dropout=d["DROPOUT"],
-        save_best=d["SAVE_BEST"],
     )

@@ -17,9 +17,8 @@ pyyaml = "^6.0.2"
 scikit-learn = "^1.7.1"
 torch = "^2.8.0"
 pyarrow = "^21.0.0"
-optuna = "^4.4.0"
-optuna-dashboard = "^0.19.0"
 tqdm = "^4.67.1"
+mlflow = "^3.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pyment = "^0.3.3"

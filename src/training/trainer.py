@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import csv
 import logging
 import math
-from pathlib import Path
 from typing import Dict, Literal, Tuple
 
+import mlflow
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
@@ -44,8 +43,6 @@ class Trainer:
         device: Literal["auto", "cpu", "cuda"] = "auto",
         use_huber: bool = False,
         logger: logging.Logger = None,
-        run_dir: str | Path | None = None,
-        save_best: bool = True,
     ) -> None:
         self.model = model
         self.device = _select_device(device)
@@ -60,8 +57,6 @@ class Trainer:
         self.patience = patience
 
         self.logger = logger
-        self.run_dir = Path(run_dir) if run_dir is not None else None
-        self.save_best = save_best
 
         self._best_rmse = float("inf")
         self._best_state: Dict[str, torch.Tensor] | None = None
@@ -128,7 +123,11 @@ class Trainer:
             v_rmse,
             v_mae,
         )
+
         self._maybe_update_best(v_rmse, save_now=True)
+
+        # Early stopping setup
+        epochs_no_improve = 0
 
         outer = tqdm(
             total=epochs,
@@ -150,11 +149,6 @@ class Trainer:
 
         for ep in range(1, epochs + 1):
             self.model.train()
-
-            # Early stopping setup
-            best_val = float("inf")
-            patience = self.patience
-            epochs_no_improve = 0
 
             # reset inner progress bar for this epoch (same line, no new bar)
             inner.reset(total=len(train_dl))
@@ -196,7 +190,7 @@ class Trainer:
             )
 
             # Update the model if required
-            self._maybe_update_best(v_rmse, save_now=True)
+            improved = self._maybe_update_best(v_rmse, save_now=True)
 
             # record metrics row
             self.history.append(
@@ -210,21 +204,30 @@ class Trainer:
                     "val_mae": v_mae,
                 }
             )
+            mlflow.log_metrics(
+                {
+                    "train_loss": train_loss,
+                    "train_rmse": tr_rmse,
+                    "train_mae": tr_mae,
+                    "val_loss": v_loss,
+                    "val_rmse": v_rmse,
+                    "val_mae": v_mae,
+                },
+                step=ep,
+            )
 
-            # advance outer bar by one epoch
-            outer.update(1)
-
-            # Early stopping check
-            if v_rmse < best_val:
-                best_val = v_rmse
+            # Check for early stopping
+            if improved:
                 epochs_no_improve = 0
-
             else:
                 epochs_no_improve += 1
 
-            if epochs_no_improve >= patience:
-                print(f"Early stopping at epoch {ep + 1}")
+            if epochs_no_improve >= self.patience:
+                print(f"Early stopping at epoch {ep}")
                 break
+
+            # advance outer bar by one epoch
+            outer.update(1)
 
         inner.close()
         outer.close()
@@ -232,47 +235,9 @@ class Trainer:
         if self._best_state is not None:
             self.model.load_state_dict(self._best_state)
 
-        # save history to CSV once per run
-        if self.run_dir is not None and self.history:
-            metrics_path = self.run_dir / "metrics.csv"
-            with open(metrics_path, "w", newline="") as f:
-                writer = csv.DictWriter(
-                    f,
-                    fieldnames=[
-                        "epoch",
-                        "train_loss",
-                        "train_rmse",
-                        "train_mae",
-                        "val_loss",
-                        "val_rmse",
-                        "val_mae",
-                    ],
-                )
-                writer.writeheader()
-                writer.writerows(self.history)
-            if self.logger:
-                self.logger.info("Saved metrics: %s", str(metrics_path))
-
         return {"val_rmse": self._best_rmse}
 
-    def _save_checkpoint(self, tag: str = "best") -> None:
-        """Save the model's state dictionary to a checkpoint file.
-
-        Args:
-            tag (str, optional): File tag for the checkpoint. Defaults to "best".
-
-        Returns:
-            None
-        """
-        if self.run_dir is None:
-            return
-        path = self.run_dir / f"{tag}.ckpt"
-        state = self.model.state_dict()
-        torch.save(state, path)
-        if self.logger:
-            self.logger.info("Saved checkpoint: %s", str(path))
-
-    def _maybe_update_best(self, val_rmse: float, save_now: bool) -> None:
+    def _maybe_update_best(self, val_rmse: float, save_now: bool) -> bool:
         """Update the best model state if the given RMSE is lower.
 
         Args:
@@ -280,15 +245,15 @@ class Trainer:
             save_now (bool): If True, immediately save a checkpoint when updated.
 
         Returns:
-            None
+            bool: True if improvement was found, False otherwise.
         """
         if val_rmse < self._best_rmse:
             self._best_rmse = val_rmse
             self._best_state = {
                 k: v.detach().cpu() for k, v in self.model.state_dict().items()
             }
-            if save_now and self.save_best and self.run_dir is not None:
-                self._save_checkpoint(tag="best")
+            return True
+        return False
 
     def _log(self, msg: str, *args: object) -> None:
         """Log a formatted message using the provided logger or print fallback.

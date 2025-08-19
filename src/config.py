@@ -8,8 +8,8 @@ DATA_DIR = PROJ_ROOT / "data"
 # Checkpoint path
 PROCESSED_CSV_PATH = DATA_DIR / "processed_decisions.csv"
 
-# Base directory for training runs / checkpoints
-RUNS_PATH = PROJ_ROOT / "runs"
+# MLflow tracking directory (local file-based backend)
+MLFLOW_TRACKING_DIR = PROJ_ROOT / "mlruns"
 
 # Scripts directory
 SCRIPTS_DIR = PROJ_ROOT / "scripts"

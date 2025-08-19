@@ -1,123 +1,75 @@
+import itertools
 import json
+import math
+import random
 import subprocess
 import tempfile
-from pathlib import Path
+from typing import Dict, Generator
 
-import optuna
-import pandas as pd
-from optuna.samplers import GridSampler, RandomSampler
+import mlflow
 
-from config import RUNS_PATH, TRAIN_SCRIPT_PATH
-from tuning.tuning_config import DIRECTION, N_TRIALS, SAMPLER, SEARCH_SPACE, STUDY_NAME
+from config import TRAIN_SCRIPT_PATH
+from tuning.tuning_config import EXPERIMENT_NAME, SAMPLER, SEARCH_SPACE
 
 
-def get_last_run_dir() -> Path:
-    """Return the most recently created run directory."""
-    run_dirs = sorted(
-        RUNS_PATH.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True
-    )
-    if not run_dirs:
-        raise FileNotFoundError("No run directories found under runs/")
-    return run_dirs[0]
+def build_param_grid(
+    search_space: Dict[str, tuple],
+) -> Generator[Dict[str, object], None, None]:
+    """Expand categorical search space into a full parameter grid."""
+    keys = list(search_space.keys())
+    values = [spec[1] for spec in search_space.values()]  # categorical choices
+    for combo in itertools.product(*values):
+        yield dict(zip(keys, combo))
 
 
-def suggest_from_space(
-    trial: optuna.trial.Trial,
-    name: str,
-    spec: tuple,
-) -> object:
-    """Suggest a hyperparameter value for a given trial based on a search space spec.
-
-    Args:
-        trial (optuna.trial.Trial):
-            The active Optuna trial object, used to sample parameter values.
-        name (str):
-            The name of the hyperparameter (e.g. "LR", "DROPOUT").
-        spec (tuple):
-            A tuple describing the search space. Supported formats:
-              - ("float", low: float, high: float) → float
-              - ("categorical", choices: Sequence[T]) → T
-
-    Returns:
-        object: A sampled value of the hyperparameter.
-
-    Raises:
-        ValueError: If the spec type is not recognized.
-    """
-
-    kind = spec[0]
-    if kind == "float":
-        _, low, high, log = spec
-        return trial.suggest_float(name, low, high, log=log)
-    elif kind == "categorical":
-        _, choices = spec
-        return trial.suggest_categorical(name, choices)
-    else:
-        raise ValueError(f"Unknown search space type '{kind}' for {name}")
+def sample_params(
+    search_space: Dict[str, tuple], n_trials: int
+) -> Generator[Dict[str, object], None, None]:
+    """Randomly sample parameter sets from the search space."""
+    for _ in range(n_trials):
+        params: Dict[str, object] = {}
+        for name, spec in search_space.items():
+            if spec[0] == "categorical":
+                params[name] = random.choice(spec[1])
+            elif spec[0] == "float":
+                _, low, high, log = spec
+                if log:
+                    params[name] = 10 ** random.uniform(
+                        math.log10(low), math.log10(high)
+                    )
+                else:
+                    params[name] = random.uniform(low, high)
+            else:
+                raise ValueError(f"Unsupported spec type {spec[0]}")
+        yield params
 
 
-def objective(trial: optuna.trial.Trial) -> float:
-    """Optuna objective: run training with sampled hyperparameters."""
+def run_with_params(params: Dict[str, object]) -> None:
+    """Run training with given parameters via subprocess."""
 
-    # Build override config
-    overrides = {
-        name: suggest_from_space(trial, name, spec)
-        for name, spec in SEARCH_SPACE.items()
-    }
+    # force override of experiment name
+    params["experiment_name"] = EXPERIMENT_NAME
 
-    # Save to temp JSON
     with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
-        json.dump(overrides, f)
+        json.dump(params, f)
         config_path = f.name
-
-    # Run training
-    subprocess.run(["python", TRAIN_SCRIPT_PATH, f"--config={config_path}"], check=True)
-
-    # Find last run folder
-    run_dir = get_last_run_dir()
-
-    # Record run_dir as a user attribute for this trial
-    trial.set_user_attr("run_dir", str(run_dir))
-
-    # Load metrics from CSV
-    metrics_path = run_dir / "metrics.csv"
-    if not metrics_path.exists():
-        raise FileNotFoundError(f"Metrics file not found: {metrics_path}")
-
-    df = pd.read_csv(metrics_path)
-    eval_rmse: float = float(df["val_rmse"].min())
-
-    return eval_rmse
+    subprocess.run(["python", TRAIN_SCRIPT_PATH, "--config", config_path], check=True)
 
 
 def main() -> None:
-    # Select sampler
+    """Run hyperparameter search with grid or random sampler and report best run."""
     if SAMPLER == "grid":
-        # Build grid from categorical params only
-        grid_space = {}
-        for name, spec in SEARCH_SPACE.items():
-            if spec[0] != "categorical":
-                raise ValueError(
-                    f"Grid search requires categorical params, but {name} is {spec[0]}"
-                )
-            grid_space[name] = spec[1]
-        sampler = GridSampler(grid_space)
-        n_trials = None  # Optuna will infer from grid
+        param_sets = list(build_param_grid(SEARCH_SPACE))
+    elif SAMPLER == "random":
+        from tuning.tuning_config import N_TRIALS
+
+        param_sets = list(sample_params(SEARCH_SPACE, N_TRIALS))
     else:
-        sampler = RandomSampler()
-        n_trials = N_TRIALS
+        raise ValueError(f"Unknown sampler: {SAMPLER}")
 
-    study = optuna.create_study(
-        study_name=STUDY_NAME,
-        direction=DIRECTION,
-        storage="sqlite:///db.sqlite3",
-        sampler=sampler,
-    )
-
-    study.optimize(objective, n_trials=n_trials)
-
-    print("Best params:", study.best_params)
-    print("Best value:", study.best_value)
+    for i, params in enumerate(param_sets):
+        print(f"=== Running trial {i + 1}/{len(param_sets)} with {params}")
+        run_with_params(params)
 
 
 if __name__ == "__main__":
