@@ -1,0 +1,13 @@
+{
+  "slug": "soudai",
+  "title": "Judging the Journey",
+  "tagline": "Predicting how long court cases in the Czech Republic take.",
+  "summary": "A machine learning project that predicts the duration of court cases in the Czech Republic. It scrapes and cleans public court records from rozhodnuti.justice.cz and infosoud.justice.cz, then trains regression models to predict how long each case takes.",
+  "tags": ["data scraping", "feature engineering", "machine learning", "regression"],
+  "status": "stub",
+  "repo": "https://github.com/Mark-Bugden/soudai",
+  "kitVersion": "0.1.0",
+  "built": "2026-11-17",
+  "demo": { "entry": "demo.js", "height": 560, "needsWebGL": false },
+  "writeup": "/projects/soudai/"
+}
