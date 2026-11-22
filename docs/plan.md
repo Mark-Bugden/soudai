@@ -127,7 +127,7 @@ From published decisions alone: for a senate-year with k distinct published case
 - **Interval.** P(max ≤ m | N) = C(m, k) / C(N, k), inverted for a one-sided 95% upper bound. The lower bound is m.
 - **Court totals.** Sum the senates' estimates, and get the court's interval by simulation.
 - **Missed senates.** Senate-years with no published decisions contribute nothing, so court totals undercount. Report how much.
-- **The point.** The estimate assumes published case numbers are a uniform random sample of 1..N. They aren't: only decided cases are published, so in recent years high numbers are under-represented. The comparison with the exact counts, by filing year, is the finding.
+- **The point.** The estimate assumes published case numbers are a uniform random sample of 1..N. They aren't: only decided cases are published, so in recent years high numbers are under-represented. The comparison with the exact counts, by year, is the finding.
 
 ### The journey
 
@@ -304,7 +304,11 @@ pyproject.toml, uv.lock        a uv project
 - [ ] Settle the stage model (see "The journey") and write it here.
 - [ ] Journey: weighted transition shares, Kaplan–Meier waits and curves, and the top variants, per court and nationally.
 - [ ] Exact intake by court-year and nationally, and the external check.
-- [ ] German tank estimates and intervals, compared with the exact counts by filing year, plus the undercount from senates with no published decisions.
+- [ ] German tank estimates and intervals, compared with the exact counts by year, plus the undercount from senates with no published decisions.
+  - `tank.py` was written ahead of this step, on 2026-11-22, with 61 tests against exact sums and brute-force simulation. The upper bound is the largest N with C(m, k)/C(N, k) ≥ 5%, found in floating point and settled exactly with whole numbers.
+  - A court's upper bound is the 95th percentile of simulated totals. Each senate's N is drawn from its confidence distribution (P(draw ≥ n) = C(m, k)/C(n, k)), so for one senate the simulation gives back its exact bound.
+  - In simulation the court bound covers the true total about 95% of the time when every senate has many published numbers. When some have only 1–3 it covers more often, with very wide bounds: sparse years such as 2020 will show that.
+  - A senate with no published numbers can't be estimated, so `court_total` refuses it, and the undercount is reported separately.
 - [ ] Backlog by Little's law, against the direct count.
 - [ ] A Python reference and fixtures for any maths the demo recomputes.
 - [ ] Record the headline figures here, and draft notes for the write-up in `docs/writeup.md`.
