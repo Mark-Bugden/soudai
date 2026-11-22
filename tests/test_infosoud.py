@@ -3,7 +3,7 @@
 import pytest
 from conftest import FIXTURES, FakeClient, load, make_response
 
-from soudai import infosoud
+from soudai import http, infosoud
 from soudai.http import UnexpectedResponse
 
 LOOKUP = infosoud.API + "rizeni/vyhledej"
@@ -43,6 +43,10 @@ def test_the_apis_unexpected_error_is_an_error():
         make_response(LOOKUP, 404, {"message": "Not Found"}),
         make_response(LOOKUP, 200, text="<!doctype html>", content_type="text/html"),  # the app, not the API
         make_response(LOOKUP, 200, {"cislo": 15, "druh": "C"}),  # a case without its timeline
+        make_response(LOOKUP, 200, [1, 2]),
+        make_response(LOOKUP, 200, text="{not json"),  # JSON by its content type only
+        make_response(LOOKUP, 400, ["RIZENI_0000"]),
+        make_response(LOOKUP, 400, {"message": 404}),
     ],
 )
 def test_anything_else_raises(response):
@@ -72,6 +76,28 @@ def test_a_cached_error_is_fetched_again_once():
     client = FakeClient([(("POST", LOOKUP, body), cached_error), (("POST", LOOKUP, body), found)])
     assert infosoud.lookup(client, *NACHOD, 384, 2022).outcome == "found"
     assert [refresh for *_, refresh in client.requests] == [False, True]
+
+
+def test_a_cached_answer_that_doesnt_parse_is_fetched_again_once():
+    body = infosoud.case_request(*NACHOD, 384, 2022)
+    _, found = load("infosoud/case_found.json")
+    cached_page = make_response(
+        LOOKUP, 200, text="<!doctype html>", content_type="text/html", from_cache=True
+    )
+    client = FakeClient([(("POST", LOOKUP, body), cached_page), (("POST", LOOKUP, body), found)])
+    assert infosoud.lookup(client, *NACHOD, 384, 2022).outcome == "found"
+    assert [refresh for *_, refresh in client.requests] == [False, True]
+
+
+def test_case_numbers_from_numpy_become_plain_ints():
+    import numpy
+
+    body = infosoud.case_request(
+        "KSVYCHK", "OSVYCNA", "C", numpy.int64(15), numpy.int64(384), numpy.int64(2022)
+    )
+    assert body == infosoud.case_request(*NACHOD, 384, 2022)
+    assert all(type(body[key]) is int for key in ("cisloSenatu", "bcVec", "rocnik"))
+    assert http.request_key("POST", LOOKUP, body)  # json can encode it
 
 
 def test_a_fresh_error_is_returned_as_it_is():

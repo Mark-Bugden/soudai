@@ -9,7 +9,8 @@ texts (`odkaz`) are never fetched.
 import re
 from datetime import date
 
-from .http import UnexpectedResponse
+from .http import UnexpectedResponse, parsed, with_params
+from .http import expect_json as _json
 
 API = "https://rozhodnuti.justice.cz/api/opendata"
 PAGE_SIZE = 100
@@ -31,24 +32,29 @@ def parse_case_number(text):
 
 def years(client, refresh=False):
     """{year: decisions published that year}."""
-    return {int(row["rok"]): row["pocet"] for row in _list(client.get(API, refresh=refresh), "rok", "pocet")}
+    rows = parsed(client, _index("rok"), "GET", API, refresh=refresh)
+    return {int(row["rok"]): row["pocet"] for row in rows}
 
 
 def months(client, year, refresh=False):
     """{month: decisions published that month}."""
-    response = client.get(f"{API}/{year}", refresh=refresh)
-    return {int(row["mesic"]): row["pocet"] for row in _list(response, "mesic", "pocet")}
+    rows = parsed(client, _index("mesic"), "GET", f"{API}/{year}", refresh=refresh)
+    return {int(row["mesic"]): row["pocet"] for row in rows}
 
 
 def days(client, year, month, refresh=False):
     """{date: decisions published that day}, for the days that have any."""
-    response = client.get(f"{API}/{year}/{month}", refresh=refresh)
-    return {date.fromisoformat(row["datum"]): row["pocet"] for row in _list(response, "datum", "pocet")}
+    rows = parsed(client, _index("datum"), "GET", f"{API}/{year}/{month}", refresh=refresh)
+    return {date.fromisoformat(row["datum"]): row["pocet"] for row in rows}
 
 
 def day_page(client, day, page, refresh=False):
     """One page of a day's decisions: {"items": [...], "totalPages": ..., "totalElements": ..., ...}."""
-    response = client.get(f"{API}/{day.year}/{day.month}/{day.day}", params={"page": page}, refresh=refresh)
+    url = with_params(f"{API}/{day.year}/{day.month}/{day.day}", {"page": page})
+    return parsed(client, parse_day_page, "GET", url, refresh=refresh)
+
+
+def parse_day_page(response):
     data = _json(response)
     if not isinstance(data, dict) or not {"items", "totalPages", "totalElements"} <= set(data):
         raise UnexpectedResponse(f"not a day page: {response.text[:200]}")
@@ -68,14 +74,15 @@ def pages(count):
     return -(-count // PAGE_SIZE)
 
 
-def _list(response, *keys):
+def parse_index(response, key):
+    """An index: a list of rows, each with `key` (rok, mesic or datum) and `pocet`."""
     rows = _json(response)
-    if not isinstance(rows, list) or not all(set(keys) <= set(row) for row in rows):
-        raise UnexpectedResponse(f"not an index of {keys}: {response.text[:200]}")
+    if not isinstance(rows, list) or not all(
+        isinstance(row, dict) and {key, "pocet"} <= row.keys() for row in rows
+    ):
+        raise UnexpectedResponse(f"not an index by {key}: {response.text[:200]}")
     return rows
 
 
-def _json(response):
-    if response.status != 200 or not (response.content_type or "").startswith("application/json"):
-        raise UnexpectedResponse(f"HTTP {response.status} ({response.content_type}) from {response.url}")
-    return response.json()
+def _index(key):
+    return lambda response: parse_index(response, key)

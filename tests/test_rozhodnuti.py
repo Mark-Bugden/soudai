@@ -47,6 +47,19 @@ def test_a_days_decisions_are_read_page_by_page():
     assert [item["n"] for item in rozhodnuti.day_decisions(client, day)] == [0, 1, 2, 3, 4, 5]
 
 
+def test_a_cached_page_that_isnt_one_is_fetched_again():
+    url = f"{rozhodnuti.API}/2026/1/5?page=0"
+    good = {"items": [], "totalPages": 1, "totalElements": 0}
+    client = FakeClient(
+        [
+            (("GET", url, None), make_response(url, 200, {"error": "maintenance"}, from_cache=True)),
+            (("GET", url, None), make_response(url, 200, good)),
+        ]
+    )
+    assert rozhodnuti.day_page(client, date(2026, 1, 5), 0) == good
+    assert [refresh for *_, refresh in client.requests] == [False, True]
+
+
 def test_a_page_that_isnt_one_raises():
     url = f"{rozhodnuti.API}/2026/1/5?page=0"
     client = FakeClient([(("GET", url, None), make_response(url, 200, {"error": "nope"}))])

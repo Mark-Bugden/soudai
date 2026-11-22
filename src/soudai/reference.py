@@ -36,4 +36,4 @@ def update_sources(updates, folder=paths.REFERENCE):
             sources[key] |= value
         else:
             sources[key] = value
-    path.write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(sources, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")

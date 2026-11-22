@@ -2,12 +2,13 @@
 
 - **Cache.** Every response the server gives, including not-found responses, goes into
   data/raw/cache.sqlite: the request key, URL, body, status, the response gzipped and the fetch time.
-  A request that's cached is never fetched again unless the caller asks to refresh it.
+  A request that's cached is never fetched again unless the caller asks to refresh it, or, through
+  `parsed`, the cached response turns out not to parse (a maintenance page, say).
 - **Pacing.** At most one request a second across the whole project, not per process. The time of
   the last request is kept in the cache and claimed inside a write transaction, so two processes
   share the budget rather than doubling it.
-- **Backoff.** On a connection error, a timeout or a 5xx, wait 30, 60, then 90 s and retry. More
-  than 5 failures in a row, or any 429, stop the run.
+- **Backoff.** On a connection error, a timeout, a 408 or a 5xx, wait 30, 60, then 90 s and retry.
+  More than 5 failures in a row, or any 429 or 403, stop the run.
 - **Identification.** User-Agent soudai/<version> (+https://github.com/Mark-Bugden/soudai).
 - **Run log.** Each run is a row in the cache's `runs` table, and logs every request to
   data/raw/logs/<stage>-<start time>.log.
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS pacing (
 
 
 class StopRun(Exception):
-    """The server pushed back (a 429, or too many failures in a row). Stop, and record it in the plan."""
+    """The server pushed back: a 429 or 403, or too many failures in a row. Stop, and note it in the plan."""
 
 
 class UnexpectedResponse(Exception):
@@ -107,6 +108,31 @@ def canonical(body):
 def request_key(method, url, body=None):
     text = f"{method.upper()} {url}\n{canonical(body) or ''}"
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def expect_json(response, status=200):
+    """The response's JSON, if it has the expected status and really is JSON; else UnexpectedResponse."""
+    if response.status != status or not (response.content_type or "").startswith("application/json"):
+        raise UnexpectedResponse(f"HTTP {response.status} ({response.content_type}) from {response.url}")
+    try:
+        return response.json()
+    except ValueError as error:
+        raise UnexpectedResponse(
+            f"not JSON ({error}) from {response.url}: {response.content[:200]!r}"
+        ) from None
+
+
+def parsed(client, parse, method, url, body=None, refresh=False):
+    """Fetch a request and `parse` the response. A cached response that doesn't parse (raises
+    UnexpectedResponse) isn't trusted: it's fetched again, once, and only a fresh one that doesn't parse
+    raises. So a bad answer cached during an outage doesn't stop every later run."""
+    response = client.fetch(method, url, body, refresh=refresh)
+    try:
+        return parse(response)
+    except UnexpectedResponse:
+        if not response.from_cache:
+            raise
+    return parse(client.fetch(method, url, body, refresh=True))
 
 
 def with_params(url, params):
@@ -158,7 +184,12 @@ class Client:
         self.run_id = self.db.execute(
             "INSERT INTO runs (stage, version, started_at) VALUES (?, ?, ?)", (self.stage, VERSION, started)
         ).lastrowid
-        self.log = self._open_log(started)
+        try:
+            self.log = self._open_log(started)
+        except BaseException as error:
+            self._save_counts(ended_at=utc_now(), outcome=f"failed: {type(error).__name__}: {error}")
+            self.db.close()
+            raise
         self.log.info(f"Run {self.run_id}: {self.stage}, soudai {VERSION}")
         return self
 
@@ -171,15 +202,17 @@ class Client:
             outcome = "interrupted"
         else:
             outcome = f"failed: {type(error).__name__}: {error}"
-        self._save_counts(ended_at=utc_now(), outcome=outcome)
-        self.log.info(
-            f"Run {self.run_id} {outcome}: {self.requests} requests, {self.cache_hits} from the cache, "
-            f"{self.failures} failures"
-        )
-        for handler in list(self.log.handlers):
-            handler.close()
-            self.log.removeHandler(handler)
-        self.db.close()
+        try:
+            self._save_counts(ended_at=utc_now(), outcome=outcome)
+            self.log.info(
+                f"Run {self.run_id} {outcome}: {self.requests} requests, {self.cache_hits} from the cache, "
+                f"{self.failures} failures"
+            )
+        finally:
+            for handler in list(self.log.handlers):
+                handler.close()
+                self.log.removeHandler(handler)
+            self.db.close()
         return False
 
     def get(self, url, params=None, refresh=False):
@@ -216,9 +249,9 @@ class Client:
             elapsed = time.perf_counter() - started
             sent = canonical(body) or ""
             self.log.debug(f"{method} {url} {sent} -> {reply.status_code} in {elapsed:.2f} s")
-            if reply.status_code == 429:
-                raise StopRun(f"HTTP 429 on {method} {url}")
-            if reply.status_code >= 500:
+            if reply.status_code in (403, 429):
+                raise StopRun(f"HTTP {reply.status_code} on {method} {url}")
+            if reply.status_code == 408 or reply.status_code >= 500:
                 self._failure(method, url, f"HTTP {reply.status_code}")
                 continue
             self.failures_in_a_row = 0

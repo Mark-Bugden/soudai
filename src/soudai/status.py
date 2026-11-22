@@ -6,7 +6,6 @@ It only reads: it never creates the cache, and it's safe to run while a stage is
 """
 
 import gzip
-import json
 import re
 import sqlite3
 from collections import Counter
@@ -14,6 +13,7 @@ from collections import Counter
 import pyarrow.parquet
 
 from . import infosoud, paths, rozhodnuti
+from .http import Response, UnexpectedResponse
 from .reference import read_csv
 
 # What each later stage writes. Nothing is there until its milestone runs.
@@ -72,50 +72,68 @@ def _runs(db, last=8):
 
 def _decisions(db):
     """Published decisions (milestone 3): the day pages cached, against the days in the month indexes."""
-    expected = {}
-    for url, content in db.execute(
-        "SELECT url, content FROM responses WHERE url LIKE ? AND status = 200", (rozhodnuti.API + "/%",)
-    ):
-        if DAY_INDEX.match(url):
-            for row in json.loads(gzip.decompress(content)):
-                expected[row["datum"]] = rozhodnuti.pages(row["pocet"])
+    expected, indexes, unreadable = {}, 0, 0
     cached = Counter()
-    for (url,) in db.execute(
-        "SELECT url FROM responses WHERE url LIKE ? AND status = 200", (rozhodnuti.API + "/%",)
+    for url, status, content, content_type in db.execute(
+        "SELECT url, status, content, content_type FROM responses WHERE url LIKE ?", (rozhodnuti.API + "/%",)
     ):
-        if match := DAY_PAGE.match(url):
+        if status != 200:
+            continue
+        if DAY_INDEX.match(url):
+            try:
+                rows = rozhodnuti.parse_index(_response(url, status, content, content_type), "datum")
+            except UnexpectedResponse:
+                unreadable += 1
+                continue
+            indexes += 1
+            expected |= {row["datum"]: rozhodnuti.pages(row["pocet"]) for row in rows}
+        elif match := DAY_PAGE.match(url):
             year, month, day, _ = (int(group) for group in match.groups())
             cached[f"{year:04d}-{month:02d}-{day:02d}"] += 1
     complete = sum(1 for day, pages in expected.items() if cached[day] >= pages)
-    return [
+    lines = [
         "Published decisions (milestone 3):",
-        f"  {len(expected):,} days in the {_count_indexes(db):,} cached month indexes, {complete:,} of them "
+        f"  {len(expected):,} days in the {indexes:,} cached month indexes, {complete:,} of them "
         f"fully cached; {sum(cached.values()):,} of {sum(expected.values()):,} day pages",
-        "",
     ]
-
-
-def _count_indexes(db):
-    urls = db.execute("SELECT url FROM responses WHERE url LIKE ?", (rozhodnuti.API + "/%",))
-    return sum(1 for (url,) in urls if DAY_INDEX.match(url))
+    if unreadable:
+        lines.append(f"  {unreadable:,} cached month indexes don't parse, and will be fetched again")
+    return lines + [""]
 
 
 def _lookups(db):
-    """Case lookups (milestones 4 and 5), by filing year and outcome."""
-    rows = db.execute(
-        "SELECT json_extract(body, '$.rocnik'), status, count(*) FROM responses WHERE url = ? GROUP BY 1, 2",
-        (infosoud.API + "rizeni/vyhledej",),
-    ).fetchall()
-    if not rows:
-        return ["Case lookups (milestones 4 and 5): none yet", ""]
+    """Case lookups (milestones 4 and 5), by the case number's year and the outcome."""
+    url = infosoud.API + "rizeni/vyhledej"
     by_year = {}
-    for year, status, n in rows:
-        by_year.setdefault(year, Counter())["found" if status == 200 else f"HTTP {status}"] += n
-    lines = ["Case lookups (milestones 4 and 5), by filing year:"]
+    found = db.execute(
+        "SELECT json_extract(body, '$.rocnik'), count(*) FROM responses"
+        " WHERE url = ? AND status = 200 GROUP BY 1",
+        (url,),
+    )
+    for year, n in found:
+        by_year.setdefault(year, Counter())["found"] += n
+    others = db.execute(
+        "SELECT json_extract(body, '$.rocnik'), status, content, content_type FROM responses"
+        " WHERE url = ? AND status != 200",
+        (url,),
+    )
+    for year, status, content, content_type in others:
+        try:
+            outcome = infosoud.parse_lookup(_response(url, status, content, content_type)).outcome
+        except UnexpectedResponse:
+            outcome = "unexpected"
+        by_year.setdefault(year, Counter())[outcome.replace("_", " ")] += 1
+    if not by_year:
+        return ["Case lookups (milestones 4 and 5): none yet", ""]
+    lines = ["Case lookups (milestones 4 and 5), by the case number's year:"]
     for year in sorted(by_year, key=str):
         counts = ", ".join(f"{n:,} {outcome}" for outcome, n in sorted(by_year[year].items()))
         lines.append(f"  {year}: {counts}")
     return lines + [""]
+
+
+def _response(url, status, content, content_type):
+    return Response(url, status, gzip.decompress(content), content_type, "", from_cache=True)
 
 
 def _reference(folder):

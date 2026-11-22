@@ -183,11 +183,20 @@ def test_server_errors_back_off_too(make_client, clock):
     assert 30 in clock.sleeps
 
 
-def test_server_errors_are_not_cached(make_client):
-    client, _ = make_client([FakeReply(502), FakeReply(200, b"[1]")])
+def test_server_errors_are_not_cached(tmp_path, make_client):
+    client, _ = make_client([FakeReply(503)] * 6)
+    with pytest.raises(http.StopRun):
+        with client:
+            client.get("https://example.test/x")
+    db = sqlite3.connect(tmp_path / "cache.sqlite")
+    assert db.execute("SELECT count(*) FROM responses").fetchone()[0] == 0
+
+
+def test_a_408_backs_off_and_isnt_cached(make_client, clock):
+    client, session = make_client([FakeReply(408), FakeReply(200, b"[1]")])
     with client:
-        client.get("https://example.test/x")
         assert client.get("https://example.test/x").json() == [1]
+    assert 30 in clock.sleeps and len(session.calls) == 2
 
 
 def test_a_success_resets_the_failures_in_a_row(make_client, clock):
@@ -219,6 +228,37 @@ def test_a_429_stops_the_run_at_once(tmp_path, make_client, clock):
     assert len(session.calls) == 1
     assert [s for s in clock.sleeps if s >= 30] == []
     assert runs(tmp_path)[0]["outcome"].startswith("stopped: HTTP 429")
+
+
+def test_a_403_stops_the_run_at_once(tmp_path, make_client):
+    client, session = make_client([FakeReply(403), FakeReply(200)])
+    with pytest.raises(http.StopRun, match="403"):
+        with client:
+            client.get("https://example.test/x")
+    assert len(session.calls) == 1
+
+
+def must_be_a_list(response):
+    if not isinstance(response.json(), list):
+        raise http.UnexpectedResponse("not a list")
+    return response.json()
+
+
+def test_parsed_fetches_a_cached_response_that_doesnt_parse_again_once(make_client):
+    client, session = make_client([FakeReply(200, b'{"maintenance": true}'), FakeReply(200, b"[1]")])
+    with client:
+        client.get("https://example.test/x")  # an outage page gets cached
+        assert http.parsed(client, must_be_a_list, "GET", "https://example.test/x") == [1]
+        assert http.parsed(client, must_be_a_list, "GET", "https://example.test/x") == [1]
+    assert len(session.calls) == 2
+
+
+def test_parsed_raises_on_a_fresh_response_that_doesnt_parse(make_client):
+    client, session = make_client([FakeReply(200, b"{}")])
+    with pytest.raises(http.UnexpectedResponse):
+        with client:
+            http.parsed(client, must_be_a_list, "GET", "https://example.test/x")
+    assert len(session.calls) == 1
 
 
 def test_each_run_is_recorded_with_its_counts_and_a_log(tmp_path, make_client):

@@ -8,7 +8,8 @@ recognise raises UnexpectedResponse, so a run stops rather than recording nonsen
 import re
 from dataclasses import dataclass
 
-from .http import UnexpectedResponse
+from .http import UnexpectedResponse, parsed, with_params
+from .http import expect_json as _json
 
 SITE = "https://infosoud.gov.cz/"
 API = SITE + "api/v1/"
@@ -26,7 +27,8 @@ class Lookup:
 def backend_version(client):
     """The API's backend version, fetched afresh and recorded with the run, so an API change shows up."""
     response = client.get(API + "env", refresh=True)
-    version = _json(response, 200).get("backendVerze")
+    env = _json(response, 200)
+    version = env.get("backendVerze") if isinstance(env, dict) else None
     if not version:
         raise UnexpectedResponse(f"env has no backendVerze: {response.text[:200]}")
     client.set_backend_version(version)
@@ -35,32 +37,42 @@ def backend_version(client):
 
 def regional_courts(client):
     """The regional, municipal and high courts, as [{"nazev": ..., "kod": ...}]."""
-    return _courts(client.get(API + "organizace/lov"))
+    return parsed(client, _courts, "GET", API + "organizace/lov")
 
 
 def district_courts(client, regional_code):
     """The district courts under a regional court, as [{"nazev": ..., "kod": ...}]."""
-    return _courts(client.get(API + "organizace/podrizene/lov", params={"idOrganizace": regional_code}))
+    url = with_params(API + "organizace/podrizene/lov", {"idOrganizace": regional_code})
+    return parsed(client, _courts, "GET", url)
 
 
 def case_request(regional_code, district_code, register, senate, number, year):
-    """The body of a case lookup: e.g. KSVYCHK, OSVYCNA, "C", 15, 384, 2022 for 15 C 384/2022 at Náchod."""
+    """The body of a case lookup: e.g. KSVYCHK, OSVYCNA, "C", 15, 384, 2022 for 15 C 384/2022 at Náchod.
+
+    The numbers are made plain ints, so numpy's from a pandas table can't break the JSON or the cache key.
+    """
     return {
-        "druhOrganizace": regional_code,
-        "okresniSoud": district_code,
-        "druhVeci": register,
-        "cisloSenatu": senate,
-        "bcVec": number,
-        "rocnik": year,
+        "druhOrganizace": str(regional_code),
+        "okresniSoud": str(district_code),
+        "druhVeci": str(register),
+        "cisloSenatu": int(senate),
+        "bcVec": int(number),
+        "rocnik": int(year),
     }
 
 
 def lookup(client, regional_code, district_code, register, senate, number, year):
-    """Look one case up. An error answer is never trusted from the cache: it's fetched again once."""
+    """Look one case up. A cached error, or a cached answer that doesn't parse, isn't trusted: it's
+    fetched again once."""
     body = case_request(regional_code, district_code, register, senate, number, year)
     response = client.post(API + "rizeni/vyhledej", body)
-    result = parse_lookup(response)
-    if result.outcome == "error" and response.from_cache:
+    try:
+        result = parse_lookup(response)
+    except UnexpectedResponse:
+        if not response.from_cache:
+            raise
+        result = None
+    if response.from_cache and (result is None or result.outcome == "error"):
         result = parse_lookup(client.post(API + "rizeni/vyhledej", body, refresh=True))
     return result
 
@@ -70,11 +82,16 @@ def parse_lookup(response):
     the API's "unexpected error, repeat the query". Anything else raises UnexpectedResponse."""
     if response.status == 200:
         case = _json(response, 200)
+        if not isinstance(case, dict):
+            raise UnexpectedResponse(f"a found case that isn't an object: {response.text[:200]}")
         missing = {"cislo", "druh", "rocnik", "bcVec", "stav", "udalosti", "platneK"} - set(case)
         if missing:
             raise UnexpectedResponse(f"a found case lacks {sorted(missing)}: {response.text[:200]}")
         return Lookup("found", case=case)
-    message = _json(response, 400).get("message") or ""
+    error = _json(response, 400)
+    message = error.get("message") if isinstance(error, dict) else None
+    if not isinstance(message, str):
+        raise UnexpectedResponse(f"HTTP 400 without a message: {response.text[:200]}")
     code = message.split("#", 1)[0]
     if code == "RIZENI_0000":
         return Lookup("not_found", message=message)
@@ -217,9 +234,3 @@ def _courts(response):
     if not isinstance(courts, list) or not all({"nazev", "kod"} <= set(court) for court in courts):
         raise UnexpectedResponse(f"not a court list: {response.text[:200]}")
     return courts
-
-
-def _json(response, status):
-    if response.status != status or not (response.content_type or "").startswith("application/json"):
-        raise UnexpectedResponse(f"HTTP {response.status} ({response.content_type}) from {response.url}")
-    return response.json()
