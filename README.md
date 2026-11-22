@@ -1,72 +1,53 @@
-# Czech Judicial Decisions Model Training
+# Judging the Journey
 
-This repository is second part of the SOUDAI project, which aims to predict the duration of court cases in the Czech republic. The first part of the project, [Czech Judicial Decisions Scraper](https://github.com/Mark-Bugden/SOUDAI_data_scraping), is focussed on scraping, cleaning, and preprocessing court data from publically available sources. The focus of this repository is the analysis of this data, and the development, training, and evaluation of machine-learning models which aim to predict the duration of Czech court cases. 
+An interactive look at how civil cases move through Czech district courts, and where they pile up. Visitors follow the journey of a civil case from filing to a final decision (the routes cases take, how many take each one, and how long each step lasts), compare one court's journey with the national one, and see the district courts on a map coloured by cases filed per year, backlog or typical time to a decision. A side panel shows how close an estimate of a court's caseload, made from its published decisions alone (the German tank method), gets to the exact count.
 
-## Project Structure
+The project is descriptive. It makes no predictions about individual cases, makes no claims about why courts differ, and isn't legal advice.
 
-```
-data/
-    processed_decisions.csv
-notebooks/
-    train_notebook.ipynb
-scripts/
-    train.py
-src/
-    training/
-        data.py
-        encoder.py
-        io.py
-        models.py
-        trainer.py
-        training_config.py
-        type.py
-    config.py
-    utils.py
+**Status:** being rebuilt from scratch, as of November 2026. The demo on the site is still a stub. The plan, design decisions and milestones are in [docs/plan.md](docs/plan.md), which records how far the rebuild has got.
 
-```
+## Repository layout
 
-## Installation
+| Path | What it is |
+| --- | --- |
+| [`demo/`](demo/) | The interactive demo for [mark-bugden.github.io](https://mark-bugden.github.io/), built with [demo-kit](https://github.com/Mark-Bugden/demo-kit). Its README explains how to run and build it. |
+| [`src/soudai/`](src/soudai/) | Python: the scrapers, the parse steps and the analysis. |
+| [`tests/`](tests/) | Python tests. They never touch the network. |
+| [`docs/`](docs/) | The plan. |
 
-This project uses Poetry for dependency management. To install poetry, follow the instructions [here](https://python-poetry.org/docs/). 
-Once poetry is installed, you can install the project as follows:
+The plan's "Repo layout" section lists what each part will hold as the rebuild goes on, including `reference/` (hand-checked tables) and `data/derived/` (the parsed tables).
 
-```bash
-git clone https://github.com/Mark-Bugden/SOUDAI_model_training.git
-cd SOUDAI_model_training
-poetry install
+## Running the pipeline
+
+The pipeline uses [uv](https://docs.astral.sh/uv/):
+
+```sh
+uv sync
+uv run pytest
 ```
 
+Each stage will run as `uv run soudai <stage>`, in this order. The plan gives each stage's inputs, outputs and rough cost.
 
-## Data Folders
+| Stage | What it does | Milestone |
+| --- | --- | --- |
+| `courts`, `events` | Build the reference tables of district courts and event codes. | 2 |
+| `decisions` | List every published decision since 2020. | 3 |
+| `senates`, `intake` | Find each court's senates, and count the cases each one filed per year. | 4 |
+| `sample` | Fetch the timelines of a random sample of cases. | 5 |
+| `analyse`, `export` | Compute the journeys, waits, estimates and backlog, and write the demo's data. | 6–7 |
+| `status` | Report each stage's progress. | 2 |
 
-This repository relies on one external data file, namely the `processed_decisions.csv` file which can be obtained by running the scraping and preprocessing pipeline from [Czech Judicial Decisions Scraper](https://github.com/Mark-Bugden/SOUDAI_data_scraping). The .csv file should be copied to the data folder at `data/processed_decisions.csv` before running the notebooks in this repository. 
+Every response is cached in `data/raw/cache.sqlite`, which is never committed, and every stage resumes where it stopped. The scrapers make at most one request a second across the whole project.
 
-## Model training workflow
+## Data
 
-The model training pipeline consists of modular components which handle input and encoding, data loading, model definition, and training. The training entry point is the script `scripts/train.py` (or alternatively the notebook `notebooks/train_notebook.ipynb` for more interactive training). The various components of the training pipeline are defined in `src/training`. Configurable parameters for training are stored in `src/training/training_config.py` and can be adjusted prior to training. Each training run produces a timestamped run directory containing trained models, logs, and configuration snapshots.
+- **Published decisions** come from the open data of [rozhodnuti.justice.cz](https://rozhodnuti.justice.cz/), the public database of anonymised Czech court decisions. The demo uses their case numbers, courts and dates. Full texts are never fetched, and the judge's name, which the open data includes, is dropped when the listing is parsed, so no derived table, export or demo holds it.
+- **Case timelines** come from [infosoud.gov.cz](https://infosoud.gov.cz/), the courts' public case-tracking service. Its responses hold no names.
 
-High level flow:
-1. Configuration and Logging
-2. Data preparation
-3. Model initialisation
-4. Training setup
-5. Training loop
-  
-## Experiment tracking and hyperparameter tuning
-We use MLFlow for experiment tracking. The entrypoint for hyperparameter tuning is the script `scripts/tuning.py`. Configurable elements for hyperparameter tunings are stored in `src/tuning/tuning_config.py` and can be adjusted prior to tuning. All relevant experiment details are logged during training, and these can be browsed using the mlflow ui by running the following command:
-```bash
-poetry run mlflow ui --port 5000
-```
-and then accessing the ui through a web browser at [http://127.0.0.1:5000](http://127.0.0.1:5000)
+## Licence
 
-## Contributing
+The code is under the [MIT License](LICENSE).
 
-Contributions are welcome. Please submit pull requests with clear, well-documented code, and add tests where relevant.
+## History
 
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
-## Contact
-
-For questions or suggestions, please open an issue or contact the maintainer listed in the `pyproject.toml`.
+The project started as two repositories, one scraping court data and one training a PyTorch model to predict how long a case would take. In November 2026 it was rebuilt from scratch in this repository as a descriptive, interactive demo. The old code remains in this repository's history and in [SOUDAI_data_scraping](https://github.com/Mark-Bugden/SOUDAI_data_scraping).

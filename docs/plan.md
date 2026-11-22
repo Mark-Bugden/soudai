@@ -219,13 +219,19 @@ pyproject.toml, uv.lock        a uv project
 - [x] Case numbers run per senate. One senate's docket had no gaps, so exact intake counts are possible, and open cases are listed.
 - [x] Decisions with Mark: the scope above, filing years 2020–2025, and 1 request a second.
 
-### 1. Fresh start (PR)
-- [ ] Delete the old `src/`, `scripts/`, `notebooks/` and Poetry `pyproject.toml`. They stay in git history.
-- [ ] Create the uv project: Python ≥ 3.12, package `src/soudai`, with pandas, pyarrow, numpy, scipy, requests and lifelines (or justify another survival library), plus pytest and ruff for development. Commit `uv.lock`.
-- [ ] `.gitignore`: ignore `data/raw/`, but not `data/derived/` or `reference/`.
-- [ ] Extend `CLAUDE.md` (added in #3): point it to this plan, and add `uv run pytest` to its list of CI checks (and `npm test` once the demo has tests).
-- [ ] Rewrite `README.md`: what the project is, its status, how to run each stage, and the data sources. Mark edits the wording.
-- [ ] Add `tests.yml` running pytest. node:test joins it when the demo has tests.
+### 1. Fresh start (PR, 2026-11-22)
+- [x] Delete the old `src/`, `scripts/`, `notebooks/` and Poetry `pyproject.toml`. They stay in git history.
+- [x] Create the uv project: Python ≥ 3.12, package `src/soudai`, with pandas, pyarrow, numpy, scipy, requests and lifelines (or justify another survival library), plus pytest and ruff for development. Commit `uv.lock`.
+  - Built with `uv_build`, like the sibling repos. The lock resolved pandas 2.3.3, numpy 2.5.5, scipy 1.18.1, pyarrow 26.0.1, requests 2.34.2 and lifelines 0.30.3.
+  - lifelines it is. Its `KaplanMeierFitter` takes `weights`, and a fit on six hand-worked weighted cases gave the expected curve. It caps pandas below 3.0, which is why pandas is on 2.3.
+  - Ruff is configured in `pyproject.toml` (line length 110, rules E, F, W, I, B, UP) but isn't in CI: run `uv run ruff check` and `uv run ruff format --check` before a PR.
+  - `src/soudai/paths.py` holds where the pipeline reads and writes, as in doctor-who-ratings.
+- [x] `.gitignore`: ignore `data/raw/`, but not `data/derived/` or `reference/`.
+  - The old rule was a bare `data/`, which would also have ignored `demo/public/data/`. The new one is anchored, `/data/raw/`. `tests/test_repo.py` checks it with `git check-ignore`, using the paths in `paths.py`. It's the only test so far, and pytest fails a run that collects no tests.
+- [x] Extend `CLAUDE.md` (added in #3): point it to this plan, and add `uv run pytest` to its list of CI checks (and `npm test` once the demo has tests).
+- [x] Rewrite `README.md`: what the project is, its status, how to run each stage, and the data sources. Mark edits the wording.
+  - The stages are listed with the milestone that builds each one, since none runs yet.
+- [x] Add `tests.yml` running pytest. node:test joins it when the demo has tests.
 - [x] Commit this plan (its own PR, 2026-11-22).
 - The demo isn't touched, so the stub stays live and no version bump is needed.
 
