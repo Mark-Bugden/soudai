@@ -1,4 +1,4 @@
-"""The German tank estimate: how many cases a senate filed in a year, from its published decisions alone.
+"""The German tank estimate: how many cases a senate registered in a year, from its published decisions alone.
 
 A senate numbers its civil cases 1..N each year. If the published decisions show k distinct case numbers,
 the highest m, and those are a uniform random sample of 1..N:
