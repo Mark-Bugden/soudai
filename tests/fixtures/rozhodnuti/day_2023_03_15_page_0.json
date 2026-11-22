@@ -1,0 +1,2630 @@
+{
+ "method": "GET",
+ "url": "https://rozhodnuti.justice.cz/api/opendata/2023/3/15?page=0",
+ "body": null,
+ "status": 200,
+ "content_type": "application/json",
+ "response": {
+  "items": [
+   {
+    "jednaciCislo": "15 C 384/2022-15",
+    "soud": "Okresní soud v Náchodě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSNA:2023:15.C.384.2022.3",
+    "predmetRizeni": "O zaplacení 25 455 Kč s příslušenstvím",
+    "datumVydani": "2023-01-30",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "elektronický podpis",
+     "peněžité plnění",
+     "smlouva o zápůjčce"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§ 2048 z. č. 89/2012 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§ 14b vyhl. č. 177/96 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/65bde688-b541-46d5-b046-53791c2e23cc"
+   },
+   {
+    "jednaciCislo": "20 C 266/2022-30",
+    "soud": "Okresní soud v Pardubicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPU:2022:20.C.266.2022.1",
+    "predmetRizeni": "o zaplacení 1 083 Kč s příslušenstvím",
+    "datumVydani": "2022-11-25",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 2758 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 2782 z. č. 89/2012 Sb.",
+     "§ 2804 z. č. 89/2012 Sb.",
+     "§ 49 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/ce0ae6e5-6150-43a3-ab60-7342debbadb1"
+   },
+   {
+    "jednaciCislo": "5 C 380/2022-50",
+    "soud": "Okresní soud v Náchodě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSNA:2023:5.C.380.2022.1",
+    "predmetRizeni": "o zaplacení 11 550 Kč s příslušenstvím (úvěr)",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "insolvence",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 96 z. č. 99/1963 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/26c301e0-562c-4c33-9c2b-9f992d921b5f"
+   },
+   {
+    "jednaciCislo": "7 C 341/2022-17",
+    "soud": "Okresní soud v Třebíči",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSTR:2023:7.C.341.2022.1",
+    "predmetRizeni": "zaplacení částky 4 626,44 Kč",
+    "datumVydani": "2023-02-01",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "dlužné nájemné",
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§  z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 7 vyhl. č. 177/1996 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 14b vyhl. č. 120/2014 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/eb52e4d2-45fa-489d-b3b5-0bb6662c265f"
+   },
+   {
+    "jednaciCislo": "9 C 245/2022-39",
+    "soud": "Okresní soud v Písku",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPI:2023:9.C.245.2022.1",
+    "predmetRizeni": "zaplacení 21 730 Kč s příslušenstvím",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru",
+     "smlouva o zápůjčce"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§ 118a z. č. 99/1963 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb.",
+     "§ 573 z. č. 89/2012 Sb.",
+     "§ 49 z. č. 99/1963 Sb.",
+     "§ 86 z. č. 257/2016 Sb.",
+     "§ 174a z. č. 99/1963 Sb.",
+     "§ 172 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/db513a93-e7dc-421d-a590-cb95c4cd5d61"
+   },
+   {
+    "jednaciCislo": "21 C 336/2022-23",
+    "soud": "Okresní soud Plzeň-město",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPM:2022:21.C.336.2022.1",
+    "predmetRizeni": "O zaplacení 5 175 Kč s příslušenstvím",
+    "datumVydani": "2022-12-21",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 513 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/c978df2e-a50d-46e1-aebb-f75bc739ad27"
+   },
+   {
+    "jednaciCislo": "4 C 420/2022-47",
+    "soud": "Okresní soud v Tachově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSTC:2023:4.C.420.2022.1",
+    "predmetRizeni": "O zaplacení 246 319,19 Kč s příslušenstvím",
+    "datumVydani": "2023-01-10",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 7 vyhl. č. 177/1996 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 120 z. č. 99/1963 Sb.",
+     "§  z. č. 257/2016 Sb.",
+     "§ 1969 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/6f6d81b7-8cbb-44ee-b8bd-84a8f1710d07"
+   },
+   {
+    "jednaciCislo": "24 C 41/2021-73",
+    "soud": "Okresní soud v Chomutově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSCV:2023:24.C.41.2021.5",
+    "predmetRizeni": "zaplacení 12 529 Kč s příslušenstvím",
+    "datumVydani": "2023-01-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "dodávky energie",
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 118a z. č. 99/1963 Sb.",
+     "§ 50 z. č. 458/2000 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/353a5473-ff5f-4596-b9ea-2a4d1320b737"
+   },
+   {
+    "jednaciCislo": "11 C 356/2022-17",
+    "soud": "Okresní soud Plzeň-jih",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPJ:2023:11.C.356.2022.1",
+    "predmetRizeni": "O zaplacení 15 000 Kč s příslušenstvím",
+    "datumVydani": "2023-01-12",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o zápůjčce"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/4836a66f-270b-4ad7-b047-5d05ec706206"
+   },
+   {
+    "jednaciCislo": "12 C 304/2022-34",
+    "soud": "Okresní soud v Novém Jičíně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSNJ:2023:12.C.304.2022.1",
+    "predmetRizeni": "O zaplacení 13 939,78 Kč s příslušenstvím",
+    "datumVydani": "2023-01-10",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "elektronický podpis",
+     "peněžité plnění",
+     "smlouva o úvěru",
+     "smlouva pracovní"
+    ],
+    "zminenaUstanoveni": [
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 87 z. č. 257/2016 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/a565cb00-611c-4125-aef0-be2b8b8e7d3b"
+   },
+   {
+    "jednaciCislo": "50 C 122/2022-40",
+    "soud": "Okresní soud v Mostě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSMO:2023:50.C.122.2022.2",
+    "predmetRizeni": "20 365,45 Kč s příslušenstvím",
+    "datumVydani": "2023-01-11",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§  z. č. 145/2010 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 2993 z. č. 89/2012 Sb.",
+     "§ 1 z. č. 257/2016 Sb.",
+     "§ 2 z. č. 110/2006 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/e08d15f3-1ac3-4af4-8949-a38049ed3009"
+   },
+   {
+    "jednaciCislo": "33 C 209/2022-49",
+    "soud": "Okresní soud Brno-Venkov",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSBI:2022:33.C.209.2022.2",
+    "predmetRizeni": "O zaplacení 12 500 Kč s příslušenstvím",
+    "datumVydani": "2022-12-07",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "elektronický podpis",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 46b z. č. 99/1963 Sb.",
+     "§ 118a z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 1820 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/ab83d04c-bbd1-469b-aff1-88b2c6f6b794"
+   },
+   {
+    "jednaciCislo": "17 C 201/2022-52",
+    "soud": "Okresní soud v Pardubicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPU:2022:17.C.201.2022.2",
+    "predmetRizeni": "o zaplacení 6 598 Kč s příslušenstvím",
+    "datumVydani": "2022-12-19",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 15 z. č. 168/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/199e569b-040c-4181-a39f-9e616882befc"
+   },
+   {
+    "jednaciCislo": "11 C 393/2022-34",
+    "soud": "Okresní soud Plzeň-jih",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPJ:2023:11.C.393.2022.1",
+    "predmetRizeni": "O zaplacení 44 783 Kč s příslušenstvím",
+    "datumVydani": "2023-01-12",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§  vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/9e788cf0-18ac-41d2-af6d-b9ab987d646b"
+   },
+   {
+    "jednaciCislo": "59 C 66/2022-121",
+    "soud": "Okresní soud v Ostravě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSOV:2023:59.C.66.2022.2",
+    "predmetRizeni": "o zaplacení 20 369,47 Kč s příslušenstvím",
+    "datumVydani": "2023-01-24",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 2993 z. č. 89/2012 Sb.",
+     "§ 573 z. č. 89/2012 Sb.",
+     "§ 142a z. č. 99/1963 Sb.",
+     "§ 14 vyhl. č. 177/1996 Sb.",
+     "§ 146 z. č. 99/1963 Sb.",
+     "§  z. č. 257/2016 Sb.",
+     "§ 2395a z. č. 89/2012 Sb.",
+     "§  vyhl. č. 511/2021 Sb.",
+     "§  vyhl. č. 467/2022 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/00a2ae3e-6f23-4a44-8475-f31648342957"
+   },
+   {
+    "jednaciCislo": "7 C 288/2022-26",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2022:7.C.288.2022.1",
+    "predmetRizeni": "zaplacení částky 8 165 Kč s příslušenstvím - příspěvek",
+    "datumVydani": "2022-12-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 3 z. č. 168/1999 Sb.",
+     "§  vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/4eeeb84c-498e-4574-8caa-10c18960e9e8"
+   },
+   {
+    "jednaciCislo": "48 C 178/2022-19",
+    "soud": "Okresní soud v Mostě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSMO:2023:48.C.178.2022.3",
+    "predmetRizeni": "[částka] s příslušenstvím",
+    "datumVydani": "2023-02-08",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "insolvence",
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§  z. č. 145/2010 Sb.",
+     "§  z. č. 120/2001 Sb.",
+     "§  z. č. 110/2006 Sb.",
+     "§ 1 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/301d367a-0514-4c20-bf81-3642a6df7b1d"
+   },
+   {
+    "jednaciCislo": "18 C 14/2023-22",
+    "soud": "Okresní soud v Karviné",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKI:2023:18.C.14.2023.1",
+    "predmetRizeni": "rozvod",
+    "datumVydani": "2023-03-03",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "rozvod manželství"
+    ],
+    "zminenaUstanoveni": [
+     "§ 755 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/159d6c65-6957-4093-a428-471235ea0bb6"
+   },
+   {
+    "jednaciCislo": "46 C 133/2021-106",
+    "soud": "Obvodní soud pro Prahu 2",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH02:2022:46.C.133.2021.8",
+    "predmetRizeni": "",
+    "datumVydani": "2022-05-13",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 204 z. č. 99/1963 Sb.",
+     "§ 164 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/1871b26a-690f-4821-aab1-ba8528c048cf"
+   },
+   {
+    "jednaciCislo": "17 C 297/2022-29",
+    "soud": "Okresní soud v Kroměříži",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKM:2023:17.C.297.2022.3",
+    "predmetRizeni": "zaplacení 5 188 Kč s příslušenstvím",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/b96ff34a-d64d-4df9-849b-f46d0316f221"
+   },
+   {
+    "jednaciCislo": "11 C 41/2015-92",
+    "soud": "Okresní soud ve Znojmě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSZN:2022:11.C.41.2015.1",
+    "predmetRizeni": "122.628 Kč s přísl.",
+    "datumVydani": "2022-04-25",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 2 z. č. 549/1991 Sb.",
+     "§ 2 vyhl. č. 254/2015 Sb.",
+     "§ 420 z. č. 89/2012 Sb.",
+     "§ 145 z. č. 40/2009 Sb.",
+     "§ 13 z. č. 89/2012 Sb.",
+     "§ 358 z. č. 40/2009 Sb.",
+     "§ 415 z. č. 89/2012 Sb.",
+     "§ 424 z. č. 40/1964 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/9cd4c5f4-8661-4618-98ad-61ddd68e7c5c"
+   },
+   {
+    "jednaciCislo": "23 C 88/2012-783",
+    "soud": "Krajský soud v Ostravě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:KSOS:2021:23.C.88.2012 .1",
+    "predmetRizeni": "o ochranu osobnosti s náhradou nemajetkové újmy v penězích",
+    "datumVydani": "2021-09-01",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "duševní porucha",
+     "náhrada nemajetkové újmy",
+     "nemajetková újma",
+     "ochrana osobnosti",
+     "peněžité plnění",
+     "pracovní úraz",
+     "zadostiučinění / satisfakce",
+     "znalecký posudek",
+     "ztížení společenského uplatnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 3028 z. č. 89/2012 Sb.",
+     "§ 95 z. č. 99/1963 Sb.",
+     "§ 7 vyhl. č. 177/96 Sb.",
+     "§ 13 z. č. 89/2012 Sb.",
+     "§ 3 z. č. 89/2012 Sb.",
+     "§ 101 z. č. 89/2012 Sb.",
+     "§ 444 z. č. 89/2012 Sb.",
+     "§ 13 z. č. 40/1964 Sb.",
+     "§ 9 z. č. 220/1991 Sb.",
+     "§ 11 z. č. 40/64 Sb.",
+     "§ 11 z. č. 40/1964 Sb.",
+     "§ 113 z. č. 89/2012 Sb.",
+     "§ 3 vyhl. č. 440/2001 Sb.",
+     "§ 55 z. č. 20/1966 Sb.",
+     "§ 211a z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/b1f1edbc-3d5f-48a6-9d60-7b1942564d39"
+   },
+   {
+    "jednaciCislo": "14 C 72/2022-39",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:14.C.72.2022.1",
+    "predmetRizeni": "zaplacení 12 690 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-10-27",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru",
+     "smluvní pokuta"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§  z. č. 145/2010 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§  z. č. 110/2006 Sb.",
+     "§ 419 z. č. 89/2012 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/3fd56603-6bec-4bf8-b616-8348c2fb9efe"
+   },
+   {
+    "jednaciCislo": "46 C 211/2022-39",
+    "soud": "Obvodní soud pro Prahu 10",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH10:2022:46.C.211.2022.1",
+    "predmetRizeni": "O 16 000 Kč s příslušenstvím",
+    "datumVydani": "2022-12-15",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 1880 z. č. 89/2012 Sb.",
+     "§ 2399 z. č. 89/2012 Sb.",
+     "§ 2396 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/3414ed35-a8a9-4af4-8536-2b662f09c58f"
+   },
+   {
+    "jednaciCislo": "21 C 273/2022-21",
+    "soud": "Okresní soud v Chomutově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSCV:2023:21.C.273.2022.2",
+    "predmetRizeni": "zaplacení 19 567,73 Kč s příslušenstvím (odběr elektřiny a plynu)",
+    "datumVydani": "2023-01-05",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "dodávky energie",
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 50 z. č. 458/2000 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/455cc4c2-3451-4723-bdc7-294be832abb6"
+   },
+   {
+    "jednaciCislo": "62 C 369/2022-49",
+    "soud": "Okresní soud v Ostravě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSOV:2023:62.C.369.2022.3",
+    "predmetRizeni": "o vydání věci",
+    "datumVydani": "2023-01-10",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 1040 z. č. 89/2012 Sb.",
+     "§ 71 z. č. 458/2000 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/a38eebad-3a86-4e94-b511-b083b2d2e263"
+   },
+   {
+    "jednaciCislo": "15 C 388/2022-16",
+    "soud": "Okresní soud v Náchodě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSNA:2023:15.C.388.2022.3",
+    "predmetRizeni": "o zaplacení 74 236,59 Kč s příslušenstvím (úvěr)",
+    "datumVydani": "2023-01-30",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§  vyhl. č. 254/2015 Sb.",
+     "§ 2395 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8d54d1f4-4e49-4960-b080-419cb752b14a"
+   },
+   {
+    "jednaciCislo": "7 C 321/2022-28",
+    "soud": "Okresní soud v Třebíči",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSTR:2023:7.C.321.2022.1",
+    "predmetRizeni": "zaplacení částky 4 384 Kč s příslušenstvím",
+    "datumVydani": "2023-02-08",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "konkurs",
+     "peněžité plnění",
+     "poplatky rozhlasové a televizní",
+     "rozhodnutí o úpadku"
+    ],
+    "zminenaUstanoveni": [
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 7 vyhl. č. 177/1996 Sb.",
+     "§ 7 z. č. 348/2005 Sb.",
+     "§ 150 z. č. 99/1963 Sb.",
+     "§ 140c z. č. 182/2006 Sb.",
+     "§ 246 z. č. 182/2006 Sb.",
+     "§ 168 z. č. 182/2006 Sb.",
+     "§ 229 z. č. 182/2006 Sb.",
+     "§ 203 z. č. 182/2006 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/91160d8e-ef0c-473b-be79-e47d5a9eb26e"
+   },
+   {
+    "jednaciCislo": "48 C 183/2022-22",
+    "soud": "Okresní soud v Mostě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSMO:2023:48.C.183.2022.3",
+    "predmetRizeni": "[částka] s příslušenstvím",
+    "datumVydani": "2023-02-08",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "insolvence",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 7 vyhl. č. 177/1996 Sb.",
+     "§  z. č. 145/2010 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§  z. č. 120/2001 Sb.",
+     "§  z. č. 110/2006 Sb.",
+     "§ 1880 z. č. 89/2012 Sb.",
+     "§ 1 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/575b0580-0055-4598-bcee-e31418176465"
+   },
+   {
+    "jednaciCislo": "17 C 291/2022",
+    "soud": "Okresní soud v Kroměříži",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKM:2023:17.C.291.2022.1",
+    "predmetRizeni": "zaplacení 2.500 Kč s příslušenstvím",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2053 z. č. 89/2012 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb.",
+     "§ 89a z. č. 373/2011 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/084cec8d-8498-4f5c-80c4-5a589d431695"
+   },
+   {
+    "jednaciCislo": "11 CO 310/2022-195",
+    "soud": "Krajský soud v Ostravě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:KSOS:2023:11.Co.310.2022.1",
+    "predmetRizeni": "",
+    "datumVydani": "2023-02-14",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "držba",
+     "peněžité plnění",
+     "prekluze",
+     "služebnost",
+     "spoluvlastnictví",
+     "věcná břemena"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 12 vyhl. č. 177/1996 Sb.",
+     "§ 220 z. č. 99/1963 Sb.",
+     "§ 1003 z. č. 89/2012 Sb.",
+     "§ 1008 z. č. 89/2012 Sb.",
+     "§ 177 z. č. 99/1963 Sb.",
+     "§ 178 z. č. 99/1963 Sb.",
+     "§ 214 z. č. 99/1963 Sb.",
+     "§ 238 z. č. 99/1963 Sb.",
+     "§  vyhl. č. 467/2022 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/24476746-5dc6-42de-81d5-bb5d5cba6017"
+   },
+   {
+    "jednaciCislo": "7 C 24/2022-67",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2022:7.C.24.2022.1",
+    "predmetRizeni": "zaplacení částky 8 817 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-09-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "smlouva o úvěru",
+     "zastavení řízení"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 96 z. č. 99/1963 Sb.",
+     "§  z. č. 257/2016 Sb.",
+     "§ 172 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/7691da9c-1747-41d6-b3c0-86f1f9270e11"
+   },
+   {
+    "jednaciCislo": "14 C 221/2021-26",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:14.C.221.2021.1",
+    "predmetRizeni": "zaplacení 51 874,19 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-10-27",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru",
+     "smluvní pokuta"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§  z. č. 145/2010 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§  z. č. 110/2006 Sb.",
+     "§ 419 z. č. 89/2012 Sb.",
+     "§ 146 z. č. 99/1963 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/4ef328f0-66cd-4a2d-b094-489cf2d78f6b"
+   },
+   {
+    "jednaciCislo": "9 C 220/2022-36",
+    "soud": "Okresní soud ve Znojmě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSZN:2022:9.C.220.2022.1",
+    "predmetRizeni": "11 230 Kč s příslušenstvím",
+    "datumVydani": "2022-12-05",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1746 z. č. 89/2012 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/0d9d55ce-502d-4eba-b205-22d9ffe20c87"
+   },
+   {
+    "jednaciCislo": "7 C 312/2022-26",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2022:7.C.312.2022.1",
+    "predmetRizeni": "zaplacení částky 4 000 Kč s příslušenstvím - náhrada nákladů",
+    "datumVydani": "2022-12-29",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 2 vyhl. č. 254/2015 Sb.",
+     "§ 89e z. č. 373/2011 Sb.",
+     "§ 17 z. č. 379/2005 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/70914218-fe80-4131-a23c-2d8e04e07723"
+   },
+   {
+    "jednaciCislo": "35 C 10/2022-19",
+    "soud": "Obvodní soud pro Prahu 1",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH01:2023:35.C.10.2022.1",
+    "predmetRizeni": "o zaplacení 125 000 Kč s příslušenstvím",
+    "datumVydani": "2023-01-03",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva kupní"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2079 z. č. 89/2012 Sb.",
+     "§ 513 z. č. 89/2012 Sb.",
+     "§ 1931 z. č. 89/2012 Sb.",
+     "§ 2 vyhl. č. 254/2015 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/e7250443-5809-46e9-9569-c57ae5a7e1e9"
+   },
+   {
+    "jednaciCislo": "36 C 254/2022-17",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:36.C.254.2022.1",
+    "predmetRizeni": "zaplacení 26 154 Kč s příslušenstvím - příspěvek za nepojištěné vozidlo",
+    "datumVydani": "2022-12-28",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§  z. č. 168/1999 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/019e3305-318a-4c62-aa0b-e24bda4a609a"
+   },
+   {
+    "jednaciCislo": "9 C 281/2022-21",
+    "soud": "Okresní soud v Jablonci nad Nisou",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSJN:2023:9.C.281.2022.1",
+    "predmetRizeni": "o zaplacení 10 885 Kč s příslušenstvím",
+    "datumVydani": "2023-02-03",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 15 z. č. 168/1999 Sb.",
+     "§ 1968 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/1b75beab-b6a5-43e4-b496-937285877cf5"
+   },
+   {
+    "jednaciCislo": "46 C 259/2022-23",
+    "soud": "Obvodní soud pro Prahu 10",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH10:2023:46.C.259.2022.1",
+    "predmetRizeni": "O 3 645 Kč s příslušenstvím",
+    "datumVydani": "2023-01-19",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 46b z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 2758 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§ 2782 z. č. 89/2012 Sb.",
+     "§ 1880 z. č. 89/2012 Sb.",
+     "§ 153 z. č. 99/1963 Sb.",
+     "§ 2775 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/b080324c-390c-43f5-9630-e23c3b57658c"
+   },
+   {
+    "jednaciCislo": "11 C 11/2023-18",
+    "soud": "Okresní soud v Děčíně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSDC:2023:11.C.11.2023.1",
+    "predmetRizeni": "O zaplacení 15 048 Kč s příslušenstvím",
+    "datumVydani": "2023-01-31",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "ručení"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§  vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/3cf5ee3e-a27e-4f2b-a6e5-a980bb02bb76"
+   },
+   {
+    "jednaciCislo": "7 C 67/2022-29",
+    "soud": "Okresní soud ve Svitavách",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSSY:2023:7.C.67.2022.1",
+    "predmetRizeni": "o vyklizení nebytového prostoru",
+    "datumVydani": "2023-01-10",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "dlužné nájemné",
+     "nebytový prostor",
+     "peněžité plnění",
+     "smlouva nájemní",
+     "výpověď z nájmu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§ 2291 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/ea3c9dc6-0b9e-480d-8fed-5504d2a140a3"
+   },
+   {
+    "jednaciCislo": "21 C 327/2022-22",
+    "soud": "Obvodní soud pro Prahu 10",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH10:2023:21.C.327.2022.1",
+    "predmetRizeni": "O [částka] s příslušenstvím",
+    "datumVydani": "2023-01-06",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru",
+     "smlouva o zápůjčce"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 46b z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 1810 z. č. 89/2012 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§  z. č. 145/2010 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 420 z. č. 89/2012 Sb.",
+     "§ 419 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/c6331bb4-f68b-451a-8fd9-692a20afeee6"
+   },
+   {
+    "jednaciCislo": "7 C 97/2022-22",
+    "soud": "Okresní soud ve Žďáru nad Sázavou",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSZR:2023:7.C.97.2022.1",
+    "predmetRizeni": "O zaplacení 12 482 Kč s příslušenstvím",
+    "datumVydani": "2023-01-30",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 2395 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/bacd8480-5a52-4e21-87b4-8faca5cc6e22"
+   },
+   {
+    "jednaciCislo": "117 C 434/2022-32",
+    "soud": "Okresní soud v Karviné, pobočka Havířov",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKIHA:2023:117.C.434.2022.1",
+    "predmetRizeni": "14 400 Kč s příslušenstvím",
+    "datumVydani": "2023-02-07",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 118 z. č. 99/1963 Sb.",
+     "§ 573 z. č. 89/2012 Sb.",
+     "§ 562,2395 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/5494f72f-c7df-44a6-b849-8537402fa098"
+   },
+   {
+    "jednaciCislo": "12 C 158/2022-31",
+    "soud": "Okresní soud v Kroměříži",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKM:2023:12.C.158.2022.7",
+    "predmetRizeni": "zaplacení 810 Kč s příslušenstvím",
+    "datumVydani": "2023-03-03",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "poplatky rozhlasové a televizní"
+    ],
+    "zminenaUstanoveni": [
+     "§ 3 z. č. 348/2005 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 513 z. č. 89/2012 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 6 z. č. 348/2005 Sb.",
+     "§ 7 z. č. 348/2005 Sb.",
+     "§ 2 vyhl. č. 254/2015 Sb.",
+     "§ 5 z. č. 348/2005 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/5009d156-5209-4162-96e5-9e3c65e5d219"
+   },
+   {
+    "jednaciCislo": "112 C 388/2022-97",
+    "soud": "Okresní soud v Karviné, pobočka Havířov",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKIHA:2023:112.C.388.2022.1",
+    "predmetRizeni": "16 533,63 Kč s příslušenstvím",
+    "datumVydani": "2023-01-16",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 118a z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb.",
+     "§ 573 z. č. 89/2012 Sb.",
+     "§ 86,87 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/c92a4cb3-d57c-44ac-b098-8ecf79d75be1"
+   },
+   {
+    "jednaciCislo": "50 C 121/2022-41",
+    "soud": "Okresní soud v Mostě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSMO:2023:50.C.121.2022.2",
+    "predmetRizeni": "14 556,51 Kč s příslušenstvím",
+    "datumVydani": "2023-01-11",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva nájemní",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§  z. č. 145/2010 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§  z. č. 110/2006 Sb.",
+     "§ 1 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/fe0f399b-bb78-439a-ad34-cee21e3b5989"
+   },
+   {
+    "jednaciCislo": "7 C 42/2022-79",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2022:7.C.42.2022.1",
+    "predmetRizeni": "zaplacení částky 164 566,81 Kč s příslušenstvím - půjčka",
+    "datumVydani": "2022-09-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§  vyhl. č. 177/1996 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§ 2392 z. č. 89/2012 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8c384960-4a07-44e8-bffd-a27ec7e7e344"
+   },
+   {
+    "jednaciCislo": "8 C 103/2022-50",
+    "soud": "Okresní soud v Rakovníku",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSRA:2022:8.C.103.2022.1",
+    "predmetRizeni": "o zaplacení 506 960,12 Kč s příslušenstvím",
+    "datumVydani": "2022-08-31",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§  vyhl. č. 254/2015 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 142a z. č. 99/1963 Sb.",
+     "§ 580 z. č. 89/2012 Sb.",
+     "§  z. č. 257/2016 Sb.",
+     "§ 2399 z. č. 89/2012 Sb.",
+     "§ 3016 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/3f8dd94e-eebf-4874-aae3-8c89361169ff"
+   },
+   {
+    "jednaciCislo": "48 C 93/2022-27",
+    "soud": "Obvodní soud pro Prahu 2",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH02:2022:48.C.93.2022.3",
+    "predmetRizeni": "o zaplacení 4 499,60 Kč",
+    "datumVydani": "2022-11-18",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 63 z. č. 127/2005 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/2948e38a-571c-45e3-803b-908ba0c931a2"
+   },
+   {
+    "jednaciCislo": "48 C 142/2022-23",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:48.C.142.2022.1",
+    "predmetRizeni": "zaplacení 11 300 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-10-19",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru",
+     "smluvní pokuta"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 580 z. č. 89/2012 Sb.",
+     "§ 1903 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/4cc1a6d5-63ab-4600-807b-ba88e8321d4a"
+   },
+   {
+    "jednaciCislo": "20 C 420/2022",
+    "soud": "Okresní soud v Litoměřicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSLT:2023:20.C.420.2022.1",
+    "predmetRizeni": "O zaplacení 17 525 Kč s příslušenstvím",
+    "datumVydani": "2023-01-25",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu",
+     "ručení"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 7 vyhl. č. 177/1996 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 513 z. č. 89/2012 Sb.",
+     "§ 118a z. č. 99/1963 Sb.",
+     "§ 14 vyhl. č. 177/1996 Sb.",
+     "§ 132 z. č. 99/1963 Sb.",
+     "§ 114c z. č. 99/1963 Sb.",
+     "§ 151od z. č. 99/1963 Sb.",
+     "§ 4 vyhl. č. 467/2022 Sb.",
+     "§ 1 vyhl. č. 467/2022 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/fc696b98-902d-438f-a4ff-6fec70d71a44"
+   },
+   {
+    "jednaciCislo": "21 C 230/2022-32",
+    "soud": "Okresní soud v Chomutově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSCV:2023:21.C.230.2022.2",
+    "predmetRizeni": "zaplacení 12 359 Kč s příslušenstvím (příspěvek nepojištěného)",
+    "datumVydani": "2023-01-05",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "ručení",
+     "smlouva kupní"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/55c2c71d-1f96-4ead-9875-4cb6aa5e0008"
+   },
+   {
+    "jednaciCislo": "19 C 23/2022-29",
+    "soud": "Obvodní soud pro Prahu 2",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH02:2022:19.C.23.2022.5",
+    "predmetRizeni": "o zaplacení 72 562 Kč s příslušenstvím",
+    "datumVydani": "2022-09-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "místní příslušnost",
+     "nemajetková újma",
+     "peněžité plnění",
+     "rozsudek pro uznání",
+     "smlouva o dílo",
+     "věcná příslušnost",
+     "zadostiučinění / satisfakce",
+     "zastavení řízení"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 1 z. č. 82/98 Sb.",
+     "§  vyhl. č. 284/2015 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/121035af-4355-4ae3-a9a2-13c4c1ccf1c4"
+   },
+   {
+    "jednaciCislo": "9 C 282/2022-20",
+    "soud": "Okresní soud v Jablonci nad Nisou",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSJN:2023:9.C.282.2022.1",
+    "predmetRizeni": "o zaplacení 12 325 Kč s příslušenstvím",
+    "datumVydani": "2023-02-03",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 15 z. č. 168/1999 Sb.",
+     "§ 1968 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/fc11ca57-6720-4093-a549-b13c3f5d607e"
+   },
+   {
+    "jednaciCislo": "11 C 315/2022-73",
+    "soud": "Okresní soud v Olomouci",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSOL:2023:11.C.315.2022.1",
+    "predmetRizeni": "o 30 564 Kč s příslušenstvím",
+    "datumVydani": "2023-01-30",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu",
+     "smlouva kupní"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§  z. č. 168/1999 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/88dd59af-f758-483c-bea1-b5adb7d80f87"
+   },
+   {
+    "jednaciCislo": "7 C 302/2022-34",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2022:7.C.302.2022.1",
+    "predmetRizeni": "zaplacení částky 5 045 Kč s příslušenstvím - příspěvek",
+    "datumVydani": "2022-12-29",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 3 z. č. 168/1999 Sb.",
+     "§  vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8eab3f71-6622-4b78-965d-c955c913a917"
+   },
+   {
+    "jednaciCislo": "20 C 356/2022-40",
+    "soud": "Okresní soud v Teplicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSTP:2023:20.C.356.2022.2",
+    "predmetRizeni": "zaplacení 4 718 Kč s příslušenstvím",
+    "datumVydani": "2023-02-01",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu",
+     "prekluze",
+     "smlouva kupní"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 15 z. č. 168/1999 Sb.",
+     "§  vyhl. č. 205/1999 Sb.",
+     "§ 2 vyhl. č. 254/2015 Sb.",
+     "§ 142a z. č. 99/1963 Sb.",
+     "§ 18 z. č. 168/1999 Sb.",
+     "§ 10b z. č. 133/2000 Sb.",
+     "§ 11 z. č. 56/2001 Sb.",
+     "§ 6 z. č. 500/2004 Sb.",
+     "§ 51 z. č. 111/2009 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/72555c1b-c21b-40cf-9b8b-37d70f458467"
+   },
+   {
+    "jednaciCislo": "19 C 340/2022-57",
+    "soud": "Okresní soud v Děčíně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSDC:2023:19.C.340.2022.1",
+    "predmetRizeni": "O zaplacení 111 500 Kč s příslušenstvím",
+    "datumVydani": "2023-01-31",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 14 vyhl. č. 177/1996 Sb.",
+     "§ 122 z. č. 257/2016 Sb.",
+     "§ 2662 z. č. 89/2012 Sb.",
+     "§  vyhl. č. 467/2022 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8def9e03-d227-48f4-818b-47d9dae4f270"
+   },
+   {
+    "jednaciCislo": "11 C 452/2022-21",
+    "soud": "Okresní soud v Děčíně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSDC:2023:11.C.452.2022.1",
+    "predmetRizeni": "O zaplacení 33 178,04 Kč s příslušenstvím",
+    "datumVydani": "2023-01-18",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "dodávky energie",
+     "odstoupení od smlouvy",
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 2048 z. č. 89/2012 Sb.",
+     "§  z. č. 458/2000 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8c06843e-24a2-49f7-b9b7-9119dac90101"
+   },
+   {
+    "jednaciCislo": "17 C 319/2022-32",
+    "soud": "Okresní soud v Kroměříži",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKM:2023:17.C.319.2022.3",
+    "predmetRizeni": "zaplacení 4 483 Kč s příslušenstvím",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/b35a7b64-dff3-4723-85e9-fdf6c99be3ba"
+   },
+   {
+    "jednaciCislo": "4 C 434/2022-43",
+    "soud": "Okresní soud v Tachově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSTC:2023:4.C.434.2022.1",
+    "predmetRizeni": "O zaplacení 2 069 Kč s příslušenstvím",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "jízdné",
+     "peněžité plnění",
+     "postoupení pohledávky"
+    ],
+    "zminenaUstanoveni": [
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 37 z. č. 266/1994 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2550 z. č. 89/2012 Sb.",
+     "§  vyhl. č. 175/2000 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 7 vyhl. č. 177/1996 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 120 z. č. 99/1963 Sb.",
+     "§ 1880 z. č. 89/2012 Sb.",
+     "§ 114a z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/1df4921d-f411-4f00-8249-256f4726b5f8"
+   },
+   {
+    "jednaciCislo": "46 C 354/2022-18",
+    "soud": "Obvodní soud pro Prahu 10",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH10:2023:46.C.354.2022.1",
+    "predmetRizeni": "O 2 445 Kč s příslušenstvím",
+    "datumVydani": "2023-01-26",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 46b z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/de5691a5-d08e-41c4-848c-636c119038d3"
+   },
+   {
+    "jednaciCislo": "17 C 312/2022-66",
+    "soud": "Okresní soud v Kroměříži",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKM:2023:17.C.312.2022.4",
+    "predmetRizeni": "zaplacení 6 145 Kč s příslušenstvím",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/a2b62104-d9a5-459c-8943-e00633d11109"
+   },
+   {
+    "jednaciCislo": "10 C 40/2022-21",
+    "soud": "Okresní soud v Tachově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSTC:2022:10.C.40.2022.1",
+    "predmetRizeni": "rozvod manželství",
+    "datumVydani": "2022-11-30",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "převod nemovitostí",
+     "rozvod manželství",
+     "společné jmění manželů",
+     "výživné"
+    ],
+    "zminenaUstanoveni": [
+     "§ 23 z. č. 292/2013 Sb.",
+     "§ 757 z. č. 89/2012 Sb.",
+     "§ 755 z. č. 89/2012 Sb.",
+     "§ 758 z. č. 89/2012 Sb.",
+     "§ 687 z. č. 89/2012 Sb.",
+     "§ 11 z. č. 269/2021 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8dcca1ac-2d51-4536-ac3f-3181ff240290"
+   },
+   {
+    "jednaciCislo": "106 C 261/2022-85",
+    "soud": "Okresní soud v Karviné, pobočka Havířov",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSKIHA:2023:106.C.261.2022.1",
+    "predmetRizeni": "",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [],
+    "zminenaUstanoveni": [
+     "§ 164 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/cbe952fd-0573-4fad-b458-b3f13a82533b"
+   },
+   {
+    "jednaciCislo": "17 C 208/2022-21",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:17.C.208.2022.1",
+    "predmetRizeni": "zaplacení 27 553 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-12-21",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2048 z. č. 89/2012 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 87 z. č. 257/2016 Sb.",
+     "§ 86 z. č. 257/2016 Sb.",
+     "§ 2395 z. č. 257/2016 Sb.",
+     "§ 1970 nař. vl. č. 351/2015 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/40aef68f-a5bc-48ab-9f0f-bf2ea97f3cdf"
+   },
+   {
+    "jednaciCislo": "36 C 328/2022-122",
+    "soud": "Okresní soud ve Zlíně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSZL:2023:36.C.328.2022.1",
+    "predmetRizeni": "zaplacení 224 879,61 Kč s příslušenstvím",
+    "datumVydani": "2023-01-18",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "insolvence",
+     "neplatnost právního jednání",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 87 z. č. 257/2016 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 2993 z. č. 89/2012 Sb.",
+     "§ 86 z. č. 257/2016 Sb.",
+     "§ 586 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/4b8ce8cb-8833-4331-bf90-c18b8612d550"
+   },
+   {
+    "jednaciCislo": "31 C 311/2022-33",
+    "soud": "Okresní soud Plzeň-město",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPM:2023:31.C.311.2022.1",
+    "predmetRizeni": "O zaplacení 21 440 Kč s příslušenstvím",
+    "datumVydani": "2023-01-05",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 142a z. č. 99/1963 Sb.",
+     "§ 173 z. č. 99/1963 Sb.",
+     "§ 174a z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/825fc2f2-e230-4823-966c-5bb48a25e89c"
+   },
+   {
+    "jednaciCislo": "46 C 242/2022-60",
+    "soud": "Obvodní soud pro Prahu 10",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH10:2023:46.C.242.2022.1",
+    "predmetRizeni": "O 16 893,28 Kč s příslušenstvím",
+    "datumVydani": "2023-01-19",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva kupní"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 46b z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2079 z. č. 89/2012 Sb.",
+     "§ 63 z. č. 127/2005 Sb.",
+     "§ 1998 z. č. 89/2012 Sb.",
+     "§ 129 z. č. 127/2005 Sb.",
+     "§ 2005 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/ad22687a-36e6-4c87-ae2d-7285247f934c"
+   },
+   {
+    "jednaciCislo": "20 C 272/2022-29",
+    "soud": "Okresní soud v Pardubicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPU:2022:20.C.272.2022.1",
+    "predmetRizeni": "o zaplacení 2 021 Kč s příslušenstvím",
+    "datumVydani": "2022-11-08",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 15 z. č. 168/1999 Sb.",
+     "§ 49 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8c884e33-17a2-41e2-a932-daa3834936f3"
+   },
+   {
+    "jednaciCislo": "46 C 281/2022-20",
+    "soud": "Obvodní soud pro Prahu 10",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH10:2022:46.C.281.2022.1",
+    "predmetRizeni": "O 3 590 Kč s příslušenstvím",
+    "datumVydani": "2022-12-29",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 46b z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/a536b13d-a306-4e65-a7fc-25bbc16b325e"
+   },
+   {
+    "jednaciCislo": "7 C 240/2022",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2023:7.C.240.2022.1",
+    "predmetRizeni": "zaplacení částky 23.993,73 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2023-02-07",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§  vyhl. č. 177/1996 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 120 z. č. 99/1963 Sb.",
+     "§ 96 z. č. 99/1963 Sb.",
+     "§  z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/7472a1aa-1524-4c83-953b-bf8d5af3ccac"
+   },
+   {
+    "jednaciCislo": "48 C 112/2022-57",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:48.C.112.2022.1",
+    "predmetRizeni": "zaplacení 19 714 Kč s příslušenstvím - půjčka",
+    "datumVydani": "2022-10-19",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o zápůjčce"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 1970 nař. vl. č. 351/2013 Sb.",
+     "§ 1813 z. č. 89/2012 Sb.",
+     "§ 573 z. č. 89/2012 Sb.",
+     "§ 1958 z. č. 89/2012 Sb.",
+     "§ 9 z. č. 145/2010 Sb.",
+     "§ 580 z. č. 89/2012 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/ebcbec13-fb1f-4f0c-b5d0-6b8a74279766"
+   },
+   {
+    "jednaciCislo": "17 C 202/2022-22",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:17.C.202.2022.1",
+    "predmetRizeni": "zaplacení 25 965,75 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-11-09",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru",
+     "smluvní pokuta"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1879 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2048 z. č. 89/2012 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 419 z. č. 89/2012 Sb.",
+     "§ 86 z. č. 257/2016 Sb.",
+     "§ 1721 z. č. 89/2012 Sb.",
+     "§ 421 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/7ff27422-637e-4bf3-b5da-64be6aafcf66"
+   },
+   {
+    "jednaciCislo": "20 C 132/2022-39",
+    "soud": "Okresní soud v Pardubicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPU:2022:20.C.132.2022.1",
+    "predmetRizeni": "o zaplacení 10 780 Kč s příslušenstvím",
+    "datumVydani": "2022-11-01",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "insolvence",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru",
+     "smlouva o zápůjčce",
+     "smlouva pracovní"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§ 87 z. č. 257/2016 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 49 z. č. 99/1963 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/e3e0ea68-d6c0-4e75-84c8-5a2ed7df5342"
+   },
+   {
+    "jednaciCislo": "7 C 163/2022-88",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2023:7.C.163.2022.1",
+    "predmetRizeni": "zaplacení částky 11.841 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2023-01-19",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/c4a4d25f-14ca-4390-ba5b-09e3ee361cd9"
+   },
+   {
+    "jednaciCislo": "7 C 121/2022-48",
+    "soud": "Okresní soud ve Vyškově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSVY:2022:7.C.121.2022.1",
+    "predmetRizeni": "zaplacení částky 17 270,25 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-12-15",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 11 vyhl. č. 177/1996 Sb.",
+     "§  z. č. 549/1991 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§  z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8cadb7eb-d1f5-4ba9-9c09-2f317e20f86b"
+   },
+   {
+    "jednaciCislo": "10 C 298/2022-131",
+    "soud": "Okresní soud v Pardubicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPU:2022:10.C.298.2022.2",
+    "predmetRizeni": "o zaplacení 456 699,90 Kč s příslušenstvím",
+    "datumVydani": "2022-12-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 1968 z. č. 89/2012 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 7 vyhl. č. 177/1996 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 142a z. č. 99/1963 Sb.",
+     "§ 49 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/2fe5e78c-d5af-4f43-8fb7-ca7efa5425b0"
+   },
+   {
+    "jednaciCislo": "48 C 149/2022-20",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:48.C.149.2022.1",
+    "predmetRizeni": "zaplacení 13 240 Kč s příslušenstvím - úvěr",
+    "datumVydani": "2022-11-09",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 2991 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§ 588 z. č. 89/2012 Sb.",
+     "§ 1813 z. č. 89/2012 Sb.",
+     "§ 580 z. č. 89/2012 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/c224371c-ec09-4aeb-a8f4-531e7b2ffa83"
+   },
+   {
+    "jednaciCislo": "46 C 325/2022-54",
+    "soud": "Okresní soud ve Zlíně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSZL:2022:46.C.325.2022.1",
+    "predmetRizeni": "nahrazení projevu vůle",
+    "datumVydani": "2022-12-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§  vyhl. č. 177/1996 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 1257 z. č. 89/2012 Sb.",
+     "§ 1267 z. č. 89/2012 Sb.",
+     "§ 1785 z. č. 89/2012 Sb.",
+     "§ 1786 z. č. 89/2012 Sb.",
+     "§ 1787 z. č. 89/2012 Sb.",
+     "§ 59 z. č. 458/2000 Sb.",
+     "§ 1262 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/19d12ed5-7ea7-4ca1-8806-af31843744c9"
+   },
+   {
+    "jednaciCislo": "17 C 415/2022-26",
+    "soud": "Okresní soud v Pardubicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPU:2023:17.C.415.2022.1",
+    "predmetRizeni": "o zaplacení 11 909 Kč s příslušenstvím",
+    "datumVydani": "2023-01-18",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 15 z. č. 168/1999 Sb.",
+     "§ 49 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/4274a3b7-025a-41fb-89d7-1cb8ac664837"
+   },
+   {
+    "jednaciCislo": "1 C 425/2022-39",
+    "soud": "Okresní soud v Lounech",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSLN:2023:1.C.425.2022.1",
+    "predmetRizeni": "O zaplacení 13 275 Kč s příslušenstvím",
+    "datumVydani": "2023-02-15",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 157 z. č. 99/1963 Sb.",
+     "§ 251 z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/b95301d4-54f7-4cb9-be90-d1d0e7bd7c80"
+   },
+   {
+    "jednaciCislo": "21 C 260/2022-29",
+    "soud": "Okresní soud v Chomutově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSCV:2023:21.C.260.2022.2",
+    "predmetRizeni": "zaplacení 40 000 Kč s příslušenstvím (úvěr)",
+    "datumVydani": "2023-01-12",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "řidičský průkaz",
+     "skončení pracovního poměru",
+     "smlouva nájemní",
+     "smlouva o úvěru",
+     "smlouva pracovní",
+     "výživné",
+     "vzájemné plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 151 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 2 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/014a1d1e-6a48-4f89-8acf-98fe6bd2f476"
+   },
+   {
+    "jednaciCislo": "6 C 310/2022-18",
+    "soud": "Okresní soud v Rokycanech",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSRO:2022:6.C.310.2022.1",
+    "predmetRizeni": "zaplacení 27 000 Kč s přísl.",
+    "datumVydani": "2022-12-16",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 2395 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/fe77ec3e-3ddf-4f5b-bb91-915a0b001a65"
+   },
+   {
+    "jednaciCislo": "8 C 205/2022-14",
+    "soud": "Okresní soud v Rokycanech",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSRO:2022:8.C.205.2022.1",
+    "predmetRizeni": "zaplacení 5 141 Kč s přísl.",
+    "datumVydani": "2022-12-29",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "ručení"
+    ],
+    "zminenaUstanoveni": [
+     "§ 4 z. č. 168/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/f651e413-0276-4139-baa7-c852866728a1"
+   },
+   {
+    "jednaciCislo": "30 C 376/2022-47",
+    "soud": "Okresní soud Plzeň-město",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPM:2022:30.C.376.2022.1",
+    "predmetRizeni": "O zaplacení 6 477,35 Kč s příslušenstvím",
+    "datumVydani": "2022-12-20",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o běžném účtu",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2048 z. č. 89/2012 Sb.",
+     "§ 142a z. č. 99/1963 Sb.",
+     "§ 45a z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/4d502568-1e74-44f8-9099-9602fc989154"
+   },
+   {
+    "jednaciCislo": "4 C 91/2020-163",
+    "soud": "Okresní soud v Chrudimi",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSCR:2023:4.C.91.2020.1",
+    "predmetRizeni": "o zrušení a vypořádání podílového vlastnictví",
+    "datumVydani": "2023-01-16",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "podílové spoluvlastnictví",
+     "spoluvlastnictví",
+     "znalecký posudek"
+    ],
+    "zminenaUstanoveni": [
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 148 z. č. 99/1963 Sb.",
+     "§ 1140 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/8cabfc0b-ce07-4924-94d3-a8816fe80fb7"
+   },
+   {
+    "jednaciCislo": "20 C 201/2022-30",
+    "soud": "Okresní soud v Jihlavě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSJI:2023:20.C.201.2022.1",
+    "predmetRizeni": "o rozvod manželství",
+    "datumVydani": "2023-01-09",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "rozvod manželství"
+    ],
+    "zminenaUstanoveni": [
+     "§ 23 z. č. 292/2013 Sb.",
+     "§ 755 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/3b7afb9e-0de1-4d9a-ac99-4aab3c9ff1b2"
+   },
+   {
+    "jednaciCislo": "20 C 149/2022-23",
+    "soud": "Okresní soud v Jihlavě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSJI:2023:20.C.149.2022.1",
+    "predmetRizeni": "o rozvod manželství",
+    "datumVydani": "2023-01-18",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "rozvod manželství"
+    ],
+    "zminenaUstanoveni": [
+     "§ 23 z. č. 292/2013 Sb.",
+     "§ 755 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/32e02952-8362-4a1f-bc07-26197c6a54fd"
+   },
+   {
+    "jednaciCislo": "31 C 419/2022-26",
+    "soud": "Okresní soud Plzeň-město",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPM:2023:31.C.419.2022.1",
+    "predmetRizeni": "O zaplacení 1 412 Kč s příslušenstvím",
+    "datumVydani": "2023-01-26",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 12 z. č. 168/1999 Sb.",
+     "§ 142a z. č. 99/1963 Sb.",
+     "§ 13 z. č. 168/1999 Sb.",
+     "§ 173 z. č. 99/1963 Sb.",
+     "§ 174a z. č. 99/1963 Sb.",
+     "§ 13 z. č. 1686/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/d37dfc22-dca7-425d-85fa-9f5085d7b9ec"
+   },
+   {
+    "jednaciCislo": "23 C 66/2022-39",
+    "soud": "Okresní soud ve Znojmě",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSZN:2023:23.C.66.2022.1",
+    "predmetRizeni": "68 813,64 Kč s příslušenstvím",
+    "datumVydani": "2023-02-07",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "bezdůvodné obohacení",
+     "smlouva o úvěru"
+    ],
+    "zminenaUstanoveni": [
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 118a z. č. 99/1963 Sb.",
+     "§ 2395 z. č. 89/2012 Sb.",
+     "§ 2993 z. č. 89/2012 Sb.",
+     "§ 580 z. č. 89/2012 Sb.",
+     "§ 86 z. č. 257/2016 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/dfe8e2e7-99f7-4c04-a10f-2266dee765c5"
+   },
+   {
+    "jednaciCislo": "25 C 432/2022-15",
+    "soud": "Okresní soud v Liberci",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSLI:2023:25.C.432.2022.1",
+    "predmetRizeni": "Rozvod manželství",
+    "datumVydani": "2023-03-14",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [],
+    "zminenaUstanoveni": [
+     "§ 23 z. č. 292/2013 Sb.",
+     "§ 755 z. č. 89/2012 Sb.",
+     "§ 758 z. č. 89/2012 Sb.",
+     "§  z. č. 99/1963 Sb.",
+     "§ 11 z. č. 269/2021 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/5268b97d-b87f-4e4d-b437-b7725359b6e7"
+   },
+   {
+    "jednaciCislo": "46 C 280/2022-19",
+    "soud": "Obvodní soud pro Prahu 10",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPH10:2022:46.C.280.2022.1",
+    "predmetRizeni": "O 1 860 Kč s příslušenstvím",
+    "datumVydani": "2022-12-29",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 46b z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/b8055a21-e58a-4a97-9325-f69e7c88d050"
+   },
+   {
+    "jednaciCislo": "31 C 347/2022-30",
+    "soud": "Okresní soud Plzeň-město",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPM:2023:31.C.347.2022.1",
+    "predmetRizeni": "O zaplacení 1 695 Kč s příslušenstvím",
+    "datumVydani": "2023-01-30",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 142a z. č. 99/1963 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/2ee145c2-227a-456d-8b97-c8220b76ccaf"
+   },
+   {
+    "jednaciCislo": "14 C 154/2022-30",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2022:14.C.154.2022.1",
+    "predmetRizeni": "zaplacení 17 160 Kč s příslušenstvím - příspěvek za nepojištěné vozidlo",
+    "datumVydani": "2022-10-25",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/43691e45-0798-47c3-bece-2a9b301fb228"
+   },
+   {
+    "jednaciCislo": "20 C 307/2022-21",
+    "soud": "Okresní soud v Pardubicích",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSPU:2022:20.C.307.2022.1",
+    "predmetRizeni": "o zaplacení 15 960 Kč s příslušenstvím",
+    "datumVydani": "2022-11-25",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 2 vyhl. č. 205/1999 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb.",
+     "§ 15 z. č. 168/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/99970feb-8043-4bc2-8c49-9c50498f7ec0"
+   },
+   {
+    "jednaciCislo": "4 C 443/2022-18",
+    "soud": "Okresní soud v Tachově",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSTC:2023:4.C.443.2022.1",
+    "predmetRizeni": "O zaplacení 4 330 Kč s příslušenstvím",
+    "datumVydani": "2023-01-17",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 202 z. č. 99/1963 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 101 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2 nař. vl. č. 351/2013 Sb.",
+     "§ 137 z. č. 99/1963 Sb.",
+     "§ 13 vyhl. č. 177/1996 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§  vyhl. č. 205/1999 Sb.",
+     "§ 120 z. č. 99/1963 Sb.",
+     "§ 2a vyhl. č. 417/2017 Sb.",
+     "§ 114a z. č. 99/1963 Sb.",
+     "§ 2 vyhl. č. 417/2017 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/2c5b87e2-9bcc-41ee-88ce-58588b5b4a64"
+   },
+   {
+    "jednaciCislo": "5 C 216/2022-43",
+    "soud": "Okresní soud v Jičíně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:OSJC:2023:5.C.216.2022.1",
+    "predmetRizeni": "o 17 275 Kč s příslušenstvím",
+    "datumVydani": "2023-01-26",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "elektronický podpis",
+     "peněžité plnění",
+     "postoupení pohledávky",
+     "smlouva o úvěru",
+     "smlouva o zápůjčce",
+     "utvrzení dluhu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 149 z. č. 99/1963 Sb.",
+     "§ 160 z. č. 99/1963 Sb.",
+     "§ 2390 z. č. 89/2012 Sb.",
+     "§  z. č. 127/2005 Sb.",
+     "§ 1813 z. č. 89/2012 Sb.",
+     "§ 1814 z. č. 89/2012 Sb.",
+     "§ 2051 z. č. 89/2012 Sb.",
+     "§ 122 z. č. 257/2016 Sb.",
+     "§ 561 z. č. 89/2012 Sb.",
+     "§ 1798 z. č. 89/2012 Sb.",
+     "§ 5 z. č. 297/2016 Sb.",
+     "§ 8 z. č. 89/2012 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/bd2cd09f-a63b-4344-be4a-7a41ab5ddfc3"
+   },
+   {
+    "jednaciCislo": "108 C 203/2022-25",
+    "soud": "Městský soud v Brně",
+    "autor": "REDACTED",
+    "ecli": "ECLI:CZ:MSBR:2023:108.C.203.2022.1",
+    "predmetRizeni": "zaplacení 14 005 Kč s příslušenstvím - příspěvek za nepojištěné vozidlo",
+    "datumVydani": "2023-01-19",
+    "datumZverejneni": "2023-03-15",
+    "klicovaSlova": [
+     "peněžité plnění",
+     "pojištění odpovědnosti za škodu"
+    ],
+    "zminenaUstanoveni": [
+     "§ 14b vyhl. č. 177/1996 Sb.",
+     "§  nař. vl. č. 351/2013 Sb.",
+     "§ 142 z. č. 99/1963 Sb.",
+     "§ 1970 z. č. 89/2012 Sb.",
+     "§ 4 z. č. 168/1999 Sb.",
+     "§ 115a z. č. 99/1963 Sb.",
+     "§ 1 z. č. 168/1999 Sb.",
+     "§ 2a vyhl. č. 205/1999 Sb."
+    ],
+    "odkaz": "https://rozhodnuti.justice.cz/api/finaldoc/84c29aa8-b839-4a0e-ab8c-2061e08a8321"
+   }
+  ],
+  "numberOfItems": 100,
+  "pageSize": 100,
+  "pageNumber": 0,
+  "totalPages": 4,
+  "totalElements": 400
+ }
+}

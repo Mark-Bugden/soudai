@@ -1,0 +1,33 @@
+kind,code,label_cs,tooltip_cs,description_cs,gloss_en
+event,DOVOL_RIZ,Řízení o opravném prostředku na Nejvyšším soudu ČR,Řízení o opravném prostředku na Nejvyšším soudu ČR se myslí zahájení dovolacího řízení na Nejvyšším soudu,Ve spisu byl podán opravný prostředek,Supreme Court review opened
+event,NAD_RIZENI,Řízení u nadřízeného soudu,Řízení u nadřízeného soudu se myslí zahájení souvisejícího řízení na nadřízeném soudu,Ve spisu byl podán opravný prostředek,Proceedings at a higher court opened
+event,NAR_JED,Nařízení jednání,Nařízení jednání je naplánování jednání do jednacího kalendáře soudu,Bylo nařízeno jednání ve věci,Hearing scheduled
+event,ODES_SPIS,Odeslání spisu,Odesláním spisu se rozumí: např.: odeslání nadřízenému soudu k prostudování,Spis byl odeslán,File sent out
+event,ODVOLANI,Řízení o opravném prostředku u krajského a vrchního soudu,Řízení o opraveném prostředku u krajského a vrchního soudu se myslí zahájení odvolacího řízení,Ve spisu byl podán opravný prostředek,Appeal opened at the regional or high court
+event,PNS_NASTUP,Poznámka o procesních opatřeních - Procesní nástupnictví,Druhem rozhodnutí ve věci bylo rozhodnutí o procesním nástupnictvím,,Note: succession of a party
+event,PNS_ODLOZ,Poznámka o procesních opatřeních - Usnesení o odložení vykonavatelnosti,Druhem rozhodnutí ve věci bylo usnesení o odložení vykonavatelnosti,,Note: enforceability deferred
+event,PNS_ODL_PM,Poznámka o procesních opatřeních - Odložení právní moci,Poznámka o procesních opatřeních - Odložení právní moci,,Note: legal force deferred
+event,PNS_VYZVA,Poznámka o procesních opatřeních - Výzva,Druhem rozhodnutí ve věci byla Výzva,,Note: request to a party
+event,POD_OP_PR,Podán opravný prostředek,Podání opravného prostředku je např. odvolání některého z účastníků řízení k vydanému rozhodnutí ve věci,Byl podán opravný prostředek ve věci,Remedy filed (e.g. an appeal)
+event,PREVD_SPIS,Převedeno,Událostí Převedeno se rozumí: ukončení zpracování věci a převedení dalšího řízení pod jinou spisovou značku,Převedeno řízení pod jinou spisovou značku,Transferred to another case number
+event,PR_VEC_NS,Datum přerušení věci,Datum kdy bylo přerušeno soudní řízení,,Proceedings suspended
+event,SPIS_K_SC,Odeslání spisu k soudci,Odesláním spisu se rozumí odeslání spisu soudci,Spis byl odeslán soudci,File sent to the judge
+event,SPIS_K_SO,Odeslání spisu k soudnímu komisaři,Odesláním spisu se rozumí odeslání spisu soudnímu komisaři,Spis byl odeslán soudnímu komisaři,File sent to the court commissioner
+event,SPIS_OD_SC,Soudce předal spis,Předáním spisu soudcem se rozumí vrácení spisu od soudce,Soudce předal spis zpět,File returned by the judge
+event,SPIS_OD_SO,Soudní komisař předal spis,Předáním spisu soudním komisařem se rozumí vrácení spisu od soudního komisaře,Soudní komisař předal spis zpět,File returned by the court commissioner
+event,ST_VEC_OBZ,Obživnutí věci,Obživnutím věci se myslí zrušení původního vyřizujícího rozhodnutí a v soudním řízení se pokračuje,Věc byla obživnuta,Case revived
+event,ST_VEC_ODS,Skončení věci,"Tzv. ""Odškrtnutí"" věci, nastane v okamžiku vyřízení všech náležitostí souvisejících s řízením",Skončení věci a uložení na spisovnu nebo převedení pod jinou spisovou značku,Case closed in the register
+event,ST_VEC_PRE,Přerušení řízení,Přerušením řízení věci nastává např.: v případě prohlášení konkurzu na účastníka řízení,Bylo přerušeno soudní řízení,Proceedings suspended
+event,ST_VEC_PUK,Datum pravomocného ukončení věci,Datum pravomocného ukončení věci,Datum pravomocného ukončení věci,Legally final
+event,ST_VEC_UPR,Pokračování řízení,Ukončeno přerušení řízení,Bylo ukončeno přerušení věci a bude pokračováno v soudním řízení,Proceedings resumed
+event,ST_VEC_VYR,Vyřízení věci,Vyřízením věci se myslí vyřízení věci,Věc se vyřídila,Case disposed
+event,VRAC_SPIS,Vrácení spisu,Vrácením spisu se rozumí: např.: na vrácení spisu od nadřízeného soudu,Spis byl vrácen na soud,File returned
+event,VR_SP_NS,Datum vrácení spisu,Datem vrácení spisu se myslí vrácení spisu odvolacímu soudu,,File returned to the appeal court
+event,VYD_ROZH,Vydání rozhodnutí,Vydání rozhodnutí je rozhodnutí soudce nebo vyšší soudní úřednice,Bylo vydáno rozhodnutí ve věci,Decision issued
+event,VYR_OP_PR,Vyřízení opravného prostředku,"Opravný prostředek je vyřízen např. nadřízeným krajským soudem, kde je vydáno nové rozhodnutí",Opravný prostředek byl vyřízen,Remedy resolved
+event,ZAHAJ_RIZ,Zahájení řízení,Zahájení řízení je zápis spisové značky do příslušného rejstříku,Bylo zahájeno soudní řízení,Case filed
+event,ZRUS_JED,Zrušení jednání,Zrušení nařízeného jednání,Bylo zrušeno jednání ve věci,Hearing cancelled
+status,nevyřízená věc,nevyřízená věc,,,Open
+status,Vyřízená věc - po vyhlášení konečného rozhodnutí,Vyřízená věc - po vyhlášení konečného rozhodnutí,,,Disposed: the final decision has been announced
+status,"Pravomocná věc - stav věci se změnil na pravomocnou po nabytí právní moci všech výroků či vůči všem osobám, o nichž bylo meritorně rozhodováno","Pravomocná věc - stav věci se změnil na pravomocnou po nabytí právní moci všech výroků či vůči všem osobám, o nichž bylo meritorně rozhodováno",,,"Legally final: every part of the decision has taken effect, for everyone it decided on"
+status,Odškrtnutá - evidenčně ukončená věc,Odškrtnutá - evidenčně ukončená věc,,,Closed in the register

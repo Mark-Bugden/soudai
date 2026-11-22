@@ -1,0 +1,44 @@
+{
+ "method": "GET",
+ "url": "https://rozhodnuti.justice.cz/api/opendata",
+ "body": null,
+ "status": 200,
+ "content_type": "application/json",
+ "response": [
+  {
+   "rok": 2020,
+   "pocet": 797,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2020"
+  },
+  {
+   "rok": 2021,
+   "pocet": 150939,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2021"
+  },
+  {
+   "rok": 2022,
+   "pocet": 181861,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2022"
+  },
+  {
+   "rok": 2023,
+   "pocet": 85462,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023"
+  },
+  {
+   "rok": 2024,
+   "pocet": 61203,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2024"
+  },
+  {
+   "rok": 2025,
+   "pocet": 71514,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2025"
+  },
+  {
+   "rok": 2026,
+   "pocet": 64682,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2026"
+  }
+ ]
+}

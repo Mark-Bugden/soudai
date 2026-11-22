@@ -1,0 +1,135 @@
+{
+ "method": "POST",
+ "url": "https://infosoud.gov.cz/api/v1/rizeni/vyhledej",
+ "body": {
+  "druhOrganizace": "KSVYCHK",
+  "okresniSoud": "OSVYCNA",
+  "druhVeci": "C",
+  "cisloSenatu": 15,
+  "bcVec": 4,
+  "rocnik": 2022
+ },
+ "status": 200,
+ "content_type": "application/json",
+ "response": {
+  "cislo": 15,
+  "druh": "C",
+  "rocnik": 2022,
+  "bcVec": 4,
+  "nadrizenaOrganizace": "Krajský soud Hradec Králové",
+  "organizace": "Okresní soud Náchod",
+  "typOrganizace": "os",
+  "stav": "Odškrtnutá - evidenčně ukončená věc",
+  "stavDatum": "25.05.2022",
+  "napad": null,
+  "udalosti": [
+   {
+    "udalostId": null,
+    "udalost": "ZAHAJ_RIZ",
+    "poradi": 1,
+    "datum": "2021-09-22",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 4,
+     "rocnik": 2022,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_PRE",
+    "poradi": 7,
+    "datum": "2022-01-26",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 4,
+     "rocnik": 2022,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "VYD_ROZH",
+    "poradi": 13,
+    "datum": "2022-02-10",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 4,
+     "rocnik": 2022,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_VYR",
+    "poradi": 20,
+    "datum": "2022-02-10",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 4,
+     "rocnik": 2022,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_UPR",
+    "poradi": 12,
+    "datum": "2022-02-21",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 4,
+     "rocnik": 2022,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_PUK",
+    "poradi": 22,
+    "datum": "2022-03-23",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 4,
+     "rocnik": 2022,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_ODS",
+    "poradi": 21,
+    "datum": "2022-05-25",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 4,
+     "rocnik": 2022,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   }
+  ],
+  "navazneVeci": [],
+  "platneK": "2026-11-21T18:30:01+01:00"
+ }
+}

@@ -61,11 +61,11 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
   - Each event has `udalost` (a code), `datum`, `poradi`, `zruseno` (cancelled) and `jednani` (hearings). The list isn't in date order, so sort by `datum`, then `poradi`.
   - Not found: HTTP 400 with `message` starting `RIZENI_0000`, e.g. `RIZENI_0000#15 C 9999 / 2022#Okresní soud Náchod`. Any other 400 (the app's validation codes are `RIZENI_VALIDATION_000x`) means our request is wrong.
 - `POST udalost/vyhledej` exists, but returns less than `rizeni/vyhledej`. Don't use it.
-- The app calls `GET env` for the backend version (`backendVerze`). Record it with each run so an API change can be spotted. (Not yet tried.)
+- The app calls `GET env` for the backend version (`backendVerze`). Every run that uses infosoud records it (2.0.0.10 on 2026-11-22), so an API change can be spotted. It also returns `prostredi` (`MSP_PROD`).
 - **Event codes seen:** `ZAHAJ_RIZ`, `NAR_JED`, `VYD_ROZH`, `ST_VEC_VYR`, `ST_VEC_PUK`, `ST_VEC_ODS`, `ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`, `POD_OP_PR` and `VYR_OP_PR`.
-  - Working glosses, to confirm in step 2: filing, hearing scheduled, decision issued, case disposed, legally final, closed in the register, appeal, file sent, file returned, remedy filed, remedy resolved.
+  - The English glosses are in `reference/events.csv` (step 2), with the app's Czech labels for all 28 codes it knows.
   - The app's JS bundle holds the Czech labels and tooltips. One set is for the Supreme Court (`ns`), where `ZAHAJ_RIZ` reads "Došlo Nejvyššímu soudu", and one is for the other courts. Take the glosses from the latter.
-- **Statuses seen:** `nevyřízená věc` (open), `Vyřízená věc - po vyhlášení konečného rozhodnutí`, `Pravomocná věc - …`, `Odškrtnutá - evidenčně ukončená věc`.
+- **Statuses seen:** `nevyřízená věc` (open), `Vyřízená věc - po vyhlášení konečného rozhodnutí`, `Pravomocná věc - stav věci se změnil na pravomocnou po nabytí právní moci všech výroků či vůči všem osobám, o nichž bylo meritorně rozhodováno` (whose `stavDatum` is null) and `Odškrtnutá - evidenčně ukončená věc`. They're in `reference/events.csv` too.
 
 **Case numbers.** A case number is `senát rejstřík pořadové-číslo/ročník`, with `-n` added for a document within the case.
 - The sequence number restarts each year **for each senate**, not for the whole court. The six-day sample had 70 (court, year, number) triples used by more than one senate.
@@ -77,7 +77,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 
 ### Decisions
 
-- **Scope.** District-level courts (okresní and obvodní soudy and Městský soud v Brně; about 86, confirm in step 2), register `C`, cases filed 2020–2025 (decided 2026-11-22). Městský soud v Praze is a regional-level court and is out of scope.
+- **Scope.** District-level courts (okresní and obvodní soudy and Městský soud v Brně: 86, confirmed in step 2), register `C`, cases filed 2020–2025 (decided 2026-11-22). Městský soud v Praze is a regional-level court and is out of scope.
 - **Pacing.** 1 request a second across the whole project (decided 2026-11-22). On a connection error, wait 30, 60, then 90 s and retry. On any 429, or more than 5 failures in a row, stop the run and record it here. If 1 s draws 429s or keeps resetting, go back to 3 s and tell Mark.
 - **Identification.** User-Agent `soudai/<version> (+https://github.com/Mark-Bugden/soudai)`.
 - **Cache.** Every response, including not-found responses, goes into a SQLite cache at `data/raw/cache.sqlite`: request key, URL, body, status, the response gzipped, and the fetch time. Nothing that's cached is fetched again unless a stage asks to refresh it. The cache is the snapshot, so it's never deleted, and it's never committed.
@@ -107,7 +107,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - Case numbers parse, and the regex covers every case number in the decisions table.
 - Every court in `decisions` maps to a row of `reference/courts.csv`.
 - The binary search finds the top of a fake docket, including dockets of 0 and 1 cases.
-- Every sampled case has `ZAHAJ_RIZ`, and its date falls in the case's year.
+- Every sampled case has `ZAHAJ_RIZ`, and its date falls in the case's year. (This won't hold as written: see "Filing date and case year" under "Open questions".)
 - No judge's name appears anywhere in `data/derived/` or the export.
 - The German tank estimator and its interval match a brute-force simulation.
 - The weighted Kaplan–Meier matches hand-worked cases.
@@ -235,14 +235,36 @@ pyproject.toml, uv.lock        a uv project
 - [x] Commit this plan (its own PR, 2026-11-22).
 - The demo isn't touched, so the stub stays live and no version bump is needed.
 
-### 2. Scraper foundations (PR)
-- [ ] `http.py`: the SQLite cache, the project-wide 1 request a second, the backoff and stop rules, the User-Agent and a run log.
-- [ ] `infosoud.py`: court lists and case lookup, returning found / not found / error, with anything else raising. Record `GET env`'s backend version with each run.
-- [ ] `rozhodnuti.py`: the year/month/day index and the day pages.
-- [ ] `reference/courts.csv`: every district-level court with its infosoud code, regional code, rozhodnuti name (they differ: "Okresní soud v Náchodě" against "Okresní soud Náchod") and the area it serves. Seed it from the old court map, and check it by hand. Record the count.
-- [ ] `reference/events.csv`: each event code with its Czech label and tooltip from the app's bundle (the non-Supreme-Court set) and an English gloss. Add the status values. Mark checks the glosses.
-- [ ] `reference/sources.json`: endpoints, the date checked and the backend version.
-- [ ] `soudai status`, and the offline tests.
+### 2. Scraper foundations (PR, 2026-11-22)
+- [x] `http.py`: the SQLite cache, the project-wide 1 request a second, the backoff and stop rules, the User-Agent and a run log.
+  - The cache has three tables: `responses` (key, method, URL, canonical JSON body, status, gzipped response, content type, fetch time, run), `runs` (stage, version, start and end, outcome, backend version, requests, cache hits, failures) and `pacing`. It's in WAL mode, so `soudai status` can read during a run.
+  - Every response except a 5xx, a 408, a 429 or a 403 is cached, including not-found 400s. The key is a hash of the method, URL and body, with the body's keys sorted.
+  - A cached response that doesn't parse (an outage page cached by mistake, say) isn't trusted. `http.parsed` fetches it again, once, so a bad answer can't block every later run. The same goes for a cached lookup that came back `RIZENI_0001`.
+  - **Pacing is project-wide.** The time of the last request lives in the cache and is claimed inside `BEGIN IMMEDIATE`, so a second process queues behind the first instead of doubling the rate. Checked with two processes sharing a cache: all 9 gaps between their 10 requests were 1.000–1.001 s. Cached responses skip the pacing.
+  - **Backoff, as read here:** a connection error, a timeout, a reset partway through a response, a 408 or a 5xx counts as a failure. The waits after the 1st, 2nd and 3rd failure in a row are 30, 60 and 90 s, and then 90 s again. The 6th failure in a row raises `StopRun`, and so does any 429. A success resets the count. A 403 stops the run too: it's the likeliest sign of being blocked.
+  - Each run logs every request to `data/raw/logs/<stage>-<start>.log`, and progress to the console.
+  - **Live pacing so far:** 237 requests at 1 a second on 2026-11-22, with 2 connection resets (both on rozhodnuti, each cleared by one 30 s wait) and no 429s.
+- [x] `infosoud.py`: court lists and case lookup, returning found / not found / error, with anything else raising. Record `GET env`'s backend version with each run.
+  - The app's messages settle what "error" means: `RIZENI_0000` is not found, and `RIZENI_0001` is "an unexpected error occurred while loading the case, repeat the query". That's the error. An error is never trusted from the cache: `lookup` fetches it again once. The `RIZENI_VALIDATION_000x` codes, `ORGANIZACE_0000`, other statuses, HTML and found cases missing fields raise `UnexpectedResponse`.
+  - It also finds the bundle chunk with the event labels (breadth-first from `main-*.js`, stopping at the first hit) and parses the labels and messages out of the JS object literal.
+  - In 54 cases at Náchod, senate 15, `jednani` was always empty, and cancelled events (`zruseno`) came in pairs: a hearing scheduled and its cancellation.
+  - **13 of those 54 cases were filed before their case number's year.** Their `ZAHAJ_RIZ` falls in the year before: 11 of the first 12 numbers of 2022 were filed between 2021-09-01 and 2021-12-16, and 2 of the 14 sampled 2025 cases were filed in 2024. See "Filing date and case year" under "Open questions".
+- [x] `rozhodnuti.py`: the year/month/day index and the day pages.
+  - The month index lists only the days with decisions, weekends included when there are any. The case-number regex is here too, as `parse_case_number`. It also matched `11 CO 310/2022-195` (the register in capitals) and numbers with no document part, `17 C 291/2022`.
+  - Six whole days (3,403 decisions) included 13 whose `soud` is `(nezadán)`, "not given". Step 3 has to count them and leave them out.
+- [x] `reference/courts.csv`: every district-level court with its infosoud code, regional code, rozhodnuti name (they differ: "Okresní soud v Náchodě" against "Okresní soud Náchod") and the area it serves. Seed it from the old court map, and check it by hand. Record the count.
+  - **86 courts**: 75 okresní soudy, the 10 obvodní soudy and Městský soud v Brně. Krajský soud Brno has 14, České Budějovice 8, Hradec Králové 11, Ostrava 11, Plzeň 10, Praha 12, Ústí nad Labem 10, Městský soud Praha 10, and the high courts none.
+  - The court map is read at a fixed commit. Three courts have a second rozhodnuti name, for a branch: Bruntál (Krnov), Karviná (Havířov) and Vsetín (Valašské Meziřičí). So `rozhodnuti_names` holds several, separated by `; `, 89 in all.
+  - Hand-checked: the areas against the 76 okresy and Prague's 10 districts. Every district-level name in six whole days of decisions maps to one court, and 85 of 86 courts appeared. Hodonín's name is unconfirmed until step 3. `reference/README.md` has the details.
+- [x] `reference/events.csv`: each event code with its Czech label and tooltip from the app's bundle (the non-Supreme-Court set) and an English gloss. Add the status values. Mark checks the glosses.
+  - 28 event codes from `chunk-KZJVN2ZT.js`, each with label, tooltip and description, and 4 statuses. The 54 timelines fetched in this step used 9 of them: `ZAHAJ_RIZ`, `NAR_JED`, `ZRUS_JED`, `VYD_ROZH`, `ST_VEC_VYR`, `ST_VEC_PUK`, `ST_VEC_ODS`, `ST_VEC_PRE` and `ST_VEC_UPR`. The feasibility check's other codes (`ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`, `POD_OP_PR`, `VYR_OP_PR`) are all in the bundle.
+  - **For Mark:** the glosses are short labels for the demo, e.g. `ZAHAJ_RIZ` "Case filed", `ST_VEC_VYR` "Case disposed", `ST_VEC_PUK` "Legally final", `ST_VEC_ODS` "Case closed in the register". Edit them in the CSV: `soudai events` keeps them.
+- [x] `reference/sources.json`: endpoints, the date checked and the backend version.
+- [x] `soudai status`, and the offline tests.
+  - `uv run soudai <stage>` has `courts` (`--write`), `events` and `status`. `status` reports the cache, the last runs, the day pages cached against the cached month indexes, case lookups by the case number's year and by outcome (found, not found, error, or unexpected), the reference tables and the derived tables. It never creates the cache.
+  - 98 tests, all offline. They run on real responses in `tests/fixtures/`: 7 cases (found, not found, open, cancelled hearing, suspended, disposed, legally final), the court lists, the env, the labels chunk (cut to its resource bundle), and rozhodnuti's indexes and a day page with every `autor` replaced by `REDACTED`. The client's tests use a fake session and clock, so none of them waits.
+  - The Windows console's code page can't print č or ř, so the CLI switches stdout and stderr to UTF-8.
+  - A review of the code turned up two minor bugs, both fixed: `status` lumped every 400 together, and a test of 5xx caching couldn't fail. It also turned up the edge cases above (cached outage pages, 403s and 408s, malformed JSON, numpy ints in a request body), and the filing-year finding.
 
 ### 3. Published decisions (run, then PR)
 - [ ] List every decision from 2020 to the snapshot date.
@@ -291,8 +313,12 @@ pyproject.toml, uv.lock        a uv project
 
 - **Map geometry.** Court areas or court seats? Natural Earth, which zombie-outbreak uses, only has regions (kraje), not districts (okresy). Court areas mostly follow okresy, with exceptions to check: Prague (ten obvodní soudy), Brno (Městský soud v Brně and Okresní soud Brno-venkov), and Plzeň and Ostrava. Find an okres boundary source with a licence that allows publishing (e.g. ČÚZK, or Eurostat municipalities merged by okres). If none is clean, use points at the court seats.
 - **Appeals.** An appeal at the regional court has its own case number (register `Co`), listed in `navazneVeci`. Following these links would give appeal durations. That's out of scope for now: the district case's own events (`ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`) give the loop.
+- **Filing date and case year.** A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. That's unconfirmed. It matters in three places, and needs a decision with Mark before steps 4–6:
+  - **Intake.** A senate-year's top number counts cases *registered* in C that year. The demo should call it that, or count by filing year from the sample.
+  - **Waits.** Measure from `ZAHAJ_RIZ`, the real filing date, not from 1 January of the case year.
+  - **The check.** Replace "falls in the case's year" with "falls in the case's year or before", and record the share and the lag by court.
 - **Older open cases.** The sample covers cases filed 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 filings would close the gap if the numbers need it.
-- **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way.
+- **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way. A clue from step 2: one day's first page of decisions had senates 106, 112 and 117 at "Okresní soud v Karviné, pobočka Havířov" and 108 at Městský soud v Brně, so a branch's senates may be numbered from 100. Ústí nad Orlicí has no branch, though.
 - **Official statistics.** Which source and edition to compare intake against (step 6).
 - **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit.
 - **Model card.** There's no model. Add a model card only if Mark wants one and there's a real figure for it, such as the German tank estimate's error against the exact counts.

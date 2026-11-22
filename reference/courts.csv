@@ -1,0 +1,87 @@
+code,regional_code,name,rozhodnuti_names,area
+OSJICCB,KSJICCB,Okresní soud České Budějovice,Okresní soud v Českých Budějovicích,České Budějovice
+OSJICCK,KSJICCB,Okresní soud Český Krumlov,Okresní soud v Českém Krumlově,Český Krumlov
+OSJICJH,KSJICCB,Okresní soud Jindřichův Hradec,Okresní soud v Jindřichově Hradci,Jindřichův Hradec
+OSJICPE,KSJICCB,Okresní soud Pelhřimov,Okresní soud v Pelhřimově,Pelhřimov
+OSJICPI,KSJICCB,Okresní soud Písek,Okresní soud v Písku,Písek
+OSJICPT,KSJICCB,Okresní soud Prachatice,Okresní soud v Prachaticích,Prachatice
+OSJICST,KSJICCB,Okresní soud Strakonice,Okresní soud ve Strakonicích,Strakonice
+OSJICTA,KSJICCB,Okresní soud Tábor,Okresní soud v Táboře,Tábor
+OSJIMBK,KSJIMBM,Okresní soud Blansko,Okresní soud v Blansku,Blansko
+OSJIMBM,KSJIMBM,Městský soud Brno,Městský soud v Brně,Brno-město
+OSJIMBO,KSJIMBM,Okresní soud Brno-venkov,Okresní soud Brno-Venkov,Brno-venkov
+OSJIMBV,KSJIMBM,Okresní soud Břeclav,Okresní soud v Břeclavi,Břeclav
+OSJIMHO,KSJIMBM,Okresní soud Hodonín,Okresní soud v Hodoníně,Hodonín
+OSJIMJI,KSJIMBM,Okresní soud Jihlava,Okresní soud v Jihlavě,Jihlava
+OSJIMKM,KSJIMBM,Okresní soud Kroměříž,Okresní soud v Kroměříži,Kroměříž
+OSJIMPV,KSJIMBM,Okresní soud Prostějov,Okresní soud v Prostějově,Prostějov
+OSJIMTR,KSJIMBM,Okresní soud Třebíč,Okresní soud v Třebíči,Třebíč
+OSJIMUH,KSJIMBM,Okresní soud Uherské Hradiště,Okresní soud v Uherském Hradišti,Uherské Hradiště
+OSJIMVY,KSJIMBM,Okresní soud Vyškov,Okresní soud ve Vyškově,Vyškov
+OSJIMZL,KSJIMBM,Okresní soud Zlín,Okresní soud ve Zlíně,Zlín
+OSJIMZN,KSJIMBM,Okresní soud Znojmo,Okresní soud ve Znojmě,Znojmo
+OSJIMZR,KSJIMBM,Okresní soud Žďár nad Sázavou,Okresní soud ve Žďáru nad Sázavou,Žďár nad Sázavou
+OSPHA01,MSPHAAB,Obvodní soud Praha 1,Obvodní soud pro Prahu 1,Praha 1
+OSPHA02,MSPHAAB,Obvodní soud Praha 2,Obvodní soud pro Prahu 2,Praha 2
+OSPHA03,MSPHAAB,Obvodní soud Praha 3,Obvodní soud pro Prahu 3,Praha 3
+OSPHA04,MSPHAAB,Obvodní soud Praha 4,Obvodní soud pro Prahu 4,Praha 4
+OSPHA05,MSPHAAB,Obvodní soud Praha 5,Obvodní soud pro Prahu 5,Praha 5
+OSPHA06,MSPHAAB,Obvodní soud Praha 6,Obvodní soud pro Prahu 6,Praha 6
+OSPHA07,MSPHAAB,Obvodní soud Praha 7,Obvodní soud pro Prahu 7,Praha 7
+OSPHA08,MSPHAAB,Obvodní soud Praha 8,Obvodní soud pro Prahu 8,Praha 8
+OSPHA09,MSPHAAB,Obvodní soud Praha 9,Obvodní soud pro Prahu 9,Praha 9
+OSPHA10,MSPHAAB,Obvodní soud Praha 10,Obvodní soud pro Prahu 10,Praha 10
+OSSCECL,KSSCEUL,Okresní soud Česká Lípa,Okresní soud v České Lípě,Česká Lípa
+OSSCECV,KSSCEUL,Okresní soud Chomutov,Okresní soud v Chomutově,Chomutov
+OSSCEDC,KSSCEUL,Okresní soud Děčín,Okresní soud v Děčíně,Děčín
+OSSCEJN,KSSCEUL,Okresní soud Jablonec nad Nisou,Okresní soud v Jablonci nad Nisou,Jablonec nad Nisou
+OSSCELB,KSSCEUL,Okresní soud Liberec,Okresní soud v Liberci,Liberec
+OSSCELN,KSSCEUL,Okresní soud Louny,Okresní soud v Lounech,Louny
+OSSCELT,KSSCEUL,Okresní soud Litoměřice,Okresní soud v Litoměřicích,Litoměřice
+OSSCEMO,KSSCEUL,Okresní soud Most,Okresní soud v Mostě,Most
+OSSCETP,KSSCEUL,Okresní soud Teplice,Okresní soud v Teplicích,Teplice
+OSSCEUL,KSSCEUL,Okresní soud Ústí nad Labem,Okresní soud v Ústí nad Labem,Ústí nad Labem
+OSSEMBR,KSSEMOS,Okresní soud Bruntál,"Okresní soud v Bruntále; Okresní soud v Bruntále, pobočka Krnov",Bruntál
+OSSEMFM,KSSEMOS,Okresní soud Frýdek-Místek,Okresní soud ve Frýdku-Místku,Frýdek-Místek
+OSSEMJE,KSSEMOS,Okresní soud Jeseník,Okresní soud v Jeseníku,Jeseník
+OSSEMKA,KSSEMOS,Okresní soud Karviná,"Okresní soud v Karviné; Okresní soud v Karviné, pobočka Havířov",Karviná
+OSSEMNJ,KSSEMOS,Okresní soud Nový Jičín,Okresní soud v Novém Jičíně,Nový Jičín
+OSSEMOC,KSSEMOS,Okresní soud Olomouc,Okresní soud v Olomouci,Olomouc
+OSSEMOP,KSSEMOS,Okresní soud Opava,Okresní soud v Opavě,Opava
+OSSEMOS,KSSEMOS,Okresní soud Ostrava,Okresní soud v Ostravě,Ostrava-město
+OSSEMPR,KSSEMOS,Okresní soud Přerov,Okresní soud v Přerově,Přerov
+OSSEMSU,KSSEMOS,Okresní soud Šumperk,Okresní soud v Šumperku,Šumperk
+OSSEMVS,KSSEMOS,Okresní soud Vsetín,"Okresní soud ve Vsetíně; Okresní soud ve Vsetíně, pobočka Valašské Meziřičí",Vsetín
+OSSTCBE,KSSTCAB,Okresní soud Beroun,Okresní soud v Berouně,Beroun
+OSSTCBN,KSSTCAB,Okresní soud Benešov,Okresní soud v Benešově,Benešov
+OSSTCKH,KSSTCAB,Okresní soud Kutná Hora,Okresní soud v Kutné Hoře,Kutná Hora
+OSSTCKL,KSSTCAB,Okresní soud Kladno,Okresní soud v Kladně,Kladno
+OSSTCKO,KSSTCAB,Okresní soud Kolín,Okresní soud v Kolíně,Kolín
+OSSTCMB,KSSTCAB,Okresní soud Mladá Boleslav,Okresní soud v Mladé Boleslavi,Mladá Boleslav
+OSSTCME,KSSTCAB,Okresní soud Mělník,Okresní soud v Mělníku,Mělník
+OSSTCNB,KSSTCAB,Okresní soud Nymburk,Okresní soud v Nymburce,Nymburk
+OSSTCPB,KSSTCAB,Okresní soud Příbram,Okresní soud v Příbrami,Příbram
+OSSTCPY,KSSTCAB,Okresní soud Praha-Východ,Okresní soud Praha-východ,Praha-východ
+OSSTCPZ,KSSTCAB,Okresní soud Praha-Západ,Okresní soud Praha-západ,Praha-západ
+OSSTCRA,KSSTCAB,Okresní soud Rakovník,Okresní soud v Rakovníku,Rakovník
+OSVYCCR,KSVYCHK,Okresní soud Chrudim,Okresní soud v Chrudimi,Chrudim
+OSVYCHB,KSVYCHK,Okresní soud Havlíčkův Brod,Okresní soud v Havlíčkově Brodě,Havlíčkův Brod
+OSVYCHK,KSVYCHK,Okresní soud Hradec Králové,Okresní soud v Hradci Králové,Hradec Králové
+OSVYCJC,KSVYCHK,Okresní soud Jičín,Okresní soud v Jičíně,Jičín
+OSVYCNA,KSVYCHK,Okresní soud Náchod,Okresní soud v Náchodě,Náchod
+OSVYCPA,KSVYCHK,Okresní soud Pardubice,Okresní soud v Pardubicích,Pardubice
+OSVYCRK,KSVYCHK,Okresní soud Rychnov nad Kněžnou,Okresní soud v Rychnově nad Kněžnou,Rychnov nad Kněžnou
+OSVYCSM,KSVYCHK,Okresní soud Semily,Okresní soud v Semilech,Semily
+OSVYCSY,KSVYCHK,Okresní soud Svitavy,Okresní soud ve Svitavách,Svitavy
+OSVYCTU,KSVYCHK,Okresní soud Trutnov,Okresní soud v Trutnově,Trutnov
+OSVYCUO,KSVYCHK,Okresní soud Ústí nad Orlicí,Okresní soud v Ústí nad Orlicí,Ústí nad Orlicí
+OSZPCCH,KSZPCPM,Okresní soud Cheb,Okresní soud v Chebu,Cheb
+OSZPCDO,KSZPCPM,Okresní soud Domažlice,Okresní soud v Domažlicích,Domažlice
+OSZPCKT,KSZPCPM,Okresní soud Klatovy,Okresní soud v Klatovech,Klatovy
+OSZPCKV,KSZPCPM,Okresní soud Karlovy Vary,Okresní soud v Karlových Varech,Karlovy Vary
+OSZPCPJ,KSZPCPM,Okresní soud Plzeň-jih,Okresní soud Plzeň-jih,Plzeň-jih
+OSZPCPM,KSZPCPM,Okresní soud Plzeň-Město,Okresní soud Plzeň-město,Plzeň-město
+OSZPCPS,KSZPCPM,Okresní soud Plzeň-sever,Okresní soud Plzeň-sever,Plzeň-sever
+OSZPCRO,KSZPCPM,Okresní soud Rokycany,Okresní soud v Rokycanech,Rokycany
+OSZPCSO,KSZPCPM,Okresní soud Sokolov,Okresní soud v Sokolově,Sokolov
+OSZPCTC,KSZPCPM,Okresní soud Tachov,Okresní soud v Tachově,Tachov
