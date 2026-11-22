@@ -15,3 +15,6 @@ __pycache__/
 # Data: the response cache and run logs are never committed (and never deleted). Anchored, so
 # data/derived/, reference/ and the demo's own data in demo/public/data/ stay tracked.
 /data/raw/
+# The decisions table: over 10 MB, and its subjects sometimes name people (see the plan, step 3).
+# `uv run soudai decisions --parse-only` rebuilds it from the cache.
+/data/derived/decisions.parquet

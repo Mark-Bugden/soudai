@@ -32,6 +32,7 @@ class FakeClient:
         self.responses = {}
         self.requests = []
         self.backend_version = None
+        self.fetched_at = {}  # request key -> when the cached copy was fetched, for decisions.stale
         for key, response in responses:
             self.add(*key, response)
 
@@ -48,6 +49,11 @@ class FakeClient:
 
     def post(self, url, body, refresh=False):
         return self.fetch("POST", url, body, refresh=refresh)
+
+    def cached(self, method, url, body=None):
+        """What the cache holds for a request: here, only what a test put in `fetched_at`."""
+        fetched_at = self.fetched_at.get(http.request_key(method, url, body))
+        return None if fetched_at is None else http.Response(url, 200, b"", None, fetched_at, True)
 
     def set_backend_version(self, version):
         self.backend_version = version

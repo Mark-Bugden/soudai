@@ -152,7 +152,60 @@ def connect(path=paths.CACHE):
     return db
 
 
-class Client:
+class NotCached(Exception):
+    """A CacheReader was asked for a response that isn't in the cache."""
+
+
+class _Reads:
+    """get, post and cached, for anything with the cache open as `db` and a `fetch`."""
+
+    def get(self, url, params=None, refresh=False):
+        return self.fetch("GET", with_params(url, params), refresh=refresh)
+
+    def post(self, url, body, refresh=False):
+        return self.fetch("POST", url, body, refresh=refresh)
+
+    def cached(self, method, url, body=None):
+        """The cached response to a request, or None, without fetching anything."""
+        row = self.db.execute(
+            "SELECT status, content, content_type, fetched_at FROM responses WHERE key = ?",
+            (request_key(method, url, body),),
+        ).fetchone()
+        if row is None:
+            return None
+        status, content, content_type, fetched_at = row
+        return Response(url, status, gzip.decompress(content), content_type, fetched_at, from_cache=True)
+
+
+class CacheReader(_Reads):
+    """The cache, read without fetching anything: for the steps that parse what the scrapers fetched.
+    It takes the same calls as Client, and raises NotCached for anything that isn't there.
+
+        with CacheReader() as cache:
+            years = rozhodnuti.years(cache)
+    """
+
+    def __init__(self, cache=paths.CACHE):
+        self.cache = cache
+
+    def __enter__(self):
+        if not self.cache.exists():
+            raise NotCached(f"there's no cache at {self.cache}")
+        self.db = sqlite3.connect(self.cache)
+        return self
+
+    def __exit__(self, kind, error, traceback):
+        self.db.close()
+        return False
+
+    def fetch(self, method, url, body=None, refresh=False):
+        response = self.cached(method, url, body)
+        if response is None:
+            raise NotCached(f"{method} {url} {canonical(body) or ''}".rstrip())
+        return response
+
+
+class Client(_Reads):
     """A run of one stage: the cache, the pacing, the backoff and the run's log.
 
     `session`, `clock` and `sleep` are there for the tests.
@@ -214,23 +267,6 @@ class Client:
                 self.log.removeHandler(handler)
             self.db.close()
         return False
-
-    def get(self, url, params=None, refresh=False):
-        return self.fetch("GET", with_params(url, params), refresh=refresh)
-
-    def post(self, url, body, refresh=False):
-        return self.fetch("POST", url, body, refresh=refresh)
-
-    def cached(self, method, url, body=None):
-        """The cached response to a request, or None, without fetching anything."""
-        row = self.db.execute(
-            "SELECT status, content, content_type, fetched_at FROM responses WHERE key = ?",
-            (request_key(method, url, body),),
-        ).fetchone()
-        if row is None:
-            return None
-        status, content, content_type, fetched_at = row
-        return Response(url, status, gzip.decompress(content), content_type, fetched_at, from_cache=True)
 
     def fetch(self, method, url, body=None, refresh=False):
         """The response to a request: from the cache if it's there, unless `refresh`, else from the server."""

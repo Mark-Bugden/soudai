@@ -27,12 +27,12 @@ uv sync
 uv run pytest
 ```
 
-Each stage runs as `uv run soudai <stage>`, in this order. The stages from milestone 3 on aren't built yet. The plan gives each stage's inputs, outputs and rough cost.
+Each stage runs as `uv run soudai <stage>`, in this order. The stages from milestone 4 on aren't built yet. The plan gives each stage's inputs, outputs and rough cost.
 
 | Stage | What it does | Milestone |
 | --- | --- | --- |
 | `courts`, `events` | Check the reference tables of district courts and event codes against infosoud. | 2 |
-| `decisions` | List every published decision since 2020. | 3 |
+| `decisions` | List every published decision since 2020, and parse them into `data/derived/decisions.parquet`. | 3 |
 | `senates`, `intake` | Find each court's senates, and count the cases each one filed per year. | 4 |
 | `sample` | Fetch the timelines of a random sample of cases. | 5 |
 | `analyse`, `export` | Compute the journeys, waits, estimates and backlog, and write the demo's data. | 6–7 |
