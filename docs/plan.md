@@ -147,7 +147,26 @@ Little's law also assumes a steady state, which 2020 wasn't. Say so wherever bac
 
 ### External check
 
-Compare national and court intake with the Ministry of Justice's official statistics. Find the source in step 6, and record its URL and edition here.
+Compare national and court intake with the Ministry of Justice's official statistics. The source was found on 2026-11-22 by web research, without touching rozhodnuti or infosoud.
+
+- **The report to compare against: S_AS_40, "Přehled o vyřizování agendy C u OS" (Tabulka č. 40).**
+  - **Where:** InfoData's reports form at https://cslav.justice.cz/InfoData/prehledy-agend.html. POST `sestavaQry=S_AS_40`, `obdobiOdQry=01.01.YYYY`, `obdobiDoQry=31.12.YYYY` and `jenVykCeleObdQry=on` with a session cookie. The result links to `/InfoData/servlet/FileServlet`.
+  - **Coverage:** one file per year for register C, with all 86 courts (Městský soud v Brně appears as "Brno"), kraj totals and a national total. The portal says the data go back to 2008.
+  - **Format:** XML Spreadsheet 2003, PDF or HTML.
+  - **Columns:** nápad, obživlo, vyřízeno, nevyřízeno by age, and pravomocně/nepravomocně.
+  - **Editions seen:** the 2020, 2022 and 2025 files, computed on 2021-01-25, 2023-01-15 and 2026-01-08.
+  - **National nápad, register C:** 286,801 in 2020, 295,311 in 2022 and 272,434 in 2025.
+- **The breakdown: V(MS)-114, "Výkaz o pohybu agendy rejstříku C u okresních soudů".**
+  - At https://cslav.justice.cz/InfoData/vykazy-soudu-a-statnich-zastupitelstvi.html, one file per court and period, keyed by infosoud's own court codes.
+  - At Náchod in 2022 it gives "celkem zapsáno do rejstříku" 2,327 and "celkem nový nápad" 2,309 (S_AS_40's figure). Of those, 1,757 were transferred from EPR (electronic payment orders) and 0 from Ro/ERo. 108 cases revived (obživlo).
+  - Nobody has explained the 18 between "zapsáno" and "nápad" yet. A senate's top number may match "zapsáno" rather than "nápad", so compare with both.
+- **Only as a cross-check: the annual report's appendix, `Data_soudy_YYYY.xlsm`.** These run from 2018 to 2025 and are listed at https://msp.gov.cz/web/msp/statisticke-udaje-z-oblasti-justice. Their civil sheet gives only "Obživa+nápad" (Náchod 2022: 2,417 = 2,309 + 108).
+- **Not suitable:** the Ministry's Power BI dashboards, which count finished cases. statistika.justice.cz didn't resolve, and data.gov.cz has no dataset.
+- **Definitions,** from the Ministry's glossary (https://msp.gov.cz/web/msp/statisticke-udaje-z-oblasti-justice/-/clanek/slovnik-pojmu):
+  - nápad is "počet nově zapsaných věcí do rejstříku za určité období", the cases newly entered in the register in the period, which is what our counts are.
+  - Cases transferred in from EPR, Ro or ERo count as nápad.
+  - obživa is a disposed case whose proceedings resume, mostly after an appeal court quashes the decision. It keeps its number, so it isn't intake.
+- **Licence:** none is stated on either site. Cite "Ministerstvo spravedlnosti ČR, InfoData".
 
 ## The experience
 
@@ -315,7 +334,15 @@ pyproject.toml, uv.lock        a uv project
 
 ## Open questions
 
-- **Map geometry.** Court areas or court seats? Natural Earth, which zombie-outbreak uses, only has regions (kraje), not districts (okresy). Court areas mostly follow okresy, with exceptions to check: Prague (ten obvodní soudy), Brno (Městský soud v Brně and Okresní soud Brno-venkov), and Plzeň and Ostrava. Find an okres boundary source with a licence that allows publishing (e.g. ČÚZK, or Eurostat municipalities merged by okres). If none is clean, use points at the court seats.
+- **Map geometry.** Court areas or court seats? Researched on 2026-11-22: **court districts don't follow the current okresy**, and the clean way to draw them is from municipalities.
+  - **What the law says.** The districts are set by zákon č. 6/2002 Sb. (https://www.zakonyprolidi.cz/cs/2002-6). Příloha 3 lists each of the 75 okresní soudy with the obce it serves, not an okres.
+  - **Ostrava and Plzeň.** Okresní soud v Ostravě covers the city of Ostrava only; the rest of okres Ostrava-město goes to Opava, Frýdek-Místek and Nový Jičín. Okresní soud Plzeň-město covers the city of Plzeň only; the rest of its okres goes to Plzeň-jih and Plzeň-sever.
+  - **Brno.** § 9(2) gives the city of Brno to Městský soud v Brně.
+  - **Prague.** Příloha 4 defines Prague's 10 courts by městské části as they stood in 2002. These match RÚIAN's 10 MOP districts, Praha 1–10.
+  - **Mismatches with today's okresy.** About 117 obce sit under a court other than their current okres's. Examples are the 9 obce moved from okres Domažlice to Plzeň-jih in 2021, which stayed with Okresní soud Domažlice, and 21 Brno-venkov obce under Žďár. Another ~65 annex names are ambiguous or renamed.
+  - **Recommended source: ČÚZK RÚIAN, under CC BY 4.0** ("ČÚZK, <year>", saying what was changed). The whole country, with obce and okresy, is https://services.cuzk.gov.cz/shp/stat/epsg-5514/1.zip (253 MB, S-JTSK). Prague's `OP_P` layer, with the 10 obvody, is in https://services.cuzk.gov.cz/shp/obec/epsg-5514/554782.zip (17 MB).
+  - **How to build it.** Merge obec polygons by the annex's lists, using a hand-checked crosswalk for the ~65 awkward names. Add the city of Brno and Prague's 10 MOP polygons, then simplify. The result should be about 100–300 KB, which is an estimate.
+  - **Alternatives:** ArcČR 4.3, which has no Prague obvody and whose licence is unconfirmed; Eurostat GISCO LAU, which is municipalities only and non-commercial; and OpenStreetMap, which is ODbL, share-alike. Points at the court seats remain the fallback.
 - **Appeals.** An appeal at the regional court has its own case number (register `Co`), listed in `navazneVeci`. Following these links would give appeal durations. That's out of scope for now: the district case's own events (`ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`) give the loop.
 - **Filing date and case year.** A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. That's unconfirmed. It matters in three places, and needs a decision with Mark before steps 4–6:
   - **Intake.** A senate-year's top number counts cases *registered* in C that year. The demo should call it that, or count by filing year from the sample.
@@ -323,7 +350,7 @@ pyproject.toml, uv.lock        a uv project
   - **The check.** Replace "falls in the case's year" with "falls in the case's year or before", and record the share and the lag by court.
 - **Older open cases.** The sample covers cases filed 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 filings would close the gap if the numbers need it.
 - **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way. A clue from step 2: one day's first page of decisions had senates 106, 112 and 117 at "Okresní soud v Karviné, pobočka Havířov" and 108 at Městský soud v Brně, so a branch's senates may be numbered from 100. Ústí nad Orlicí has no branch, though.
-- **Official statistics.** Which source and edition to compare intake against (step 6).
+- **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Still open: whether a senate's top number matches "zapsáno" or "nápad". Step 6 compares both.
 - **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit.
 - **Model card.** There's no model. Add a model card only if Mark wants one and there's a real figure for it, such as the German tank estimate's error against the exact counts.
 - **Claim amounts.** `predmetRizeni` often gives the amount claimed. It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
