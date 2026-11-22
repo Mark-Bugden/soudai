@@ -98,7 +98,15 @@ def test_the_summary_totals_by_year():
 
 @pytest.mark.parametrize(
     "seen, expected",
-    [({3, 7}, list(range(1, 18))), ({112, 3}, list(range(1, 123))), (set(), list(range(1, 11)))],
+    [
+        ({3, 7}, list(range(1, 18))),
+        (set(), list(range(1, 11))),
+        ({3, 112}, list(range(1, 14)) + [112]),  # a stray
+        ({3, 11297}, list(range(1, 14)) + [11297]),
+        ({3, 305, 310, 317}, list(range(1, 14)) + list(range(301, 328))),  # a series
+        ({3, 2104, 2110, 2119}, list(range(1, 14)) + list(range(2101, 2130))),
+        ({95, 105, 107}, list(range(1, 106)) + [107]),  # two above 100: a stray, but 105 is covered
+    ],
 )
 def test_candidate_senates(seen, expected):
     assert senates.candidates(seen) == expected

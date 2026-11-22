@@ -1,8 +1,12 @@
 """Senates (milestone 4): which senates of each court registered civil cases in each year, 2020–2025.
 
 The candidates for a court are the senates seen in its published register C decisions (any year), plus
-every senate from 1 to the highest seen + 10. A senate-year exists if its case number 1 does. For a few
-courts and one year, a sweep of senates 1–250 checks that the rule misses nothing.
+every senate from 1 to the highest seen below 100, + 10. Senates above 100 come in series by the
+hundred (105–118, 205–218 and 305–317 at Ústí nad Orlicí, 2104–2119 in Brno), so each hundred in which
+at least 3 senates are seen is probed the same way: 301 to its highest + 10, say. A hundred with fewer
+is a stray (11297 at Náchod, probably a typo), and only the senates seen in it are probed. A
+senate-year exists if its case number 1 does. For a few courts and one year, a sweep of senates 1–999
+checks that the rule misses nothing.
 
 Writes data/derived/senates.csv: one row per senate-year whose case 1 exists, or that has published
 decisions without a case 1 (flagged), with what the published decisions say about it: how many of its
@@ -22,10 +26,11 @@ PATH = paths.DERIVED / "senates.csv"
 COLUMNS = ["court", "year", "senate", "case_1", "published_cases", "published_max", "found_by"]
 YEARS = range(2020, 2026)
 MARGIN = 10
-# The wide sweep: courts with branches or high senate numbers, a Prague court and a small court.
+SERIES = 3  # the senates that must be seen in a hundred above the first for it to be probed in full
+# The wide sweep: courts with branches or senate series, a Prague court and a small court.
 SWEEP_COURTS = ["OSSEMKA", "OSJIMBM", "OSVYCUO", "OSPHA01", "OSSEMJE"]
 SWEEP_YEAR = 2023
-SWEEP_SENATES = range(1, 251)
+SWEEP_SENATES = range(1, 1000)
 
 
 def published(path=decisions.PATH):
@@ -46,7 +51,14 @@ def published(path=decisions.PATH):
 
 def candidates(seen):
     """The senates to probe for a court, from those seen in its published decisions."""
-    return sorted(set(seen) | set(range(1, max(seen, default=0) + MARGIN + 1)))
+    hundreds = defaultdict(set)
+    for senate in seen:
+        hundreds[senate // 100].add(senate)
+    probe = set(seen) | set(range(1, max(hundreds[0], default=0) + MARGIN + 1))
+    for hundred, senates in hundreds.items():
+        if hundred and len(senates) >= SERIES:
+            probe |= set(range(100 * hundred + 1, max(senates) + MARGIN + 1))
+    return sorted(probe)
 
 
 def discover(exists, courts, seen, hints, years=YEARS, sweep=()):
