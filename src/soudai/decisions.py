@@ -15,6 +15,7 @@ import calendar
 import re
 from collections import Counter
 from datetime import date, timedelta
+from itertools import pairwise
 
 import pyarrow
 import pyarrow.parquet
@@ -124,20 +125,31 @@ def _date(text):
         return None
 
 
-TITLE = re.compile(r"^(?:[\w.]*\.[\w.]*|MBA|DiS|CSc|DrSc|et)$")  # JUDr., Mgr., Ph.D., LL.M. and the like
+# JUDr., Ph.D., LL.M. and so on, and the words for a judge's role that sometimes follow the name.
+TITLE = re.compile(r"^(?:[\w.]*\.[\w.]*|MBA|DiS|CSc|DrSc|Dr|Mgr|Bc|Ing|et)$", re.IGNORECASE)
+ROLES = {"předseda", "předsedkyně", "senátu", "soudce", "soudkyně", "samosoudce", "samosoudkyně", "asistent"}
+# `autor` values that are places, not judges, each checked by hand: five decisions from 2020 to
+# 2026-11-20. They're in court names and subjects, so the check leaves them out.
+NOT_JUDGES = {"Hradci Králové", "Karlovy Vary", "Nový Jičín", "Valašském Meziříčí"}
 
 
-def bare_name(autor):
-    """A judge's name without academic titles: "JUDr. Jan Novák, Ph.D." -> "Jan Novák"."""
-    words = autor.replace(",", " ").split()
-    return " ".join(word for word in words if not TITLE.match(word))
+def name_pairs(autor):
+    """The pairs of adjacent words in an `autor` field, without titles or roles, each capitalised:
+    "JUDr. Jan Novák, Ph.D." gives {"Jan Novák"}. The field sometimes holds more than one name, a
+    number, or a name in lower case, and a pair still catches each name."""
+    words = [
+        word[:1].upper() + word[1:]
+        for word in re.split(r"[\s,;]+", autor)
+        if word.replace("-", "").isalpha() and not TITLE.match(word) and word.lower() not in ROLES
+    ]
+    return {f"{first} {second}" for first, second in pairwise(words)}
 
 
 def judges_in(columns, judges):
     """The judges' names that appear in a text column of the table. There should be none."""
     text = "\n".join({value for name in ("court_name", "subject") for value in columns[name] if value})
-    names = {bare_name(judge) for judge in judges}
-    return sorted(name for name in names if len(name) >= 6 and " " in name and name in text)
+    names = {pair for judge in judges if judge.strip() not in NOT_JUDGES for pair in name_pairs(judge)}
+    return sorted(name for name in names if len(name) >= 6 and name in text)
 
 
 def write(columns, until, path=PATH):

@@ -163,19 +163,33 @@ def test_the_table_round_trips_with_its_snapshot_and_no_judges(tmp_path, parsed_
 
 
 @pytest.mark.parametrize(
-    "autor, name",
+    "autor, pairs",
     [
-        ("JUDr. Jan Novák, Ph.D.", "Jan Novák"),
-        ("JUDr. et Mgr. Eva Malá", "Eva Malá"),
-        ("Mgr. Petr Svoboda, LL.M.", "Petr Svoboda"),
-        ("Ing. Bc. Jana Dvořáková, MBA", "Jana Dvořáková"),
+        ("JUDr. Jan Novák, Ph.D.", {"Jan Novák"}),
+        ("JUDr. et Mgr. Eva Malá", {"Eva Malá"}),
+        ("Mgr. Petr Svoboda, LL.M.", {"Petr Svoboda"}),
+        ("Ing. Bc. Jana Dvořáková, MBA", {"Jana Dvořáková"}),
+        ("Mgr Lic. Eva Malá", {"Eva Malá"}),
+        ("Mgr. Jan Novák, samosoudce", {"Jan Novák"}),
+        ("JUDr. Jan Novák, předseda senátu", {"Jan Novák"}),
+        ("JUDr. Eva Nováková-Malá, 107", {"Eva Nováková-Malá"}),
+        ("Mgr. jan novák", {"Jan Novák"}),
+        ("JUDr. Jan Novák JUDr. Eva Malá", {"Jan Novák", "Novák Eva", "Eva Malá"}),
+        ("Novák", set()),
     ],
 )
-def test_judges_names_lose_their_titles(autor, name):
-    assert decisions.bare_name(autor) == name
+def test_judges_names_lose_their_titles(autor, pairs):
+    assert decisions.name_pairs(autor) == pairs
 
 
 def test_a_judges_name_in_a_subject_is_caught():
     columns = {"court_name": ["Okresní soud v Náchodě"], "subject": ["o zaplacení, žalobce Jan Novák"]}
     assert decisions.judges_in(columns, {"JUDr. Jan Novák", "Mgr. Eva Malá"}) == ["Jan Novák"]
-    assert decisions.judges_in(columns, {"Mgr. Eva Malá"}) == []
+    assert decisions.judges_in(columns, {"Mgr. Eva Malá, samosoudkyně"}) == []
+    assert decisions.judges_in(columns, {"Mgr. Eva Malá JUDr. Jan Novák, Ph.D."}) == ["Jan Novák"]
+
+
+def test_a_place_in_the_judges_field_isnt_a_judge():
+    columns = {"court_name": ["Krajský soud v Hradci Králové"], "subject": ["o zaplacení"]}
+    assert decisions.judges_in(columns, {"Hradci Králové"}) == []
+    assert decisions.judges_in(columns, {"Hradci Králové Jan"}) == ["Hradci Králové"]

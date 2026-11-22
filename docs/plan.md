@@ -85,6 +85,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 - **Privacy.**
   - Infosoud responses hold no names.
   - rozhodnuti items name the judge (`autor`). The parse step drops it, so no derived table, export or demo holds judges' names.
+  - rozhodnuti's subjects (`predmetRizeni`) sometimes name other people, with a date of birth or an address (step 3). So the decisions table isn't committed, and no export or demo shows a subject.
   - Full texts of decisions are never fetched.
 - **Snapshot.** Each case keeps its `platneK`. The snapshot date, i.e. the end of the timeline scrape, goes into the export, "How this works" and the write-up. Censoring is at each case's `platneK`.
 - **What's committed.** `reference/` (hand-checked tables) and `data/derived/` (tables from the parse steps, with no judges' names). Any derived file over about 10 MB stays out of git (see "Open questions").
@@ -95,7 +96,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | --- | --- | --- | --- |
 | Courts | infosoud `organizace/*`, the old `references/court_map.yaml` in `Mark-Bugden/SOUDAI_data_scraping` as a seed | `reference/courts.csv` | < 100 requests |
 | Events | infosoud's JS bundle | `reference/events.csv` | < 150 requests (static files) |
-| Published decisions | rozhodnuti listing | `data/derived/decisions.parquet` | 7–9k requests, 2–3 h |
+| Published decisions | rozhodnuti listing | `data/derived/decisions.parquet` | 7,517 requests, 6 h 20 min (step 3) |
 | Senates | decisions, probes of number 1 | `data/derived/senates.csv` | ~20k requests, ~6 h (estimate) |
 | Intake | senates, binary search | `data/derived/intake.csv` | ~10–15 requests per senate-year; ~6k senate-years if courts average 12 civil senates: ~75k requests, ~21 h |
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 60 per court-year: ~31k requests, ~9 h |
@@ -286,10 +287,47 @@ pyproject.toml, uv.lock        a uv project
   - The Windows console's code page can't print č or ř, so the CLI switches stdout and stderr to UTF-8.
   - A review of the code turned up two minor bugs, both fixed: `status` lumped every 400 together, and a test of 5xx caching couldn't fail. It also turned up the edge cases above (cached outage pages, 403s and 408s, malformed JSON, numpy ints in a request body), and the filing-year finding.
 
-### 3. Published decisions (run, then PR)
-- [ ] List every decision from 2020 to the snapshot date.
-- [ ] Parse to `data/derived/decisions.parquet`: court code, senate, register, number, case year, document number, decision date, publication date and `predmetRizeni`. Drop `autor`, keywords and statutes.
-- [ ] Record: total decisions, requests, run time, resets, the split by court level and register, case numbers that didn't parse, and courts that didn't map.
+### 3. Published decisions (run, then PR, 2026-11-22)
+- [x] List every decision from 2020 to the snapshot date.
+  - **Snapshot 2026-11-21:** 616,458 decisions on 1,805 days, the last on 2026-11-20.
+  - **Three runs:**
+    - Run 21 was a trial of 2020 only: 39 requests.
+    - Run 22 made 5,462 requests in 4 h 41 min, until the computer restarted.
+    - Run 24 resumed it: 2,016 requests, with 5,311 answered from the cache, in 1 h 40 min.
+  - **In all:** 7,517 requests in 6 h 20 min, 311 failures, and no 429s or 403s. The estimate of 7–9k requests held, but the time didn't.
+  - **rozhodnuti drops a connection about every 24 requests.** All 311 failures came singly: 273 connection errors and 38 read timeouts, each cleared by one 30 s wait. A failure costs 20–30 s before the wait, so the listing manages about 20 requests a minute at any pacing. Going back to 3 s, as "Pacing" says to do if 1 s keeps resetting, would only slow it, so it wasn't done, and Mark was told.
+  - **The day pages aren't stable.** 15 decisions appear on two neighbouring pages of the same day. That day's count still matches its total, so for each repeat some other decision was skipped. About 15 of 616,458 are missing. The 5 other repeated case numbers have no document part: they're different documents on different days.
+- [x] Parse to `data/derived/decisions.parquet`: court code, senate, register, number, case year, document number, decision date, publication date and `predmetRizeni`. Drop `autor`, keywords and statutes.
+  - 10.9 MB, with the snapshot date and the source in its metadata. `--parse-only` rebuilds it from the cache in about 20 s.
+  - **It isn't committed.** It's over 10 MB, and `predmetRizeni` isn't fully anonymised. Most subjects use placeholders (`[částka]` in 51,796, `[číslo]`, `[anonymizováno]` and others). But about 200 give someone's date of birth or address, such as a liquidator's, and about 385 have a name with a title. `.gitignore` lists the file, so nobody commits it by accident. See "Publishing the snapshot" under "Open questions".
+  - **The judge check stopped the first parse.** Five `autor` fields hold a place, not a judge: "Hradci Králové" (twice), "Karlovy Vary", "Nový Jičín" and "Valašském Meziříčí". Each matched a court name or subject.
+  - **How the check works now.** It takes each pair of adjacent words in `autor` and looks for it in the court names and subjects. Titles and role words ("předseda senátu", "samosoudce") are left out, and each word is capitalised. Pairs are needed because some fields hold two judges, a number or a name in lower case. The four places are listed in the code and skipped. Judges' names found: 0.
+- [x] Record: total decisions, requests, run time, resets, the split by court level and register, case numbers that didn't parse, and courts that didn't map.
+  - **By year of publication:**
+
+    | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 (to 21 Nov) |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | 797 | 150,939 | 181,861 | 85,462 | 61,203 | 71,514 | 64,682 |
+
+  - **By court level:**
+    - district 589,465;
+    - regional 17,950;
+    - high 8,307;
+    - supreme 9;
+    - other 87: Ústavní soud, and three "Neznámý soud NN";
+    - `(nezadán)` 640.
+  - **Registers at district-level courts:** C 589,034, then T 198, EVC 84, EC 49, CO 32, Nc 22, Co 15, NC 6 and c 2. Another 23 have no register because their case number doesn't parse.
+  - **Case numbers that don't parse:** 24, nearly all `0  0/0`.
+  - **Courts:** all 86 appear, and every district-like name maps to one. Hodonín's name is confirmed as "Okresní soud v Hodoníně", with 4,887 decisions.
+  - **Register C at district courts, by case year:**
+
+    | | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | Decisions | 56,438 | 170,859 | 144,911 | 66,452 | 58,469 | 55,372 |
+    | Distinct cases | 55,748 | 169,381 | 143,732 | 65,690 | 57,688 | 54,700 |
+
+    7,262 senate-years have at least one, and so does every court-year.
+  - **Senates above 100 are common.** They come in series at 22 courts, and step 4's candidate rule has to change to fit. See "Senates above 100" under "Open questions".
 
 ### 4. Senates and exact intake (run, then PR)
 - [ ] Find each court's senates for each filing year (see "Exact intake"), including the wide sweep for a few courts. Record the number of active senate-years and the requests used.
@@ -345,12 +383,21 @@ pyproject.toml, uv.lock        a uv project
   - **How to build it.** Merge obec polygons by the annex's lists, using a hand-checked crosswalk for the ~65 awkward names. Add the city of Brno and Prague's 10 MOP polygons, then simplify. The result should be about 100–300 KB, which is an estimate.
   - **Alternatives:** ArcČR 4.3, which has no Prague obvody and whose licence is unconfirmed; Eurostat GISCO LAU, which is municipalities only and non-commercial; and OpenStreetMap, which is ODbL, share-alike. Points at the court seats remain the fallback.
 - **Appeals.** An appeal at the regional court has its own case number (register `Co`), listed in `navazneVeci`. Following these links would give appeal durations. That's out of scope for now: the district case's own events (`ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`) give the loop.
-- **Filing date and case year** (settled with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. That's unconfirmed. Settled: intake counts registrations and is labelled so, waits run from `ZAHAJ_RIZ`, and the check allows an earlier filing year (see "Decisions" and "Checks"). Still open: why it happens, which step 5's sample can show by court.
+- **Filing date and case year** (settled with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. The official statistics point to the first: at Náchod in 2022, 1,757 of the 2,309 new register C cases were transferred from EPR, the electronic payment order register (see "External check"). So `ZAHAJ_RIZ` is probably the EPR filing date. That's inferred, not checked case by case. Settled: intake counts registrations and is labelled so, waits run from `ZAHAJ_RIZ`, and the check allows an earlier filing year (see "Decisions" and "Checks"). Still open: why it happens, which step 5's sample can show by court.
 - **Older open cases.** The sample covers cases registered 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 registrations would close the gap if the numbers need it.
 - **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way. A clue from step 2: one day's first page of decisions had senates 106, 112 and 117 at "Okresní soud v Karviné, pobočka Havířov" and 108 at Městský soud v Brně, so a branch's senates may be numbered from 100. Ústí nad Orlicí has no branch, though.
+  - **Step 3's answer: they're common, and they come in series.** 22 courts have register C senates above 100 with cases of 2020–2025, usually the same endings under a new hundred.
+    - Ústí nad Orlicí has 105–118, 205–218 and 305–317.
+    - Kladno has 107–130, plus 207–233 with about 200 published cases each.
+    - Karviná has 106–130, at about 400 each.
+    - Brno has 104–119, 213–27x and 2104–2119.
+    - Blansko has 702–715.
+  - **Strays.** About a dozen single decisions sit far outside any series, such as 11297 at Náchod and 9249 at Liberec. They're probably typos.
+  - **Still open:** what the hundreds mean.
+  - **What step 4 needs.** Its rule probes every senate from 1 to the highest seen + 10, so one stray would cost thousands of probes, and the 1–250 sweep can't see the 300s or 2100s. The rule has to work by series instead.
 - **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Still open: whether a senate's top number matches "zapsáno" or "nápad". Step 6 compares both.
-- **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit.
+- **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit. Step 3's decisions table (10.9 MB) stays local for now. Its subjects sometimes give a person's date of birth or address, so it can't be published as it is. Without the `subject` column it would be smaller, and safe on that count. That's Mark's call.
 - **Model card.** There's no model. Add a model card only if Mark wants one and there's a real figure for it, such as the German tank estimate's error against the exact counts.
-- **Claim amounts.** `predmetRizeni` often gives the amount claimed. It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
+- **Claim amounts.** `predmetRizeni` often gives the amount claimed, though 51,796 subjects have `[částka]` in its place (step 3). It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
 - **Judges.** Discussed 2026-11-22: a judge-level aggregate (how much of the variation comes from the judge, with no names) was floated, and the scope Mark chose leaves judges out. The raw cache keeps `autor`; nothing derived does.
 - **API stability.** If infosoud's API changes during a run, stop, record what changed here, and adapt the client. The cache keeps everything already fetched.
