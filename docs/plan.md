@@ -10,7 +10,7 @@ The demo shows how civil cases move through Czech district courts, and where the
 
 1. opens on the journey of a civil case, from filing to a final decision: the routes cases take, how many take each one, and how long each step lasts
 2. picks a court and compares its journey with the national one
-3. switches to a map of the district courts, coloured by cases filed per year, backlog or typical time to a decision
+3. switches to a map of the district courts, coloured by cases registered per year, backlog or typical time to a decision
 4. sees how close an estimate of a court's caseload, made from its published decisions alone (the German tank method), gets to the exact count.
 
 The project is descriptive. It makes no predictions about individual cases, makes no claims about why courts differ, and isn't legal advice.
@@ -33,7 +33,7 @@ The project is descriptive. It makes no predictions about individual cases, make
 | --- | --- | --- |
 | Two repos: `SOUDAI_data_scraping` and this one | One repo, `soudai`, written from scratch | The old code is a reference only. It stays in this repo's history and in the public scraping repo. |
 | Poetry | uv | The same as the other project repos. |
-| Sample: published decisions from rozhodnuti.justice.cz | A random sample of all filed cases, drawn from each senate's docket on infosoud | Published decisions only cover decided cases, and publication volume swings by year (797 in 2020, 181,861 in 2022, 61,203 in 2024). Published decisions are still used, for the German tank estimate and to find senates. |
+| Sample: published decisions from rozhodnuti.justice.cz | A random sample of all registered cases, drawn from each senate's docket on infosoud | Published decisions only cover decided cases, and publication volume swings by year (797 in 2020, 181,861 in 2022, 61,203 in 2024). Published decisions are still used, for the German tank estimate and to find senates. |
 | Infosoud's HTML pages (`infosoud.justice.cz/InfoSoud/public/search.do`) | Infosoud's JSON API at `infosoud.gov.cz/api/v1` | The old site redirects every URL to the new app's front page and drops the query, so the old scraper no longer works. |
 | Target: days from filing to the published decision, capped at 5 years, open cases dropped | Each case's full timeline. Waits are estimated with censoring (Kaplan–Meier), with no cap | The cap and dropping open cases both bias durations downwards. |
 | Features: keywords and cited statutes from the decision | Not used | They're written when the case ends, so they leak the outcome. The project is descriptive now anyway. |
@@ -77,7 +77,8 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 
 ### Decisions
 
-- **Scope.** District-level courts (okresní and obvodní soudy and Městský soud v Brně: 86, confirmed in step 2), register `C`, cases filed 2020–2025 (decided 2026-11-22). Městský soud v Praze is a regional-level court and is out of scope.
+- **Scope.** District-level courts (okresní and obvodní soudy and Městský soud v Brně: 86, confirmed in step 2), register `C`, cases registered 2020–2025, i.e. with case numbers of those years (decided 2026-11-22). Městský soud v Praze is a regional-level court and is out of scope.
+- **Intake is registrations** (decided with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, which for about a quarter of sampled cases is the year after it was filed (see "Filing date and case year" under "Open questions"). Intake is the exact count of cases registered per senate-year, and the demo calls it "cases registered". The courts' official statistics probably count the same thing (nápad), and step 6 checks that. Waits are measured from `ZAHAJ_RIZ`, the filing date.
 - **Pacing.** 1 request a second across the whole project (decided 2026-11-22). On a connection error, wait 30, 60, then 90 s and retry. On any 429, or more than 5 failures in a row, stop the run and record it here. If 1 s draws 429s or keeps resetting, go back to 3 s and tell Mark.
 - **Identification.** User-Agent `soudai/<version> (+https://github.com/Mark-Bugden/soudai)`.
 - **Cache.** Every response, including not-found responses, goes into a SQLite cache at `data/raw/cache.sqlite`: request key, URL, body, status, the response gzipped, and the fetch time. Nothing that's cached is fetched again unless a stage asks to refresh it. The cache is the snapshot, so it's never deleted, and it's never committed.
@@ -107,7 +108,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - Case numbers parse, and the regex covers every case number in the decisions table.
 - Every court in `decisions` maps to a row of `reference/courts.csv`.
 - The binary search finds the top of a fake docket, including dockets of 0 and 1 cases.
-- Every sampled case has `ZAHAJ_RIZ`, and its date falls in the case's year. (This won't hold as written: see "Filing date and case year" under "Open questions".)
+- Every sampled case has `ZAHAJ_RIZ`, and its date falls in the case's year or before. Record the share filed in an earlier year, and the lag, by court.
 - No judge's name appears anywhere in `data/derived/` or the export.
 - The German tank estimator and its interval match a brute-force simulation.
 - The weighted Kaplan–Meier matches hand-worked cases.
@@ -117,7 +118,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 
 ### Exact intake
 
-For each court, senate and filing year, the highest existing number is the number of cases filed. Find it with an exponential search from a hint (the highest published number, or 16), then a binary search. Then probe the top + 1 to + 3 and the top + 10 and + 25, to catch islands above a gap. To check there are no gaps, probe 3 random numbers below the top in every senate-year. If any probe comes back missing, stop and investigate before trusting the counts.
+For each court, senate and year, the highest existing number is the number of cases registered that year. Find it with an exponential search from a hint (the highest published number, or 16), then a binary search. Then probe the top + 1 to + 3 and the top + 10 and + 25, to catch islands above a gap. To check there are no gaps, probe 3 random numbers below the top in every senate-year. If any probe comes back missing, stop and investigate before trusting the counts.
 
 A court's intake for a year is the sum over its senates. Finding the senates: the candidates for a court and year are the senates seen in its published decisions (any year), plus 1 to the highest seen + 10. A senate exists in a year if its case number 1 does. For a few courts, sweep senates 1–250 to check that the rule misses nothing.
 
@@ -141,7 +142,7 @@ From published decisions alone: for a senate-year with k distinct published case
 
 Little's law: backlog L = λW, with λ the yearly intake (exact) and W the mean time from filing to disposal. Censoring makes W's mean hard. Use a restricted mean with the horizon stated, and lean on the early filing years, which are almost all closed.
 
-As a check, count directly from the sample the weighted number of cases open on 31 December of each year. That count misses cases filed before 2020 that are still open, so it's a lower bound (see "Open questions").
+As a check, count directly from the sample the weighted number of cases open on 31 December of each year. That count misses cases registered before 2020 that are still open, so it's a lower bound (see "Open questions").
 
 Little's law also assumes a steady state, which 2020 wasn't. Say so wherever backlog is shown.
 
@@ -176,11 +177,11 @@ Compare national and court intake with the Ministry of Justice's official statis
 | Journey | A flow diagram of the stages a civil case passes through, with the appeal loop as a side branch. Each edge's thickness is the share of cases that take it, and its label is the median wait. Hovering an edge gives its share, median and interquartile range. |
 | Time to disposal | Beside the diagram: the share of cases still open t months after filing, for the selected court against all courts. |
 | Court selector | All courts, or one court, with search by name. Search ignores diacritics, so "Decin" finds Děčín. The selection is shared by both views. |
-| Courts | A map of the district courts (see "Open questions" for areas or seats), coloured by the chosen measure: cases filed per year, backlog, or median time to disposal. Clicking a court selects it. |
+| Courts | A map of the district courts (see "Open questions" for areas or seats), coloured by the chosen measure: cases registered per year, backlog, or median time to disposal. Clicking a court selects it. |
 | Court panel | For the selected court: exact intake by year beside the German tank estimate and its interval, and its backlog. |
 | Tank explainer | Stretch goal: reveal a court's published case numbers a few at a time and watch the estimate close in on the exact count. |
 | Status line | What's selected, with its headline numbers. |
-| How this works | Sources and snapshot date, what's counted (district courts, register C, filed 2020–2025), the methods in brief, and that it isn't legal advice. |
+| How this works | Sources and snapshot date, what's counted (district courts, register C, registered 2020–2025), the methods in brief, and that it isn't legal advice. |
 | Language | The interface is in English. Court names stay in Czech. Event names use the English glosses from `reference/events.csv`. |
 
 ## Look
@@ -344,11 +345,8 @@ pyproject.toml, uv.lock        a uv project
   - **How to build it.** Merge obec polygons by the annex's lists, using a hand-checked crosswalk for the ~65 awkward names. Add the city of Brno and Prague's 10 MOP polygons, then simplify. The result should be about 100–300 KB, which is an estimate.
   - **Alternatives:** ArcČR 4.3, which has no Prague obvody and whose licence is unconfirmed; Eurostat GISCO LAU, which is municipalities only and non-commercial; and OpenStreetMap, which is ODbL, share-alike. Points at the court seats remain the fallback.
 - **Appeals.** An appeal at the regional court has its own case number (register `Co`), listed in `navazneVeci`. Following these links would give appeal durations. That's out of scope for now: the district case's own events (`ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`) give the loop.
-- **Filing date and case year.** A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. That's unconfirmed. It matters in three places, and needs a decision with Mark before steps 4–6:
-  - **Intake.** A senate-year's top number counts cases *registered* in C that year. The demo should call it that, or count by filing year from the sample.
-  - **Waits.** Measure from `ZAHAJ_RIZ`, the real filing date, not from 1 January of the case year.
-  - **The check.** Replace "falls in the case's year" with "falls in the case's year or before", and record the share and the lag by court.
-- **Older open cases.** The sample covers cases filed 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 filings would close the gap if the numbers need it.
+- **Filing date and case year** (settled with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. That's unconfirmed. Settled: intake counts registrations and is labelled so, waits run from `ZAHAJ_RIZ`, and the check allows an earlier filing year (see "Decisions" and "Checks"). Still open: why it happens, which step 5's sample can show by court.
+- **Older open cases.** The sample covers cases registered 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 registrations would close the gap if the numbers need it.
 - **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way. A clue from step 2: one day's first page of decisions had senates 106, 112 and 117 at "Okresní soud v Karviné, pobočka Havířov" and 108 at Městský soud v Brně, so a branch's senates may be numbered from 100. Ústí nad Orlicí has no branch, though.
 - **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Still open: whether a senate's top number matches "zapsáno" or "nápad". Step 6 compares both.
 - **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit.
