@@ -12,10 +12,11 @@ The project is descriptive. It makes no predictions about individual cases, make
 | --- | --- |
 | [`demo/`](demo/) | The interactive demo for [mark-bugden.github.io](https://mark-bugden.github.io/), built with [demo-kit](https://github.com/Mark-Bugden/demo-kit). Its README explains how to run and build it. |
 | [`src/soudai/`](src/soudai/) | Python: the scrapers, the parse steps and the analysis. |
-| [`tests/`](tests/) | Python tests. They never touch the network. |
+| [`reference/`](reference/) | The hand-checked tables of district courts and event codes, and a record of the sources. Its README explains how they're made and checked. |
+| [`tests/`](tests/) | Python tests. They never touch the network: they run on real responses saved in `tests/fixtures/`. |
 | [`docs/`](docs/) | The plan. |
 
-The plan's "Repo layout" section lists what each part will hold as the rebuild goes on, including `reference/` (hand-checked tables) and `data/derived/` (the parsed tables).
+The plan's "Repo layout" section lists what each part will hold as the rebuild goes on, including `data/derived/` (the parsed tables).
 
 ## Running the pipeline
 
@@ -26,18 +27,18 @@ uv sync
 uv run pytest
 ```
 
-Each stage will run as `uv run soudai <stage>`, in this order. The plan gives each stage's inputs, outputs and rough cost.
+Each stage runs as `uv run soudai <stage>`, in this order. The stages from milestone 3 on aren't built yet. The plan gives each stage's inputs, outputs and rough cost.
 
 | Stage | What it does | Milestone |
 | --- | --- | --- |
-| `courts`, `events` | Build the reference tables of district courts and event codes. | 2 |
+| `courts`, `events` | Check the reference tables of district courts and event codes against infosoud. | 2 |
 | `decisions` | List every published decision since 2020. | 3 |
 | `senates`, `intake` | Find each court's senates, and count the cases each one filed per year. | 4 |
 | `sample` | Fetch the timelines of a random sample of cases. | 5 |
 | `analyse`, `export` | Compute the journeys, waits, estimates and backlog, and write the demo's data. | 6–7 |
 | `status` | Report each stage's progress. | 2 |
 
-Every response is cached in `data/raw/cache.sqlite`, which is never committed, and every stage resumes where it stopped. The scrapers make at most one request a second across the whole project.
+Every response is cached in `data/raw/cache.sqlite`, which is never committed, and every stage resumes where it stopped. The scrapers make at most one request a second across the whole project, even when two run at once, and each run logs every request to `data/raw/logs/`.
 
 ## Data
 

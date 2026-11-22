@@ -1,0 +1,53 @@
+{
+ "method": "GET",
+ "url": "https://infosoud.gov.cz/api/v1/organizace/podrizene/lov?idOrganizace=KSVYCHK",
+ "body": null,
+ "status": 200,
+ "content_type": "application/json",
+ "response": [
+  {
+   "nazev": "Okresní soud Chrudim",
+   "kod": "OSVYCCR"
+  },
+  {
+   "nazev": "Okresní soud Havlíčkův Brod",
+   "kod": "OSVYCHB"
+  },
+  {
+   "nazev": "Okresní soud Hradec Králové",
+   "kod": "OSVYCHK"
+  },
+  {
+   "nazev": "Okresní soud Jičín",
+   "kod": "OSVYCJC"
+  },
+  {
+   "nazev": "Okresní soud Náchod",
+   "kod": "OSVYCNA"
+  },
+  {
+   "nazev": "Okresní soud Pardubice",
+   "kod": "OSVYCPA"
+  },
+  {
+   "nazev": "Okresní soud Rychnov nad Kněžnou",
+   "kod": "OSVYCRK"
+  },
+  {
+   "nazev": "Okresní soud Semily",
+   "kod": "OSVYCSM"
+  },
+  {
+   "nazev": "Okresní soud Svitavy",
+   "kod": "OSVYCSY"
+  },
+  {
+   "nazev": "Okresní soud Trutnov",
+   "kod": "OSVYCTU"
+  },
+  {
+   "nazev": "Okresní soud Ústí nad Orlicí",
+   "kod": "OSVYCUO"
+  }
+ ]
+}

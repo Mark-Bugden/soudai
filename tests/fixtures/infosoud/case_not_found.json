@@ -1,0 +1,21 @@
+{
+ "method": "POST",
+ "url": "https://infosoud.gov.cz/api/v1/rizeni/vyhledej",
+ "body": {
+  "druhOrganizace": "KSVYCHK",
+  "okresniSoud": "OSVYCNA",
+  "druhVeci": "C",
+  "cisloSenatu": 15,
+  "bcVec": 9999,
+  "rocnik": 2022
+ },
+ "status": 400,
+ "content_type": "application/json",
+ "response": {
+  "timestamp": "2026-11-22T01:39:12.394+00:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "RIZENI_0000#15 C 9999 / 2022#Okresní soud Náchod",
+  "path": "/infosoud/api/v1/rizeni/vyhledej"
+ }
+}

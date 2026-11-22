@@ -1,0 +1,30 @@
+{
+  "infosoud": {
+    "site": "https://infosoud.gov.cz/",
+    "api": "https://infosoud.gov.cz/api/v1/",
+    "endpoints": {
+      "backend version": "GET env",
+      "regional, municipal and high courts": "GET organizace/lov",
+      "district courts under a regional court": "GET organizace/podrizene/lov?idOrganizace={regional code}",
+      "registers": "GET spisova-znacka/druh/lovkod?typ=rizeni",
+      "case lookup": "POST rizeni/vyhledej {druhOrganizace, okresniSoud, druhVeci, cisloSenatu, bcVec, rocnik}"
+    },
+    "backend_version": "2.0.0.10",
+    "checked": "2026-11-22",
+    "labels_chunk": "chunk-KZJVN2ZT.js"
+  },
+  "rozhodnuti": {
+    "api": "https://rozhodnuti.justice.cz/api/opendata",
+    "endpoints": {
+      "years": "GET",
+      "months of a year": "GET /{year}",
+      "days of a month": "GET /{year}/{month}",
+      "a day's decisions, 100 to a page from page 0": "GET /{year}/{month}/{day}?page={page}"
+    },
+    "checked": "2026-11-22"
+  },
+  "court_map": {
+    "url": "https://raw.githubusercontent.com/Mark-Bugden/SOUDAI_data_scraping/a9f5ba3751e25926fc014166efaee870e33973e8/references/court_map.yaml",
+    "commit": "a9f5ba3751e25926fc014166efaee870e33973e8"
+  }
+}

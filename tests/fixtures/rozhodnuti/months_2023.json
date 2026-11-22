@@ -1,0 +1,81 @@
+{
+ "method": "GET",
+ "url": "https://rozhodnuti.justice.cz/api/opendata/2023",
+ "body": null,
+ "status": 200,
+ "content_type": "application/json",
+ "response": [
+  {
+   "rok": 2023,
+   "mesic": 1,
+   "pocet": 13627,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/1"
+  },
+  {
+   "rok": 2023,
+   "mesic": 2,
+   "pocet": 9615,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/2"
+  },
+  {
+   "rok": 2023,
+   "mesic": 3,
+   "pocet": 8318,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/3"
+  },
+  {
+   "rok": 2023,
+   "mesic": 4,
+   "pocet": 5924,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/4"
+  },
+  {
+   "rok": 2023,
+   "mesic": 5,
+   "pocet": 7081,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/5"
+  },
+  {
+   "rok": 2023,
+   "mesic": 6,
+   "pocet": 6484,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/6"
+  },
+  {
+   "rok": 2023,
+   "mesic": 7,
+   "pocet": 5562,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/7"
+  },
+  {
+   "rok": 2023,
+   "mesic": 8,
+   "pocet": 6211,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/8"
+  },
+  {
+   "rok": 2023,
+   "mesic": 9,
+   "pocet": 5358,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/9"
+  },
+  {
+   "rok": 2023,
+   "mesic": 10,
+   "pocet": 6284,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/10"
+  },
+  {
+   "rok": 2023,
+   "mesic": 11,
+   "pocet": 6359,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/11"
+  },
+  {
+   "rok": 2023,
+   "mesic": 12,
+   "pocet": 4639,
+   "odkaz": "https://rozhodnuti.justice.cz/api/opendata/2023/12"
+  }
+ ]
+}

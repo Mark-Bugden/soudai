@@ -1,0 +1,45 @@
+{
+ "method": "POST",
+ "url": "https://infosoud.gov.cz/api/v1/rizeni/vyhledej",
+ "body": {
+  "druhOrganizace": "KSVYCHK",
+  "okresniSoud": "OSVYCNA",
+  "druhVeci": "C",
+  "cisloSenatu": 15,
+  "bcVec": 300,
+  "rocnik": 2026
+ },
+ "status": 200,
+ "content_type": "application/json",
+ "response": {
+  "cislo": 15,
+  "druh": "C",
+  "rocnik": 2026,
+  "bcVec": 300,
+  "nadrizenaOrganizace": "Krajský soud Hradec Králové",
+  "organizace": "Okresní soud Náchod",
+  "typOrganizace": "os",
+  "stav": "nevyřízená věc",
+  "stavDatum": "19.10.2026",
+  "napad": null,
+  "udalosti": [
+   {
+    "udalostId": null,
+    "udalost": "ZAHAJ_RIZ",
+    "poradi": 1,
+    "datum": "2026-07-31",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 15,
+     "druhVeci": "C",
+     "bcVec": 300,
+     "rocnik": 2026,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   }
+  ],
+  "navazneVeci": [],
+  "platneK": "2026-11-21T18:30:01+01:00"
+ }
+}

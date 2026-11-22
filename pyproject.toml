@@ -15,6 +15,9 @@ dependencies = [
     "scipy>=1.18",
 ]
 
+[project.scripts]
+soudai = "soudai.cli:main"
+
 [dependency-groups]
 dev = [
     "pytest>=9.2",
