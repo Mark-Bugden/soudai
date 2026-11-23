@@ -1,17 +1,19 @@
 """Exact intake (milestone 4): how many civil cases each senate registered each year, from its docket.
 
-A senate numbers its register C cases 1, 2, 3, ... afresh each year, so if the docket has no gaps, its
-highest existing number is the number of cases it registered that year. The search:
+A senate numbers its register C cases 1, 2, 3, ... afresh each year, so its highest number is the
+number of cases it registered that year. infosoud hides a few numbers, though: in 78 senate-years,
+case 1 is missing while later ones exist (step 4). The search:
 
 - **Top.** From a hint (the highest number seen in published decisions, or 1), probe upwards in steps
   of 16, 32, 64, ... until a number is missing, then binary search between the last that exists and
-  the first that doesn't.
-- **Islands.** Probe the top + 1, 2, 3, 10 and 25. Any that exists means the docket goes on past a gap.
+  the first that doesn't. If case 1 is missing but the hint exists, the search starts from the hint.
+- **Islands.** Probe the top + 1, 2, 3, 10 and 25. Any that exists means the docket goes on past a
+  hidden number, so the search carries on from the highest of them, until none exists.
 - **Holes.** Probe 3 numbers below the top, drawn with a seed made from the court, senate and year, so
   a rerun asks the same ones and the cache answers.
 
-A senate-year with an island or a hole is flagged, and its count isn't trusted until it's investigated
-(the plan: settle it with Mark before milestone 5).
+Every missing case 1, island and hole is flagged, so the plan can record how often numbers are hidden
+(and settle it with Mark before milestone 5).
 
     uv run soudai intake    # needs data/derived/senates.csv, from `soudai senates`
 """
@@ -44,11 +46,14 @@ class Docket:
 
 
 def find_top(docket, hint=None):
-    """The highest number in a docket with no gaps: 0 if number 1 doesn't exist."""
-    if not docket(1):
-        return 0
+    """The highest number in a docket with no gaps, searching from number 1, or from the hint if number
+    1 is missing: 0 if neither exists."""
     low, high = 1, None
-    if hint and hint > 1:
+    if not docket(1):
+        if not (hint and hint > 1 and docket(hint)):
+            return 0
+        low = hint
+    elif hint and hint > 1:
         if docket(hint):
             low = hint
         else:
@@ -69,14 +74,15 @@ def find_top(docket, hint=None):
     return low
 
 
-def check(docket, top, seed):
-    """Flags for numbers above the top that exist (islands) and numbers below it that don't (holes)."""
-    flags = [f"island:{top + d}" for d in ABOVE if docket(top + d)]
+def islands(docket, top):
+    """The numbers above the top that exist, from the top + 1, 2, 3, 10 and 25."""
+    return [top + d for d in ABOVE if docket(top + d)]
+
+
+def holes(docket, top, seed):
+    """The numbers below the top that don't exist, from 3 drawn with the seed."""
     below = range(2, top)
-    for number in sorted(random.Random(seed).sample(below, min(HOLES, len(below)))):
-        if not docket(number):
-            flags.append(f"hole:{number}")
-    return flags
+    return [n for n in sorted(random.Random(seed).sample(below, min(HOLES, len(below)))) if not docket(n)]
 
 
 def count(exists, court, senate, year, hint=None):
@@ -84,7 +90,14 @@ def count(exists, court, senate, year, hint=None):
     docket = Docket(exists)
     try:
         top = find_top(docket, hint)
-        flags = check(docket, top, f"{court}-{senate}-{year}") if top else ["no case 1"]
+        flags = ["hole:1"] if top and not docket(1) else []
+        while top and (above := islands(docket, top)):
+            flags += [f"island:{n}" for n in above]
+            top = find_top(docket, above[-1])
+        if top:
+            flags += [f"hole:{n}" for n in holes(docket, top, f"{court}-{senate}-{year}")]
+        else:
+            flags = ["no case 1"]
     except infosoud.LookupFailed as error:
         top, flags = None, [f"error: {error}"]
     return {
@@ -98,9 +111,11 @@ def count(exists, court, senate, year, hint=None):
 
 
 def read_senates(path=paths.DERIVED / "senates.csv"):
-    """The senate-years whose case 1 exists, from `soudai senates`."""
+    """Every senate-year from `soudai senates`: those whose case 1 exists, and those with published
+    decisions but no case 1, since infosoud hides some numbers. The count settles the second kind: the
+    search starts from their highest published number if it exists, and they count 0 if it doesn't."""
     with open(path, encoding="utf-8", newline="") as file:
-        return [row for row in csv.DictReader(file) if row["case_1"] == "found"]
+        return list(csv.DictReader(file))
 
 
 def run():
