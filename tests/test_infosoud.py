@@ -194,3 +194,33 @@ def test_the_labels_chunk_is_found_from_the_front_page_and_the_search_stops_ther
     assert infosoud.labels_chunk(client)[0] == "chunk-TWO.js"
     assert client.requests[0] == ("GET", site, None, True)  # the front page is always fetched afresh
     assert len(client.requests) == 4
+
+
+def test_exists_answers_found_and_not_found():
+    record, found = load("infosoud/case_found.json")
+    missing_record, missing = load("infosoud/case_not_found.json")
+    client = FakeClient(
+        [(("POST", LOOKUP, record["body"]), found), (("POST", LOOKUP, missing_record["body"]), missing)]
+    )
+    assert infosoud.exists(client, *NACHOD, 384, 2022) is True
+    assert infosoud.exists(client, *NACHOD, 9999, 2022) is False
+
+
+def test_exists_asks_again_after_an_error_and_gives_up_after_three():
+    body = infosoud.case_request(*NACHOD, 384, 2022)
+    error = make_response(LOOKUP, 400, {"message": "RIZENI_0001"})
+    _, found = load("infosoud/case_found.json")
+    client = FakeClient([(("POST", LOOKUP, body), error), (("POST", LOOKUP, body), found)])
+    assert infosoud.exists(client, *NACHOD, 384, 2022) is True
+    client = FakeClient([(("POST", LOOKUP, body), error)])
+    with pytest.raises(infosoud.LookupFailed):
+        infosoud.exists(client, *NACHOD, 384, 2022)
+    assert len(client.requests) == 3
+
+
+def test_exists_refuses_a_found_case_that_isnt_the_one_asked_for():
+    _, found = load("infosoud/case_found.json")  # 15 C 384/2022
+    body = infosoud.case_request(*NACHOD, 385, 2022)
+    client = FakeClient([(("POST", LOOKUP, body), found)])
+    with pytest.raises(UnexpectedResponse):
+        infosoud.exists(client, *NACHOD, 385, 2022)

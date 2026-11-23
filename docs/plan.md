@@ -97,11 +97,11 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Courts | infosoud `organizace/*`, the old `references/court_map.yaml` in `Mark-Bugden/SOUDAI_data_scraping` as a seed | `reference/courts.csv` | < 100 requests |
 | Events | infosoud's JS bundle | `reference/events.csv` | < 150 requests (static files) |
 | Published decisions | rozhodnuti listing | `data/derived/decisions.parquet` | 7,517 requests, 6 h 20 min (step 3) |
-| Senates | decisions, probes of number 1 | `data/derived/senates.csv` | ~20k requests, ~6 h (estimate) |
-| Intake | senates, binary search | `data/derived/intake.csv` | ~10–15 requests per senate-year; ~6k senate-years if courts average 12 civil senates: ~75k requests, ~21 h |
+| Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, ~10 h (estimated from step 3's table) |
+| Intake | senates, binary search | `data/derived/intake.csv` | ~12 requests per senate-year, ~8.4k senate-years: ~100–110k requests, ~30 h (estimate) |
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 60 per court-year: ~31k requests, ~9 h |
 
-The estimates for the senate and intake stages rest on a guess of about 12 civil senates per court. Replace them with real numbers as the stages run.
+The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
 ### Checks (pytest)
 
@@ -121,7 +121,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 
 For each court, senate and year, the highest existing number is the number of cases registered that year. Find it with an exponential search from a hint (the highest published number, or 16), then a binary search. Then probe the top + 1 to + 3 and the top + 10 and + 25, to catch islands above a gap. To check there are no gaps, probe 3 random numbers below the top in every senate-year. If any probe comes back missing, stop and investigate before trusting the counts.
 
-A court's intake for a year is the sum over its senates. Finding the senates: the candidates for a court and year are the senates seen in its published decisions (any year), plus 1 to the highest seen + 10. A senate exists in a year if its case number 1 does. For a few courts, sweep senates 1–250 to check that the rule misses nothing.
+A court's intake for a year is the sum over its senates. Finding the senates (revised after step 3): the candidates for a court and year are the senates seen in its published decisions (any year), plus 1 to the highest seen below 100, + 10. Senates above 100 come in series by the hundred, so each hundred with at least 3 senates seen is probed the same way, from its 1 to its highest + 10 (301–327 for 305–317, say). In a hundred with fewer, only the senates seen are probed, since those are strays such as 11297. A senate exists in a year if its case number 1 does. For a few courts, sweep senates 1–999 in one year to check that the rule misses nothing.
 
 ### The German tank estimate
 
@@ -334,6 +334,20 @@ pyproject.toml, uv.lock        a uv project
 - [ ] Find each senate-year's highest number, with the probes above it and the 3 gap probes below it.
 - [ ] Write `data/derived/intake.csv` (court, senate, year, count, probes used, flags), and record totals by court-year and nationally. If any gap turned up, stop: record it here and settle it with Mark before step 5.
 
+Built before the run (2026-11-22), with tests on fake dockets:
+- **`soudai senates`** writes `data/derived/senates.csv`, with one row per senate-year whose case 1 exists. Senate-years that have published decisions but no case 1 get a row too, flagged. Each row carries what step 3's table says about the senate-year: how many of its cases were published, and the highest number among them.
+- **`soudai intake`** writes `data/derived/intake.csv`, using that highest number as the search's hint. A lookup that keeps failing (`RIZENI_0001` three times) flags its senate-year and doesn't stop the run. `infosoud.exists` also checks that a found case is the one asked for.
+- **Candidates, by series.** The first rule (1 to the highest seen + 10) would have cost 272,568 probes, because stray senates like 11297 at Náchod and 9249 at Liberec stretch the range. Step 3's table also showed a natural line between strays and series:
+  - every hundred above the first with 1 or 2 senates seen has at most 3 published cases;
+  - every one with 3 or more has at least 6 senates, and all but one (Brno-venkov, 7 senates and 9 cases) have 45 cases or more.
+  - With the rule by series, the median court has 53 candidates, and Městský soud v Brně the most, 262.
+- **The sweep** widens to 1–999 at Karviná, Brno, Ústí nad Orlicí, Prague 1 and Jeseník in 2023, to cover hundreds like 300 and 700.
+- **Estimated cost of the senates stage:** 31,962 probes by the rule and 4,441 in the sweep, so 36,403 requests, about 10 h.
+- **Estimated cost of intake,** simulated by running the search on dockets of the German tank size, hinted with the highest published number:
+  - 13.1 probes per senate-year for the 7,262 with published decisions, about 1 of them case 1, which the senates stage has already cached;
+  - with ~15% more senate-years that have no published decisions, about 100–110k requests, ~30 h.
+- **A first look at the German tank estimate.** From the published decisions alone, it gives national register C totals of 294,192 (2020), 292,409, 294,591, 287,539, 286,718 and 274,013 (2025). The official nápad is 286,801 for 2020, 295,311 for 2022 and 272,434 for 2025. These are senate-years with published decisions only, before any exact count. Step 6 does this properly.
+
 ### 5. Timeline sample (run, then PR)
 - [ ] Draw 60 cases per court-year, uniformly over the court-year's docket (all its senates' numbers together), with a recorded seed. Each case's weight is the court-year's intake / 60.
 - [ ] Parse to `data/derived/cases.parquet` (case, court, filing date, status, status date, `platneK`, weight) and `data/derived/events.parquet` (case, code, date, `poradi`, cancelled).
@@ -394,9 +408,9 @@ pyproject.toml, uv.lock        a uv project
     - Blansko has 702–715.
   - **Strays.** About a dozen single decisions sit far outside any series, such as 11297 at Náchod and 9249 at Liberec. They're probably typos.
   - **Still open:** what the hundreds mean.
-  - **What step 4 needs.** Its rule probes every senate from 1 to the highest seen + 10, so one stray would cost thousands of probes, and the 1–250 sweep can't see the 300s or 2100s. The rule has to work by series instead.
+  - **What step 4 needs.** Its rule probes every senate from 1 to the highest seen + 10, so one stray would cost thousands of probes, and the 1–250 sweep can't see the 300s or 2100s. The rule has to work by series instead, and since step 4 it does (see "Exact intake").
 - **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Still open: whether a senate's top number matches "zapsáno" or "nápad". Step 6 compares both.
-- **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit. Step 3's decisions table (10.9 MB) stays local for now. Its subjects sometimes give a person's date of birth or address, so it can't be published as it is. Without the `subject` column it would be smaller, and safe on that count. That's Mark's call.
+- **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit. Step 3's decisions table (10.9 MB) stays local for now. Its subjects sometimes give a person's date of birth or address, so it can't be published as it is. Mark decided on 2026-11-22 to keep it private: nothing in the demo needs it.
 - **Model card.** There's no model. Add a model card only if Mark wants one and there's a real figure for it, such as the German tank estimate's error against the exact counts.
 - **Claim amounts.** `predmetRizeni` often gives the amount claimed, though 51,796 subjects have `[částka]` in its place (step 3). It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
 - **Judges.** Discussed 2026-11-22: a judge-level aggregate (how much of the variation comes from the judge, with no names) was floated, and the scope Mark chose leaves judges out. The raw cache keeps `autor`; nothing derived does.
