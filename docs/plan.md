@@ -97,8 +97,8 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Courts | infosoud `organizace/*`, the old `references/court_map.yaml` in `Mark-Bugden/SOUDAI_data_scraping` as a seed | `reference/courts.csv` | < 100 requests |
 | Events | infosoud's JS bundle | `reference/events.csv` | < 150 requests (static files) |
 | Published decisions | rozhodnuti listing | `data/derived/decisions.parquet` | 7,517 requests, 6 h 20 min (step 3) |
-| Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, ~10 h (estimated from step 3's table) |
-| Intake | senates, binary search | `data/derived/intake.csv` | ~12 requests per senate-year, ~8.4k senate-years: ~100–110k requests, ~30 h (estimate) |
+| Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, 10 h 8 min (step 4) |
+| Intake | senates, binary search | `data/derived/intake.csv` | 7,670 senate-years: ~93k requests, ~26 h, or up to ~32 h (estimate, step 4) |
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 60 per court-year: ~31k requests, ~9 h |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
@@ -119,7 +119,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 
 ### Exact intake
 
-For each court, senate and year, the highest existing number is the number of cases registered that year. Find it with an exponential search from a hint (the highest published number, or 16), then a binary search. Then probe the top + 1 to + 3 and the top + 10 and + 25, to catch islands above a gap. To check there are no gaps, probe 3 random numbers below the top in every senate-year. If any probe comes back missing, stop and investigate before trusting the counts.
+For each court, senate and year, the highest existing number is the number of cases registered that year. Find it with an exponential search from a hint (the highest published number, or 16), then a binary search. Then probe the top + 1 to + 3 and the top + 10 and + 25, to catch islands above a gap. To check there are no gaps, probe 3 random numbers below the top in every senate-year. If any probe comes back missing, stop and investigate before trusting the counts. Step 4 found that infosoud hides a few numbers (see "Hidden case numbers" under "Open questions"). So when a probe above the top finds a number, the search carries on from it, and when case 1 is hidden, it starts from the highest published number. Every hidden number it meets is flagged.
 
 A court's intake for a year is the sum over its senates. Finding the senates (revised after step 3): the candidates for a court and year are the senates seen in its published decisions (any year), plus 1 to the highest seen below 100, + 10. Senates above 100 come in series by the hundred, so each hundred with at least 3 senates seen is probed the same way, from its 1 to its highest + 10 (301–327 for 305–317, say). In a hundred with fewer, only the senates seen are probed, since those are strays such as 11297. A senate exists in a year if its case number 1 does. For a few courts, sweep senates 1–999 in one year to check that the rule misses nothing.
 
@@ -330,9 +330,28 @@ pyproject.toml, uv.lock        a uv project
   - **Senates above 100 are common.** They come in series at 22 courts, and step 4's candidate rule has to change to fit. See "Senates above 100" under "Open questions".
 
 ### 4. Senates and exact intake (run, then PR)
-- [ ] Find each court's senates for each filing year (see "Exact intake"), including the wide sweep for a few courts. Record the number of active senate-years and the requests used.
+- [x] Find each court's senates for each filing year (see "Exact intake"), including the wide sweep for a few courts. Record the number of active senate-years and the requests used.
+  - **Run 25, 2026-11-22 to 23:** 36,403 requests in 10 h 8 min, with no failures. That's the estimate to the request. infosoud ran at exactly 1 a second all night.
+  - **7,544 senate-years have a case 1:**
+
+    | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+    | --- | --- | --- | --- | --- | --- |
+    | 1,256 | 1,268 | 1,273 | 1,265 | 1,252 | 1,230 |
+
+    That's about 14.6 senates per court-year. 408 of them have no published decisions; the margin of 10 found them.
+  - **The sweep of 1–999** at Karviná, Brno, Ústí nad Orlicí, Prague 1 and Jeseník in 2023 found nothing the rule missed.
+  - **126 senate-years have published decisions but no case 1.** A follow-up run (26, 373 requests) asked infosoud for cases 2 and 3 and the highest published number in each:
+    - In 78, the highest published number exists, so they're real senate-years whose case 1 is hidden. In 61 of them cases 2 and 3 exist too, in 7 neither does, and in 10 one of them does.
+    - In 48, none exists. 44 have a single published decision, 3 have two and 1 has six, so they're probably typos in the case numbers.
+  - **That's a gap, so it's recorded here to settle with Mark before step 5.** See "Hidden case numbers" under "Open questions".
+  - `data/derived/senates.csv` has all 7,670 rows: 7,544 found and 126 not found.
 - [ ] Find each senate-year's highest number, with the probes above it and the 3 gap probes below it.
 - [ ] Write `data/derived/intake.csv` (court, senate, year, count, probes used, flags), and record totals by court-year and nationally. If any gap turned up, stop: record it here and settle it with Mark before step 5.
+
+Changed after the senates run (2026-11-23):
+- **Intake counts the 126 too.** If case 1 is hidden but the highest published number exists, the search starts there, and the senate-year is flagged `hole:1`. If neither exists, it counts 0, flagged `no case 1`.
+- **Intake carries on past hidden numbers.** If a probe above the top (+1, 2, 3, 10 or 25) finds a number, the search starts again from the highest one found, until none does. On fake dockets, this finds the true top past up to 7 hidden numbers in a row where the search stops. A run of 10 or more right there would go unnoticed.
+- **Estimated cost,** simulated on the real 7,670 senate-years: about 93k requests, about 26 h, if the dockets are the size the German tank estimate gives. If they're 20% bigger, it's 115k requests and 32 h. The 408 senate-years with no published decisions are assumed to have 50 cases each, or 300 in the bigger case.
 
 Built before the run (2026-11-22), with tests on fake dockets:
 - **`soudai senates`** writes `data/derived/senates.csv`, with one row per senate-year whose case 1 exists. Senate-years that have published decisions but no case 1 get a row too, flagged. Each row carries what step 3's table says about the senate-year: how many of its cases were published, and the highest number among them.
@@ -398,6 +417,10 @@ Built before the run (2026-11-22), with tests on fake dockets:
   - **Alternatives:** ArcČR 4.3, which has no Prague obvody and whose licence is unconfirmed; Eurostat GISCO LAU, which is municipalities only and non-commercial; and OpenStreetMap, which is ODbL, share-alike. Points at the court seats remain the fallback.
 - **Appeals.** An appeal at the regional court has its own case number (register `Co`), listed in `navazneVeci`. Following these links would give appeal durations. That's out of scope for now: the district case's own events (`ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`) give the loop.
 - **Filing date and case year** (settled with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. The official statistics point to the first: at Náchod in 2022, 1,757 of the 2,309 new register C cases were transferred from EPR, the electronic payment order register (see "External check"). So `ZAHAJ_RIZ` is probably the EPR filing date. That's inferred, not checked case by case. Settled: intake counts registrations and is labelled so, waits run from `ZAHAJ_RIZ`, and the check allows an earlier filing year (see "Decisions" and "Checks"). Still open: why it happens, which step 5's sample can show by court.
+- **Hidden case numbers** (step 4; settle with Mark before step 5). infosoud doesn't show every case number. In 78 senate-years, case 1 is missing while later numbers exist, and in 17 of them case 2 or 3 is missing too. A senate's counter never skips, so the highest number still counts its registrations, and intake now searches past hidden numbers. What's open:
+  - **Why.** Perhaps cases moved to another register or court, cases entered by mistake, or cases infosoud keeps private.
+  - **How often.** Intake's hole probes (3 per senate-year) will measure it.
+  - **What it means for step 5.** Whether a hidden number should count in a court-year's sample frame. A sampled number that's hidden would be drawn again.
 - **Older open cases.** The sample covers cases registered 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 registrations would close the gap if the numbers need it.
 - **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way. A clue from step 2: one day's first page of decisions had senates 106, 112 and 117 at "Okresní soud v Karviné, pobočka Havířov" and 108 at Městský soud v Brně, so a branch's senates may be numbered from 100. Ústí nad Orlicí has no branch, though.
   - **Step 3's answer: they're common, and they come in series.** 22 courts have register C senates above 100 with cases of 2020–2025, usually the same endings under a new hundred.

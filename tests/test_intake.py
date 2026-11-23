@@ -32,7 +32,8 @@ def test_each_number_is_asked_once():
     exists = docket_of(400)
     docket = intake.Docket(exists)
     intake.find_top(docket, 390)
-    intake.check(docket, 400, "seed")
+    intake.islands(docket, 400)
+    intake.holes(docket, 400, "seed")
     assert len(exists.asked) == len(set(exists.asked)) == len(docket.answers)
 
 
@@ -45,29 +46,48 @@ def test_the_search_takes_few_probes(n, hint, most):
     assert len(docket.answers) <= most
 
 
-def test_an_island_above_the_top_is_flagged():
+def test_an_island_above_the_top_is_found():
     docket = intake.Docket(docket_of(100, extra={110}))
     top = intake.find_top(docket, 90)
     assert top == 100
-    assert intake.check(docket, top, "seed") == ["island:110"]
+    assert intake.islands(docket, top) == [110]
 
 
-def test_holes_below_the_top_are_flagged():
+def test_holes_below_the_top_are_found():
     docket = intake.Docket(docket_of(100, missing=set(range(2, 100))))
-    flags = intake.check(docket, 100, "seed")
-    assert len(flags) == 3 and all(flag.startswith("hole:") for flag in flags)
+    assert len(intake.holes(docket, 100, "seed")) == 3
 
 
 def test_a_clean_docket_has_no_flags_and_the_hole_probes_repeat():
     first, second = intake.Docket(docket_of(300)), intake.Docket(docket_of(300))
-    assert intake.check(first, 300, "OSVYCNA-15-2022") == intake.check(second, 300, "OSVYCNA-15-2022") == []
+    for docket in (first, second):
+        assert intake.islands(docket, 300) == intake.holes(docket, 300, "OSVYCNA-15-2022") == []
     assert first.answers.keys() == second.answers.keys()  # so a rerun asks the same numbers, from the cache
 
 
 def test_tiny_dockets_have_no_room_for_holes():
     for n in (1, 2):
-        docket = intake.Docket(docket_of(n))
-        assert intake.check(docket, n, "seed") == []
+        assert intake.holes(intake.Docket(docket_of(n)), n, "seed") == []
+
+
+# From a hint of 100, the search for the top of 1..200 stops first at 180, where these are hidden.
+@pytest.mark.parametrize("hidden", [{180}, {180, 181}, set(range(180, 187))])
+def test_the_count_carries_on_past_hidden_numbers(hidden):
+    row = intake.count(docket_of(200, missing=hidden), "OSVYCNA", 15, 2022, hint=100)
+    assert row["count"] == 200
+    assert row["flags"] == "; ".join(f"island:{n}" for n in (181, 182, 189) if n not in hidden)
+
+
+def test_hidden_numbers_the_search_skips_dont_matter():
+    row = intake.count(docket_of(400, missing={150, 276, 300}), "OSVYCNA", 15, 2022, hint=100)
+    assert row["count"] == 400
+
+
+def test_a_hidden_case_1_is_counted_from_the_published_number():
+    row = intake.count(docket_of(396, missing={1}), "OSVYCNA", 15, 2022, hint=388)
+    assert (row["count"], row["flags"]) == (396, "hole:1")
+    row = intake.count(docket_of(3, missing={1, 2, 3}), "OSVYCNA", 15, 2022, hint=388)  # a typo
+    assert (row["count"], row["flags"]) == (0, "no case 1")
 
 
 def test_counting_a_senate_year():
