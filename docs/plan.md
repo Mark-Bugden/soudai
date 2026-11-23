@@ -13,7 +13,7 @@ The demo shows how civil cases move through Czech district courts, and where the
 3. switches to a map of the district courts, coloured by cases registered per year, backlog or typical time to a decision
 4. sees how close an estimate of a court's caseload, made from its published decisions alone (the German tank method), gets to the exact count.
 
-The project is descriptive. It makes no predictions about individual cases, makes no claims about why courts differ, and isn't legal advice.
+The project was first planned as purely descriptive. On 2026-11-23 Mark decided that it also predicts: a model forecasts how much longer a case will take, from its history so far (see "The remaining-time model"). How the demo shows that is still to be settled. The project makes no claims about why courts differ, and isn't legal advice.
 
 ## Working on this plan
 
@@ -36,8 +36,8 @@ The project is descriptive. It makes no predictions about individual cases, make
 | Sample: published decisions from rozhodnuti.justice.cz | A random sample of all registered cases, drawn from each senate's docket on infosoud | Published decisions only cover decided cases, and publication volume swings by year (797 in 2020, 181,861 in 2022, 61,203 in 2024). Published decisions are still used, for the German tank estimate and to find senates. |
 | Infosoud's HTML pages (`infosoud.justice.cz/InfoSoud/public/search.do`) | Infosoud's JSON API at `infosoud.gov.cz/api/v1` | The old site redirects every URL to the new app's front page and drops the query, so the old scraper no longer works. |
 | Target: days from filing to the published decision, capped at 5 years, open cases dropped | Each case's full timeline. Waits are estimated with censoring (Kaplan–Meier), with no cap | The cap and dropping open cases both bias durations downwards. |
-| Features: keywords and cited statutes from the decision | Not used | They're written when the case ends, so they leak the outcome. The project is descriptive now anyway. |
-| Model: a PyTorch embedding MLP predicting days | No predictive model. Exact intake counts, German tank estimates, Kaplan–Meier waits and Little's law | Mark's scope decision on 2026-11-22. |
+| Features: keywords and cited statutes from the decision | Not used | They're written when the case ends, so they leak the outcome. |
+| Model: a PyTorch embedding MLP predicting days | Exact intake counts, German tank estimates, Kaplan–Meier waits and Little's law, plus a recurrent network forecasting each case's remaining time from its history, with censoring, against simpler models (see "The remaining-time model") | Mark's scope decisions on 2026-11-22 (descriptive) and 2026-11-23 (the model). |
 | Judges as a feature (`autor`) | Not analysed. Judges' names never leave the raw cache | See "Data". |
 | Title "Judging the Journey" | Kept, with the slug `soudai` | The journey is now literally what the demo shows. |
 
@@ -139,6 +139,52 @@ From published decisions alone: for a senate-year with k distinct published case
 - **Curves.** Time from filing to disposal, and to legal force, as "share still open after t months", per court and nationally.
 - **Variants.** The most common full paths, with their shares.
 
+### The remaining-time model
+
+Decided with Mark on 2026-11-23. He wants the portfolio to show more machine learning, in particular deep learning and business value. Language models aren't needed. Any framing of the model is Mark's to write.
+
+- **The question.** Given everything that has happened to a case so far, what's the chance it finishes in each of the next 36 months? From those come the chances it finishes within 1, 3, 6 or 12 months.
+- **How it follows from the map.** The map gives averages: from each stage, what usually happens next and how long it takes. The model answers the same question for one case, from its whole history: every event, the gaps between them, and the court. That includes what the map simplifies away, such as repeated hearings and cancellations. The map is the yardstick. The model only earns its place if it beats the map's averages.
+- **The network.** A recurrent neural network of the GRU type (Cho et al. 2014), with a discrete-time survival output, also called "logistic hazard" (Gensheimer & Narasimhan 2019; Kvamme & Borgan 2021). The closest published model is Dynamic-DeepHit (Lee, Yoon & van der Schaar 2019). In process mining, the field is called predictive process monitoring (Tax, Verenich, La Rosa & Dumas 2017). The starting sizes, to be tuned:
+  - **Each event is 10 numbers:** its type, one of 28, as 8 learned numbers (an 8 × 28 weight matrix applied to a one-hot vector); log(1 + days since the previous event); and log(1 + days since filing).
+  - **The hidden state** is a vector of 32 numbers, starting at zeros. The GRU updates it once per event, with the same weights at every step.
+  - **The output layers.** At the moment of a forecast they take 37 numbers: the last hidden state, the court (4 learned numbers, from a 4 × 86 matrix) and log(1 + days since the last event). They go through a fully connected layer of 32 with ReLU, then one of 36, each through a sigmoid.
+  - **The outputs.** Output k, p_k, is the chance the case ends in month k, given that it's open at the start of that month. The chance it's still open after k months is (1 − p₁)…(1 − p_k).
+  - **Size:** about 7,100 weights and biases, small enough to run in the demo.
+- **The training data** is step 5's sample of timelines:
+  1. Drop cancelled events, and sort by date, then by `poradi`.
+  2. Choose the event that counts as finished (still open: disposal or legal force).
+  3. Cut each case after each of its events before the end, making each cut one example. An example is the events so far, plus either the month the case ended in or "still open after n months", counted to its `platneK`.
+  4. Weight each example by its case's sampling weight.
+  5. Split by time: train on earlier registration years, and test on later ones.
+  6. In a batch, pad shorter cases to the same length, and mark which steps are real.
+
+  The 13,377 timelines cached by step 4's probes so far have a median of 6 events once cancelled ones are dropped, and at most 49. So 31k sampled cases would give roughly 200k examples.
+- **Training.** One pass through a case gives a hidden state after every event, so all its cuts are scored together.
+  - **The loss.** For a case that ended in month k, it's −[log(1 − p₁) + … + log(1 − p_{k−1}) + log p_k]. For a case still open after n months, it's −[log(1 − p₁) + … + log(1 − p_n)].
+  - **Backpropagation through time.** The chain of steps is unrolled, and each shared weight's gradient is the sum of its contributions from all the steps. The GRU and the output layers are trained together.
+- **Comparison models,** each knowing more about the case than the one before:
+  1. **The court average:** a Kaplan–Meier curve per court.
+  2. **The process map:** per court, the stage reached and the time spent in it.
+  3. **A Cox proportional hazards model** on hand-made features.
+  4. **Gradient-boosted trees** (XGBoost or LightGBM) on the same features, predicting the same 36 monthly chances.
+  5. **The GRU network.**
+
+  The hand-made features are the court, the current stage, the time since filing and since the last event, the number of hearings and of cancellations so far, whether there has been an appeal, and whether a decision has been issued. An optional extra is the network's output layers fed the hand-made features instead of the sequence. It separates "a neural network helps" from "reading the sequence helps". If the GRU doesn't clearly beat the trees, the write-up says so.
+- **Scoring.** Every model is scored the same way, on the same held-out later years:
+  - **concordance:** how often the model correctly ranks which of two cases finishes first;
+  - **the Brier score** at 6, 12 and 24 months, corrected for censoring;
+  - **calibration:** of the cases given a 70% chance of finishing within a year, about 70% should.
+
+  The scores are also broken down by court, and by how far into a case the forecast is made.
+- **Still open:**
+  - which event counts as finished;
+  - step 5's sample size: 60 cases per court-year (~31k cases, ~9 h) may be small for the network, and each extra case costs one request;
+  - whether intake's hole probes, which are 3 random cases per senate-year and come with their full timelines, can add to the training data, with the right weights;
+  - modelling the different endings (judgment, withdrawal) as competing risks;
+  - a transformer as a further comparison;
+  - how the demo shows the model, to be settled with Mark.
+
 ### Backlog
 
 Little's law: backlog L = λW, with λ the yearly intake (exact) and W the mean time from filing to disposal. Censoring makes W's mean hard. Use a restricted mean with the horizon stated, and lean on the early filing years, which are almost all closed.
@@ -217,6 +263,7 @@ src/soudai/
   events.py                    event log and stage model
   tank.py                      German tank estimates and intervals
   survival.py                  weighted Kaplan–Meier
+  model.py                     the remaining-time network and its comparison models
   backlog.py                   Little's law and the direct count
   export.py                    writes demo/public/data/ and the JS fixtures
   status.py                    progress of each stage, from the cache and derived tables
@@ -369,6 +416,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
 
 ### 5. Timeline sample (run, then PR)
 - [ ] Draw 60 cases per court-year, uniformly over the court-year's docket (all its senates' numbers together), with a recorded seed. Each case's weight is the court-year's intake / 60.
+  - Before drawing, settle the sample size with Mark: the remaining-time model may need more than 60 (see "The remaining-time model").
 - [ ] Parse to `data/derived/cases.parquet` (case, court, filing date, status, status date, `platneK`, weight) and `data/derived/events.parquet` (case, code, date, `poradi`, cancelled).
 - [ ] Check that every case has a filing event in its case year and that events order sensibly, and record the share still open by filing year.
 
@@ -398,10 +446,16 @@ Built before the run (2026-11-22), with tests on fake dockets:
 - [ ] Draft the write-up in `docs/writeup.md` for Mark, including a plain statement that nothing here is legal advice.
 - [ ] Set `status: "live"` once Mark agrees, in a PR that bumps the version.
 
+### 9. The remaining-time model (PR)
+- [ ] Build the comparison models and the GRU network (see "The remaining-time model"). Train and score them all on the same split.
+- [ ] Record the scores here, model by model, by court and by how far into a case the forecast is made.
+- [ ] Settle with Mark how the demo shows the model, then build it. A PR that changes the demo bumps `version`.
+
 ## For Mark, on the site
 
-- **The write-up.** `content/projects/soudai.md` is a draft with a TODO, which asks for a plain statement that the predictions aren't legal advice. There are no predictions now, but the statement still belongs there.
+- **The write-up.** `content/projects/soudai.md` is a draft with a TODO, which asks for a plain statement that the predictions aren't legal advice. The project makes predictions again, since 2026-11-23 (see "The remaining-time model"), so the statement matters.
 - **The copy.** The tagline and summary ("Predicting how long court cases in the Czech Republic take") describe the old project. Mark rewrites them for the manifest and the site.
+- **The README.** It says the project "makes no predictions about individual cases", which no longer holds since 2026-11-23. Mark rewords it.
 - **Status.** The site lists the project once a release is `in-progress` or `live` and the write-up is out of draft.
 
 ## Open questions
@@ -434,7 +488,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
   - **What step 4 needs.** Its rule probes every senate from 1 to the highest seen + 10, so one stray would cost thousands of probes, and the 1–250 sweep can't see the 300s or 2100s. The rule has to work by series instead, and since step 4 it does (see "Exact intake").
 - **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Still open: whether a senate's top number matches "zapsáno" or "nápad". Step 6 compares both.
 - **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit. Step 3's decisions table (10.9 MB) stays local for now. Its subjects sometimes give a person's date of birth or address, so it can't be published as it is. Mark decided on 2026-11-22 to keep it private: nothing in the demo needs it.
-- **Model card.** There's no model. Add a model card only if Mark wants one and there's a real figure for it, such as the German tank estimate's error against the exact counts.
+- **Model card.** There's a model now (see "The remaining-time model"). Whether to add a model card for it is Mark's call. Its scores against the comparison models would be the figures in it.
 - **Claim amounts.** `predmetRizeni` often gives the amount claimed, though 51,796 subjects have `[částka]` in its place (step 3). It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
 - **Judges.** Discussed 2026-11-22: a judge-level aggregate (how much of the variation comes from the judge, with no names) was floated, and the scope Mark chose leaves judges out. The raw cache keeps `autor`; nothing derived does.
 - **API stability.** If infosoud's API changes during a run, stop, record what changed here, and adapt the client. The cache keeps everything already fetched.
