@@ -78,7 +78,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 ### Decisions
 
 - **Scope.** District-level courts (okresní and obvodní soudy and Městský soud v Brně: 86, confirmed in step 2), register `C`, cases registered 2020–2025, i.e. with case numbers of those years (decided 2026-11-22). Městský soud v Praze is a regional-level court and is out of scope.
-- **Intake is registrations** (decided with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, which for about a quarter of sampled cases is the year after it was filed (see "Filing date and case year" under "Open questions"). Intake is the exact count of cases registered per senate-year, and the demo calls it "cases registered". The courts' official statistics probably count the same thing (nápad), and step 6 checks that. Waits are measured from `ZAHAJ_RIZ`, the filing date.
+- **Intake is registrations** (decided with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, which for about a quarter of sampled cases is the year after it was filed (see "Filing date and case year" under "Open questions"). Intake is the exact count of cases registered per senate-year, and the demo calls it "cases registered". The courts' official statistics count nearly the same thing. Step 4's counts match "zapsáno" (entered in the register), which runs about 0.5% above "nápad" (see "Official statistics" under "Open questions"). Waits are measured from `ZAHAJ_RIZ`, the filing date.
 - **Pacing.** 1 request a second across the whole project (decided 2026-11-22). On a connection error, wait 30, 60, then 90 s and retry. On any 429, or more than 5 failures in a row, stop the run and record it here. If 1 s draws 429s or keeps resetting, go back to 3 s and tell Mark.
 - **Identification.** User-Agent `soudai/<version> (+https://github.com/Mark-Bugden/soudai)`.
 - **Cache.** Every response, including not-found responses, goes into a SQLite cache at `data/raw/cache.sqlite`: request key, URL, body, status, the response gzipped, and the fetch time. Nothing that's cached is fetched again unless a stage asks to refresh it. The cache is the snapshot, so it's never deleted, and it's never committed.
@@ -98,7 +98,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Events | infosoud's JS bundle | `reference/events.csv` | < 150 requests (static files) |
 | Published decisions | rozhodnuti listing | `data/derived/decisions.parquet` | 7,517 requests, 6 h 20 min (step 3) |
 | Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, 10 h 8 min (step 4) |
-| Intake | senates, binary search | `data/derived/intake.csv` | 7,670 senate-years: ~93k requests, ~26 h, or up to ~32 h (estimate, step 4) |
+| Intake | senates, binary search | `data/derived/intake.csv` | 7,670 senate-years: 92,195 requests, 25 h 42 min (step 4) |
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 60 per court-year: ~31k requests, ~9 h |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
@@ -392,8 +392,27 @@ pyproject.toml, uv.lock        a uv project
     - In 48, none exists. 44 have a single published decision, 3 have two and 1 has six, so they're probably typos in the case numbers.
   - **That's a gap, so it's recorded here to settle with Mark before step 5.** See "Hidden case numbers" under "Open questions".
   - `data/derived/senates.csv` has all 7,670 rows: 7,544 found and 126 not found.
-- [ ] Find each senate-year's highest number, with the probes above it and the 3 gap probes below it.
-- [ ] Write `data/derived/intake.csv` (court, senate, year, count, probes used, flags), and record totals by court-year and nationally. If any gap turned up, stop: record it here and settle it with Mark before step 5.
+- [x] Find each senate-year's highest number, with the probes above it and the 3 gap probes below it.
+  - **Run 27, 2026-11-23 to 24:** 92,195 requests (7,808 more answered from the cache) in 25 h 42 min. The estimate was ~93k and ~26 h.
+  - **4 failures,** between 00:32 and 00:40: two connection errors and two connect timeouts, one pair of them in a row. Each cleared after its wait.
+  - **13.0 probes per senate-year,** cached ones included.
+- [x] Write `data/derived/intake.csv` (court, senate, year, count, probes used, flags), and record totals by court-year and nationally. If any gap turned up, stop: record it here and settle it with Mark before step 5.
+  - **Cases registered in register C at the 86 district-level courts:**
+
+    | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | All |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | 288,307 | 292,486 | 296,731 | 288,244 | 286,255 | 273,649 | 1,725,672 |
+
+  - **Against the official statistics.** S_AS_40's national nápad is 286,801 in 2020, 295,311 in 2022 and 272,434 in 2025, so the counts run 0.53%, 0.48% and 0.45% above it. At Náchod in 2022 the count is 2,326, against V(MS)-114's "zapsáno" of 2,327 and "nápad" of 2,309. So the counts are registrations ("zapsáno"), as intended, and the small gap to nápad is the gap between the two measures. Step 6 compares every court.
+  - **Court-years.** The median court-year registered 2,630 cases. The smallest was Pelhřimov in 2020 (755) and the largest Ostrava in 2023 (18,753).
+  - **German tank, first look.** Step 4's estimate from published decisions alone came to 2.0% above these totals in 2020, and within 0.8% from 2021 on. Step 6 does this properly.
+  - **Gaps did turn up.** 263 senate-years are flagged:
+    - **48 `no case 1`:** neither case 1 nor the highest published number exists, so they count 0. These are the probable typos from the senates run.
+    - **78 `hole:1`:** case 1 is hidden, so the count started from the highest published number.
+    - **38 `island`:** the search stopped at a hidden number, found numbers above it, and carried on.
+    - **108 holes from the random probes below the top,** in 106 senate-years.
+  - **How often numbers are hidden.** 108 of the 22,315 random probes found nothing, 0.48%. Case 1 is hidden about twice as often, in 78 of the ~7,620 real senate-years (1.0%).
+  - The counts are the highest numbers that exist, so they're short only where a senate-year's last numbers are hidden. That costs a case or two at most, against hundreds per senate-year. The gap is recorded under "Hidden case numbers" for Mark to settle before step 5.
 
 Changed after the senates run (2026-11-23):
 - **Intake counts the 126 too.** If case 1 is hidden but the highest published number exists, the search starts there, and the senate-year is flagged `hole:1`. If neither exists, it counts 0, flagged `no case 1`.
@@ -473,7 +492,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
 - **Filing date and case year** (settled with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, not always the year it was filed. In the 54 Náchod cases fetched in step 2, 13 have a `ZAHAJ_RIZ` in the year before, mostly among a year's first numbers (11 of 2022's first 12). Likely causes are cases that began elsewhere and were moved into C, such as a payment order after an objection, a case from another register or court, or registration delays at the turn of the year. The official statistics point to the first: at Náchod in 2022, 1,757 of the 2,309 new register C cases were transferred from EPR, the electronic payment order register (see "External check"). So `ZAHAJ_RIZ` is probably the EPR filing date. That's inferred, not checked case by case. Settled: intake counts registrations and is labelled so, waits run from `ZAHAJ_RIZ`, and the check allows an earlier filing year (see "Decisions" and "Checks"). Still open: why it happens, which step 5's sample can show by court.
 - **Hidden case numbers** (step 4; settle with Mark before step 5). infosoud doesn't show every case number. In 78 senate-years, case 1 is missing while later numbers exist, and in 17 of them case 2 or 3 is missing too. A senate's counter never skips, so the highest number still counts its registrations, and intake now searches past hidden numbers. What's open:
   - **Why.** Perhaps cases moved to another register or court, cases entered by mistake, or cases infosoud keeps private.
-  - **How often.** Intake's hole probes (3 per senate-year) will measure it.
+  - **How often** (measured in step 4). 108 of 22,315 random probes below a senate's top were hidden (0.48%), and case 1 in 78 of ~7,620 real senate-years (1.0%). In 38 senate-years the search met a hidden number where it would have stopped, and carried on past it.
   - **What it means for step 5.** Whether a hidden number should count in a court-year's sample frame. A sampled number that's hidden would be drawn again.
 - **Older open cases.** The sample covers cases registered 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 registrations would close the gap if the numbers need it.
 - **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way. A clue from step 2: one day's first page of decisions had senates 106, 112 and 117 at "Okresní soud v Karviné, pobočka Havířov" and 108 at Městský soud v Brně, so a branch's senates may be numbered from 100. Ústí nad Orlicí has no branch, though.
@@ -486,7 +505,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
   - **Strays.** About a dozen single decisions sit far outside any series, such as 11297 at Náchod and 9249 at Liberec. They're probably typos.
   - **Still open:** what the hundreds mean.
   - **What step 4 needs.** Its rule probes every senate from 1 to the highest seen + 10, so one stray would cost thousands of probes, and the 1–250 sweep can't see the 300s or 2100s. The rule has to work by series instead, and since step 4 it does (see "Exact intake").
-- **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Still open: whether a senate's top number matches "zapsáno" or "nápad". Step 6 compares both.
+- **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Step 4 answered which measure the counts match: "zapsáno". Náchod 2022 counts 2,326, against zapsáno 2,327 and nápad 2,309, and the national counts run about 0.5% above S_AS_40's nápad. Step 6 compares every court.
 - **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit. Step 3's decisions table (10.9 MB) stays local for now. Its subjects sometimes give a person's date of birth or address, so it can't be published as it is. Mark decided on 2026-11-22 to keep it private: nothing in the demo needs it.
 - **Model card.** There's a model now (see "The remaining-time model"). Whether to add a model card for it is Mark's call. Its scores against the comparison models would be the figures in it.
 - **Claim amounts.** `predmetRizeni` often gives the amount claimed, though 51,796 subjects have `[částka]` in its place (step 3). It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
