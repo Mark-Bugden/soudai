@@ -35,7 +35,7 @@ from . import paths
 
 VERSION = version("soudai")
 USER_AGENT = f"soudai/{VERSION} (+https://github.com/Mark-Bugden/soudai)"
-INTERVAL = 1.0  # seconds between requests, across the whole project (decided 2026-11-22)
+INTERVAL = 1 / 3  # seconds between requests, across the whole project: 3 a second (Mark, 2026-11-24)
 BACKOFF = (30, 60, 90)  # seconds to wait after the 1st, 2nd and 3rd failure in a row; later ones wait 90
 MAX_FAILURES = 5  # more failures in a row than this stop the run
 TIMEOUT = 30  # seconds to wait for a response

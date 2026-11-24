@@ -57,7 +57,13 @@ def make_client(tmp_path, clock):
     def make(replies):
         session = FakeSession(replies)
         client = http.Client(
-            "test", tmp_path / "cache.sqlite", tmp_path / "logs", session, clock=clock, sleep=clock.sleep
+            "test",
+            tmp_path / "cache.sqlite",
+            tmp_path / "logs",
+            session,
+            clock=clock,
+            sleep=clock.sleep,
+            interval=1.0,
         )
         return client, session
 

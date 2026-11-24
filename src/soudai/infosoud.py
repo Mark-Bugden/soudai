@@ -81,13 +81,13 @@ class LookupFailed(Exception):
     """The API answered RIZENI_0001, "unexpected error", every time it was asked."""
 
 
-def exists(client, regional_code, district_code, register, senate, number, year, attempts=3):
-    """Whether a case number exists. An error answer is asked again, up to `attempts` times in all.
-    A found case must be the one asked for."""
+def find_case(client, regional_code, district_code, register, senate, number, year, attempts=3):
+    """A case's record, or None if the number doesn't exist. An error answer is asked again, up to
+    `attempts` times in all. A found case must be the one asked for."""
     for _ in range(attempts):
         result = lookup(client, regional_code, district_code, register, senate, number, year)
         if result.outcome == "not_found":
-            return False
+            return None
         if result.outcome == "found":
             case = result.case
             if (case["cislo"], case["druh"].upper(), case["bcVec"], case["rocnik"]) != (
@@ -97,8 +97,15 @@ def exists(client, regional_code, district_code, register, senate, number, year,
                 year,
             ):
                 raise UnexpectedResponse(f"asked for {senate} {register} {number}/{year}, got {case}"[:300])
-            return True
+            return case
     raise LookupFailed(f"{district_code} {senate} {register} {number}/{year}: {result.message}")
+
+
+def exists(client, regional_code, district_code, register, senate, number, year, attempts=3):
+    """Whether a case number exists (see `find_case`)."""
+    return (
+        find_case(client, regional_code, district_code, register, senate, number, year, attempts) is not None
+    )
 
 
 def parse_lookup(response):
