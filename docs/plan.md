@@ -102,6 +102,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
 | Official statistics | InfoData's S_AS_40 report, intake | `data/derived/official.csv` | 13 requests (step 6) |
 | Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
+| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv` | No requests: about 40 s for the two simplest methods (step 7) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -117,6 +118,8 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - The stage model gives the right path and dates for real histories, including revivals, appeals, suspensions and odd dates.
 - The official statistics parse from the real 2022 report, every court appears once, and the courts add up to the national totals.
 - The weighted Kaplan–Meier and Aalen–Johansen estimates match hand-worked cases and lifelines, and the journey numbers match a few cases worked by hand.
+- The forecasting examples cut real-looking histories on the right days, with the right features and outcomes, and the split cuts the training records off at 31 December 2023.
+- Concordance matches lifelines unweighted, and a weight counts as that many copies. The Brier score, its censoring weights and calibration match cases worked by hand, and so do the court average and the process map.
 - The export matches its schema and stays under its size budget.
 
 ## Methods
@@ -187,17 +190,22 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   1. Read the events as the stage model does (`events.log`): cancelled ones and those dated before the filing are dropped, and the rest are sorted by date, then by `poradi`. Mark confirmed on 2026-11-25 that cancellations stay out of the model.
   2. A case finishes when it becomes legally final, or at its closing if it's closed without that (settled 2026-11-25; see "The journey").
   3. Cut each case at the end of each day with events before the end, making each cut one example. A hearing and its decision usually share a date, so a cut between them would make the forecast trivial. And `NAR_JED` is dated the day the hearing is held, so the model only learns of a hearing when it happens, never ahead. An example is the events so far, plus either the month the case ended in or "still open after n months", counted to its `platneK`.
+     - **Also cut every month after filing** (days 30, 61, 91, …, for 5 years), added in step 7. Cuts on event days alone would always have 0 days since the last event, so no model could learn what a quiet spell means, and none could forecast a case between its events, or at a fixed time after filing, which is how forecasts are scored.
   4. Weight each example by its case's sampling weight.
   5. Split by time: train on earlier registration years, and test on later ones.
+     - **Settled in step 7: the split is 1 January 2024.** The models train on cases registered 2020–2023, as their records stood on 31 December 2023: anything dated later is cut off, and a case still open then is censored there. They're tested on cases registered 2024–2025, followed to the snapshot. So the scores are those of models built on 1 January 2024 and used on the cases that came after, with nothing seen from after that day. Two test years rather than one give twice the test cases, and 2024's have at least 22 months of follow-up.
+     - **Validation.** A fixed random 10% of the training cases is held out, to stop training and to tune.
   6. In a batch, pad shorter cases to the same length, and mark which steps are real.
 
-  The 13,377 timelines cached by step 4's probes so far have a median of 6 events once cancelled ones are dropped, and at most 49. So 31k sampled cases would give roughly 200k examples.
+  `examples.py` builds them. Training: 138,815 cases (those still open at the end of their filing day), 551,117 events and 1,245,125 cuts. Test: 69,336 cases, 285,826 events and 603,472 cuts. A case has at most 49 events before its end.
 - **Training.** One pass through a case gives a hidden state after every event, so all its cuts are scored together.
   - **The loss.** For a case that ended in month k, it's −[log(1 − p₁) + … + log(1 − p_{k−1}) + log p_k]. For a case still open after n months, it's −[log(1 − p₁) + … + log(1 − p_n)].
   - **Backpropagation through time.** The chain of steps is unrolled, and each shared weight's gradient is the sum of its contributions from all the steps. The GRU and the output layers are trained together.
 - **Comparison models,** each knowing more about the case than the one before:
   1. **The court average:** a Kaplan–Meier curve per court.
+     - As built (`baselines.py`): the court's curve from filing to the end, over its training cases, read from the day of the cut: S(day + t) / S(day). Where fewer than 20 of the court's sampled cases were still open on that day, it's read from the last day that had 20.
   2. **The process map:** per court, the stage reached and the time spent in it.
+     - As built: the Kaplan–Meier curve of the time left, over the training cuts in the same court and stage, with about as long in it: 0 days, 1–30, 31–91, 92–182, 183–365 or more. Where the court has fewer than 50 such cuts, all courts' are used, and failing that, all courts' in the stage. It knows nothing of the time since filing, as the map doesn't.
   3. **A Cox proportional hazards model** on hand-made features.
   4. **Gradient-boosted trees** (XGBoost or LightGBM) on the same features, predicting the same 36 monthly chances.
   5. **The GRU network.**
@@ -209,9 +217,16 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   - **calibration:** of the cases given a 70% chance of finishing within a year, about 70% should.
 
   The scores are also broken down by court, and by how far into a case the forecast is made.
+
+  As built in step 7 (`scoring.py`):
+  - **Where forecasts are scored.** Each test case at its filing, and 1, 3, 6 and 12 months after, while it's still open: 234,784 forecasts. Each case counts once at each of these landmarks, so cases with many events don't count for more. "By how far into a case" is by landmark.
+  - **Concordance** is Harrell's C, weighted (a pair weighs the product of its cases' weights), comparing cases at the same landmark only, by the expected months left (the area under the forecast curve, to 36 months). It matches lifelines' `concordance_index` unweighted, ties included.
+  - **The Brier score** at 1, 3, 6, 12 and 24 months: the weighted mean of (outcome − forecast)², where the outcome is whether the case finished within that time. A case censored before then is left out, and the others are weighted up to stand for it (inverse probability of censoring weights, Graf et al. 1999), with the censoring curve estimated at each landmark over all courts. 1, 3, 6 and 12 months are the demo's.
+  - **Calibration** at 1, 3, 6 and 12 months: forecasts in bins of 10 points, against the share of those cases that finished within the time (by Kaplan–Meier). Its summary is the mean gap between the two, weighted by the cases in each bin.
+  - `uv run soudai model` writes `data/derived/model_scores.csv` (each model's scores, for all courts and each court, and at each landmark) and `model_calibration.csv`.
 - **Still open:**
   - step 5's sample size: settled with Mark on 2026-11-24 at 400 cases per court-year, 208k in all (see step 5). More can be added later by drawing further down each senate-year's order, if the learning curve says it would help;
-  - whether intake's hole probes, which are 3 random cases per senate-year and come with their full timelines, can add to the training data, with the right weights;
+  - whether intake's hole probes, which are 3 random cases per senate-year and come with their full timelines, can add to the training data, with the right weights. Settled in step 5: they're in the sample, 22,207 of its cases;
   - modelling the different endings (judgment, withdrawal) as competing risks;
   - a transformer as a further comparison.
 - **In the demo** (settled with Mark on 2026-11-25). The model is the opening Forecast tab, and it's built before the backlog.
@@ -300,9 +315,13 @@ src/soudai/
   events.py                    event log and stage model
   tank.py                      German tank estimates and intervals
   survival.py                  weighted Kaplan–Meier and Aalen–Johansen
+  examples.py                  the forecasting examples: histories cut into forecasts, and the time split
+  scoring.py                   concordance, censoring-corrected Brier scores and calibration
+  baselines.py                 the comparison models: court average, process map, Cox, trees
   official.py                  the Ministry's official statistics (S_AS_40), against intake
   journey.py                   the journey numbers: stages, moves, waits, curves and paths
-  model.py                     the remaining-time network and its comparison models
+  model.py                     fits and scores every model: `uv run soudai model`
+  network.py                   the GRU network, in PyTorch (an optional dependency)
   backlog.py                   Little's law and the direct count
   export.py                    writes demo/public/data/ and the JS fixtures
   status.py                    progress of each stage, from the cache and derived tables
@@ -615,7 +634,25 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
 
 ### 7. The remaining-time model (PR)
 - [ ] Build the comparison models and the GRU network (see "The remaining-time model"). Train and score them all on the same split: earlier registration years for training, later ones for testing.
+  - **First PR (2026-11-25): the examples, the scores, and the two simplest methods.** `examples.py` cuts the histories, `scoring.py` scores forecasts, `baselines.py` has the court average and the process map, and `model.py` runs them as `uv run soudai model`, in about 40 s. 21 new tests. Decided here, and written into "The remaining-time model": the monthly cuts, the split on 1 January 2024, the validation share, and how each score is computed.
+  - **Still to come:** Cox and gradient-boosted trees (LightGBM), then the GRU. PyTorch and LightGBM go in an optional dependency group, so CI's install stays light.
+  - **Cases have got faster,** so every model trained on 2020–2023 expects the test cases to take longer than they did. The share of cases not yet finished 6 months after filing, by Kaplan–Meier with full follow-up, by year registered:
+
+    | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+    | --- | --- | --- | --- | --- | --- |
+    | 54.7% | 55.4% | 50.3% | 50.4% | 49.7% | 42.9% |
+
+    The calibration tables show it: where the court average forecast a 45% chance of finishing within 6 months, 58% did. All the models train on the same years, so the comparison between them stays fair. Weighting recent years more, or correcting the forecasts afterwards, could reduce the gap. Neither is done yet.
 - [ ] Record the scores here, model by model, by court and by how far into a case the forecast is made.
+  - **The two simplest methods,** over all test forecasts (234,784, at filing and 1, 3, 6 and 12 months in). Higher concordance is better, and lower Brier and calibration error:
+
+    | Model | Concordance | Brier 1 mo | 3 mo | 6 mo | 12 mo | 24 mo | Calibration error 6 mo | 12 mo |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | Court average | 0.602 | 0.069 | 0.174 | 0.203 | 0.094 | 0.043 | 5.8% | 2.2% |
+    | Process map | 0.636 | 0.043 | 0.158 | 0.197 | 0.090 | 0.043 | 6.6% | 2.5% |
+
+  - **By how far into a case.** At filing both know only the court, and score the same (concordance 0.604). Further in, the process map pulls ahead: concordance 0.625 against 0.604 at 1 month, 0.669 against 0.612 at 3, 0.720 against 0.547 at 6, and 0.733 against 0.540 at 12.
+  - **By court.** Within one court, the court average gives every case at a landmark the same forecast, so its concordance there is 0.5, a coin toss: its 0.602 overall comes from ranking the courts. The process map's runs from 0.531 to 0.571 within a court. Its Brier score at 6 months is lower in 83 of the 86 courts.
 - [ ] A Python reference and fixtures for what the demo recomputes: the network's forward pass, for made-up cases.
 - [ ] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
 

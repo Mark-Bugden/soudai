@@ -1,13 +1,13 @@
 """`uv run soudai <stage>`: the pipeline's stages, in the order they run.
 
-The plan's later stages (model, export) join as their milestones are built.
+The plan's later stage, export, joins when its milestone is built.
 """
 
 import argparse
 import sys
 from datetime import date
 
-from . import courts, decisions, events, intake, journey, official, sample, senates, status
+from . import courts, decisions, events, intake, journey, model, official, sample, senates, status
 from .http import NotCached, StopRun, UnexpectedResponse
 
 
@@ -31,6 +31,7 @@ def main(argv=None):
     stage.add_argument("--parse-only", action="store_true", help="parse what's cached, fetching nothing")
     stages.add_parser("official", help="compare intake with the Ministry's official statistics, S_AS_40")
     stages.add_parser("analyse", help="compute the journey numbers, for all courts and for each court")
+    stages.add_parser("model", help="fit the remaining-time forecasts on the earlier cases and score them")
     stages.add_parser("status", help="report each stage's progress, from the cache and the tables")
     args = parser.parse_args(argv)
     try:
@@ -50,6 +51,8 @@ def main(argv=None):
             return official.run()
         if args.stage == "analyse":
             return journey.run()
+        if args.stage == "model":
+            return model.run()
         return status.run()
     except StopRun as error:
         print(f"Stopped: {error}. Record it in docs/plan.md before running again.", file=sys.stderr)

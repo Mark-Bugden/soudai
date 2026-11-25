@@ -56,6 +56,13 @@ Facts and figures from steps 1–6, gathered for Mark to write the write-up from
 - **Courts differ:** the median time to a decision runs from 92 days (Jeseník) to 238 days (Prague 1 and Litoměřice), and the median court takes 144 days.
 - **Courts also differ in what their records show.** Hradec Králové records a hearing in 22% of cases, against 80% nationally. At Prague 2, 23% of cases go to the appeal court, against 4.3%. Whether that's practice or record-keeping isn't known.
 
+## The model (step 7, in progress)
+
+- **The split.** The models learn from cases registered 2020–2023, as their records stood on 31 December 2023, and are tested on cases registered 2024–2025, followed to November 2026. So they're scored as if built on 1 January 2024 and used on the cases that came after.
+- **Where forecasts are scored:** each test case at its filing, and 1, 3, 6 and 12 months after, while it's still open.
+- **Cases have got faster.** The share not yet finished 6 months after filing, by year registered, is 54.7% (2020), 55.4%, 50.3%, 50.4%, 49.7% and 42.9% (2025). So models that learn from the earlier years expect later cases to take longer than they do.
+- **The two simplest methods so far.** The court average (the court's typical curve, from the time since filing) ranks cases right 60% of the time, and only by ranking courts: within one court it's a coin toss. The process map (the court, the stage a case is in, and how long it has been there) ranks 64% right overall, and 72–73% for cases 6 or 12 months in.
+
 ## Caveats to keep
 
 - The project makes no claims about why courts differ.
