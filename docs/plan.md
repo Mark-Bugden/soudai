@@ -123,6 +123,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - The numpy forward pass matches PyTorch's forecasts on made-up cases, the network's loss matches a hand-worked case, its batches point each forecast at its last event, and it learns a made-up pattern.
 - Concordance matches lifelines unweighted, and a weight counts as that many copies. The Brier score, its censoring weights and calibration match cases worked by hand, and so do the court average and the process map.
 - The export matches its schema and stays under its size budget.
+- The demo's JS forward pass gives PyTorch's forecasts on the fixture, and its 16-bit weights decode to the trained ones (node:test).
 
 ## Methods
 
@@ -310,6 +311,8 @@ demo/                          the site bundle, built with demo-kit (see the sit
   src/main.js                  frame, controls, view switching and shared state
   src/controls.js              the tab switch and the court search (adapted from doctor-who-ratings')
   src/courts.js, data.js, format.js   court search, lookups over the data, and the status line's text
+  src/cases.js                 the real past cases: search, random pick, and what happened next
+  src/tooltip.js               the charts' tooltip (adapted from doctor-who-ratings')
   src/views/                   forecast, process map, courts
   src/forecast.js              the network's forward pass, ported from Python, for made-up cases
   src/tank.js                  German tank estimator, ported from Python (only if the demo recomputes it)
@@ -795,6 +798,18 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - **Tests.** `npm test` runs 11 node:test tests on the committed data: the court search, the lookups and the status line. `tests.yml` has a JS job for them, and `CLAUDE.md` lists `npm test` among the checks.
   - **Checked in Edge,** with the built bundle: both themes, at 1280 × 800 and at a phone's 390 px, searching, picking a court and "All courts", switching tabs and clearing the search. No console errors.
 - [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
+  - **In three PRs:** the forward pass and real past cases (v0.5.0), then made-up cases, then how well the model does.
+  - **First PR (2026-11-26): the forward pass and real past cases.**
+    - **The forward pass** (`forecast.js`) is `forward.py` in JavaScript, in 64-bit floats. It decodes the export's 16-bit weights itself. On the fixture's 27 forecasts it gives PyTorch's to 4.3 × 10⁻⁸; numpy's gap is 1.7 × 10⁻⁸, and the rest is PyTorch's 32-bit arithmetic.
+    - **Checked against the full weights.** The exported weights decode to `network.json`'s to within half a step. On all 13,827 forecasts on the real cases (every day with events before the end, and each month to 12), the exported ensemble's largest gap from the full one is 0.00008, as in Python. A forecast of all five networks takes about 0.2 ms, so the demo recomputes it on every move of the slider.
+    - **The rail** has the court search, a case search (the selected court's 20 cases, or all 1,720, by number: "33/2024" finds 18 C 33/2024), a "Random case" button (from the selected court, or from all of them) and a "Forecast on" slider, from filing to the day before the case ended or its record ran out. Choosing a court that isn't the case's brings one of its cases at random.
+    - **The stage** shows the case's number, court and filing date. Under them come the chances it ends within 1, 3, 6 and 12 months of the day chosen, and whether it did: "It did", "It didn't", or "Not known" when its record ends first. That's counted as the scores count it.
+    - **The chart** has one time axis, in months after filing. Above are the case's events, one lane per stage reached, with those after the forecast in the curve colour. Below is the chance it has ended, month by month for 12 months from the forecast, in the accent. A line in the contrasting highlight marks the day it ended, or one in the curve colour the day its record ends. Hovering an event lists it, and hovering the forecast gives the chance at that month.
+    - **The status line** gives the case, the day, the four chances and what happened next. A hidden list gives screen readers the events.
+    - **It opens on 18 C 33/2024 at Jihlava, at filing.** That's an ordinary case, filed on 26 September 2023, with a hearing and a decision on day 177, and legally final on day 238.
+    - **Phones:** the stage is 30rem tall (26rem before), and the lanes shrink to fit, so the forecast keeps at least 110 px.
+    - **Tests:** 15 new node:test tests: the forward pass against the fixture, the decoding against `network.json`, the real cases, the case search and random pick, what a forecast reads, how a case ended and whether it ended within a time, and the text.
+    - **Checked in Edge,** with the built bundle, in both themes at 1280 × 800 and at 390 px: a random case, a court, a case by number, the slider, hovering, and switching tabs. No console errors.
 - [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
 - [ ] The Process map tab and its time curves.
 - [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.
