@@ -14,3 +14,5 @@ Real responses, saved from the cache (`data/raw/cache.sqlite`) on 2026-11-22, so
 | `infosoud/labels_chunk.js` | From the app's JS bundle (`chunk-KZJVN2ZT.js`), cut to its resource bundle: the event labels and error messages. |
 | `rozhodnuti/years.json`, `months_2023.json`, `days_2023_03.json` | The year, month and day indexes. |
 | `rozhodnuti/day_2023_03_15_page_0.json` | The first page of 2023-03-15's decisions, with every `autor` (the judge's name) replaced by `REDACTED`. |
+| `infodata/results_2022.html` | InfoData's search results for S_AS_40 in 2022 (saved 2026-11-25), cut to the results table. |
+| `infodata/s_as_40_2022.xml.gz` | The 2022 S_AS_40 report itself, as InfoData's XML spreadsheet, gzipped. |

@@ -39,8 +39,8 @@ class FakeSession:
         self.calls = []
         self.headers = {}
 
-    def request(self, method, url, json=None, timeout=None):
-        self.calls.append((method, url, json))
+    def request(self, method, url, json=None, data=None, timeout=None):
+        self.calls.append((method, url, json) if data is None else (method, url, "form", data))
         reply = self.replies.pop(0)
         if isinstance(reply, Exception):
             raise reply
@@ -84,6 +84,20 @@ def test_a_cached_request_is_not_fetched_again(make_client):
     assert first.json() == second.json() == {"a": 1}
     assert not first.from_cache and second.from_cache
     assert len(session.calls) == 1
+
+
+def test_a_form_post_is_sent_as_a_form_and_cached_apart_from_json(make_client):
+    body = {"sestavaQry": "S_AS_40", "obdobiOdQry": "01.01.2022"}
+    client, session = make_client([FakeReply(200, b"<html>form</html>", "text/html"), FakeReply(200, b"[1]")])
+    with client:
+        assert client.post("https://example.test/f", body, form=True).content == b"<html>form</html>"
+        assert client.post("https://example.test/f", body).json() == [1]
+        assert client.post("https://example.test/f", body, form=True).from_cache
+    assert session.calls == [
+        ("POST", "https://example.test/f", "form", body),
+        ("POST", "https://example.test/f", body),
+    ]
+    assert http.request_key("POST", "u", body) != http.request_key("POST", "u", body, form=True)
 
 
 def test_the_cache_outlives_the_run(make_client):

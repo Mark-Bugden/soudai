@@ -105,8 +105,9 @@ def canonical(body):
     return json.dumps(body, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
-def request_key(method, url, body=None):
-    text = f"{method.upper()} {url}\n{canonical(body) or ''}"
+def request_key(method, url, body=None, form=False):
+    """The cache key. A body sent as a web form is keyed apart from the same body sent as JSON."""
+    text = f"{method.upper()} {url}\n{'form ' if form else ''}{canonical(body) or ''}"
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
@@ -162,14 +163,15 @@ class _Reads:
     def get(self, url, params=None, refresh=False):
         return self.fetch("GET", with_params(url, params), refresh=refresh)
 
-    def post(self, url, body, refresh=False):
-        return self.fetch("POST", url, body, refresh=refresh)
+    def post(self, url, body, refresh=False, form=False):
+        """POST `body` as JSON, or with `form` as a web form (application/x-www-form-urlencoded)."""
+        return self.fetch("POST", url, body, refresh=refresh, form=form)
 
-    def cached(self, method, url, body=None):
+    def cached(self, method, url, body=None, form=False):
         """The cached response to a request, or None, without fetching anything."""
         row = self.db.execute(
             "SELECT status, content, content_type, fetched_at FROM responses WHERE key = ?",
-            (request_key(method, url, body),),
+            (request_key(method, url, body, form),),
         ).fetchone()
         if row is None:
             return None
@@ -198,8 +200,8 @@ class CacheReader(_Reads):
         self.db.close()
         return False
 
-    def fetch(self, method, url, body=None, refresh=False):
-        response = self.cached(method, url, body)
+    def fetch(self, method, url, body=None, refresh=False, form=False):
+        response = self.cached(method, url, body, form)
         if response is None:
             raise NotCached(f"{method} {url} {canonical(body) or ''}".rstrip())
         return response
@@ -268,9 +270,10 @@ class Client(_Reads):
             self.db.close()
         return False
 
-    def fetch(self, method, url, body=None, refresh=False):
-        """The response to a request: from the cache if it's there, unless `refresh`, else from the server."""
-        if not refresh and (response := self.cached(method, url, body)) is not None:
+    def fetch(self, method, url, body=None, refresh=False, form=False):
+        """The response to a request: from the cache if it's there, unless `refresh`, else from the server.
+        `body` goes as JSON, or with `form` as a web form."""
+        if not refresh and (response := self.cached(method, url, body, form)) is not None:
             self.cache_hits += 1
             return response
         while True:
@@ -278,7 +281,8 @@ class Client(_Reads):
             self.requests += 1
             started = time.perf_counter()
             try:
-                reply = self.session.request(method, url, json=body, timeout=TIMEOUT)
+                payload = {"data": body} if form else {"json": body}
+                reply = self.session.request(method, url, **payload, timeout=TIMEOUT)
             except RETRIED as error:
                 self._failure(method, url, type(error).__name__)
                 continue
@@ -294,7 +298,7 @@ class Client(_Reads):
             response = Response(
                 url, reply.status_code, reply.content, reply.headers.get("Content-Type"), utc_now(), False
             )
-            self._store(method, body, response)
+            self._store(method, body, response, form)
             return response
 
     def set_backend_version(self, backend_version):
@@ -328,11 +332,11 @@ class Client(_Reads):
         self.log.info(f"Waiting {wait} s before retrying")
         self.sleep(wait)
 
-    def _store(self, method, body, response):
+    def _store(self, method, body, response, form=False):
         self.db.execute(
             "INSERT OR REPLACE INTO responses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
-                request_key(method, response.url, body),
+                request_key(method, response.url, body, form),
                 method,
                 response.url,
                 canonical(body),
