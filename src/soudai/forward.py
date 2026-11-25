@@ -1,6 +1,6 @@
 """The network's forward pass in plain numpy (milestone 7), for one case at a time. It's the reference for
-the demo's JavaScript, which runs the network on made-up cases, and it needs no PyTorch: it reads the
-weights that `network.weights` writes.
+the demo's JavaScript, which runs the networks on made-up cases, and it needs no PyTorch: it reads the
+weights that `network.weights` writes. The forecast is the mean of the ensemble's networks' forecasts.
 
 The GRU's update, as PyTorch computes it, for an event x and the hidden state h before it:
 
@@ -23,9 +23,14 @@ def still_open(weights, court, events, day):
     """The chance a case is still open 1, 2, ... months after day `day`, given its court (a code) and its
     events so far, as (code, days after filing) in order, from its filing on day 0. `day` counts from
     filing too, and is on or after the last event's."""
-    state = {name: np.asarray(value, dtype=float) for name, value in weights["state"].items()}
     codes = {code: i for i, code in enumerate(weights["codes"])}
     courts = {code: i for i, code in enumerate(weights["courts"])}
+    return np.mean([_one(state, codes, courts, court, events, day) for state in weights["members"]], axis=0)
+
+
+def _one(numbers, codes, courts, court, events, day):
+    """One network's forecast."""
+    state = {name: np.asarray(value, dtype=float) for name, value in numbers.items()}
     w_i, w_h = state["gru.weight_ih_l0"], state["gru.weight_hh_l0"]
     b_i, b_h = state["gru.bias_ih_l0"], state["gru.bias_hh_l0"]
     size = w_h.shape[1]

@@ -1,8 +1,8 @@
 """The network: the numpy forward pass against PyTorch, the loss by hand, the batches, and learning.
 
-tests/fixtures/network/forward.json holds a network with random weights and its PyTorch forecasts at every
-cut of a few made-up cases, so the numpy forward pass (and later the demo's JavaScript) can be checked
-without PyTorch. Rewrite it with `uv run --group model python tests/test_network.py`.
+tests/fixtures/network/forward.json holds an ensemble of two networks with random weights, and its PyTorch
+forecasts at every cut of a few made-up cases, so the numpy forward pass (and later the demo's JavaScript)
+can be checked without PyTorch. Rewrite it with `uv run --group model python tests/test_network.py`.
 """
 
 import json
@@ -62,16 +62,19 @@ def made_up_examples(made=MADE_UP):
     return examples.build(cases, table)
 
 
-def make_fixture(seed=1):
-    """A network with random weights, and its PyTorch forecasts at every cut of the made-up cases."""
+def make_fixture(seeds=(1, 2)):
+    """An ensemble of networks with random weights, and its PyTorch forecasts at every cut of the made-up
+    cases."""
     import torch
 
     from soudai import network
 
-    torch.manual_seed(seed)
-    model = network.Network()
+    models = []
+    for seed in seeds:
+        torch.manual_seed(seed)
+        models.append(network.Network())
     built = made_up_examples()
-    still = network.still_open(model, network.Data(built, built.cuts))
+    still = network.ensemble_still_open(models, network.Data(built, built.cuts))
     steps = built.steps
     forecasts = []
     for i, cut in enumerate(built.cuts.itertuples()):
@@ -84,7 +87,7 @@ def make_fixture(seed=1):
                 "still_open": [round(float(x), 12) for x in still[i]],
             }
         )
-    return {"weights": network.weights(model), "forecasts": forecasts}
+    return {"weights": network.weights(models), "forecasts": forecasts}
 
 
 def test_the_numpy_forward_pass_matches_pytorch():
@@ -103,6 +106,32 @@ def test_the_fixture_is_up_to_date():
     assert [f["events"] for f in fresh["forecasts"]] == [f["events"] for f in fixture["forecasts"]]
     for new, old in zip(fresh["forecasts"], fixture["forecasts"], strict=True):
         assert new["still_open"] == pytest.approx(old["still_open"], abs=1e-6)
+
+
+def test_the_loss_of_any_forecasts_matches_the_networks_own():
+    torch = pytest.importorskip("torch")
+    from soudai import network
+
+    torch.manual_seed(1)
+    model = network.Network()
+    built = made_up_examples()
+    data = network.Data(built, built.cuts.iloc[::-1])  # in reverse, so the order has to be put back
+    still = network.still_open(model, data)
+    assert network.held_out_loss(still, data) == pytest.approx(network.evaluate(model, data), rel=1e-5)
+    # the ensemble of one network is that network
+    assert network.ensemble_still_open([model], data) == pytest.approx(still)
+
+
+def test_an_ensemble_trained_in_parallel_is_the_same_as_one_after_another(monkeypatch):
+    pytest.importorskip("torch")
+    from soudai import network
+
+    monkeypatch.setattr(network, "EPOCHS", 2)
+    built = made_up_examples(decided_or_not(60))
+    together = network.fit_ensemble(built, members=2, log=lambda _: None)
+    alone = network.fit(built, log=lambda _: None, seed=examples.SEED + 1)[0]
+    data = network.Data(built, built.cuts)
+    assert network.still_open(together[1], data) == pytest.approx(network.still_open(alone, data), abs=1e-7)
 
 
 def test_the_loss_by_hand():
@@ -157,13 +186,11 @@ def test_forecasts_come_back_in_the_order_asked():
     assert back == pytest.approx(ahead[::-1])
 
 
-def test_the_network_learns_that_decided_cases_finish_sooner():
-    pytest.importorskip("torch")
-    from soudai import network
-
-    rng = np.random.default_rng(1)
+def decided_or_not(n, seed=1):
+    """n made-up cases: half decided within days of filing, half heard about 10 months in."""
+    rng = np.random.default_rng(seed)
     made = []
-    for number in range(400):
+    for number in range(n):
         if number % 2:  # decided within days of filing, legally final about a month later
             decided = int(rng.integers(5, 20))
             end = decided + int(rng.integers(25, 35))
@@ -172,7 +199,14 @@ def test_the_network_learns_that_decided_cases_finish_sooner():
             heard = int(rng.integers(280, 320))
             steps = [("ZAHAJ_RIZ", 0), ("NAR_JED", heard), ("VYD_ROZH", heard), ("ST_VEC_PUK", heard + 30)]
         made.append(case(number, "OSVYCNA", steps))
-    built = made_up_examples(made)
+    return made
+
+
+def test_the_network_learns_that_decided_cases_finish_sooner():
+    pytest.importorskip("torch")
+    from soudai import network
+
+    built = made_up_examples(decided_or_not(400))
     model, history = network.fit(built, log=lambda _: None)
     assert history[-1] < history[0]
     at = built.cuts[built.cuts["day"] == built.steps["day"].to_numpy()[built.cuts["step"]]]
