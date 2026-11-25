@@ -759,7 +759,8 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - `docs/model-card.md`, under the headings of Mitchell et al. (2019), "Model Cards for Model Reporting": the model, intended use (left for Mark, with the facts that bear on it), factors, metrics, training and evaluation data, results, ethical considerations and caveats. Facts only, as `docs/writeup.md`. Mark writes the demo's card (step 8).
 
 ### 8. Forecast and process map: release status `in-progress`
-- [ ] Move the demo to the latest demo-kit (see "Look") and bump `version`.
+- [x] Move the demo to the latest demo-kit (see "Look") and bump `version`.
+  - **demo-kit 0.5.0,** still the latest on 2026-11-25, as demo v0.2.0. Since kit 0.2.0 a demo is dark unless the page sets `data-theme="light"`, so `index.html`'s `color-scheme` is `dark`, as in the kit's template. The stub's CSS has no colours of its own, so nothing else changed. It builds, validates, and loads in Edge with no console errors in either theme.
 - [ ] Export `demo/public/data/soudai.json` (aim for under 500 KB; the bundle must stay under 2 MB).
 - [ ] The frame, the tabs, the court selector, the status line and "How this works".
 - [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.

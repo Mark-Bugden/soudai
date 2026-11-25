@@ -6,7 +6,7 @@
   "tags": ["data scraping", "feature engineering", "machine learning", "regression"],
   "status": "stub",
   "repo": "https://github.com/Mark-Bugden/soudai",
-  "kitVersion": "0.1.0",
+  "kitVersion": "0.5.0",
   "built": "2026-11-17",
   "demo": { "entry": "demo.js", "height": 560, "needsWebGL": false },
   "writeup": "/projects/soudai/"
