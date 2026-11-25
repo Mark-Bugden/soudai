@@ -3,8 +3,9 @@ test cases (see `examples` for the split, and `scoring` for the scores).
 
 Writes data/derived/model_scores.csv, with each model's scores for all courts and for each court, over
 all the landmarks and at each (`court` and `landmark` are "all" for all of them), and
-data/derived/model_calibration.csv, with each model's calibration tables over all of them. The network's
-weights go to data/derived/network.json, for the demo.
+data/derived/model_calibration.csv, with each model's calibration tables over all of them. For the demo,
+the network's weights go to data/derived/network.json, and the real past cases it carries to
+data/derived/demo_cases.csv.
 
 The trees and the networks need the optional `model` dependency group: `uv sync --group model`.
 
@@ -22,6 +23,7 @@ from . import baselines, examples, forward, journey, paths, scoring
 SCORES = paths.DERIVED / "model_scores.csv"
 CALIBRATION = paths.DERIVED / "model_calibration.csv"
 NETWORK = paths.DERIVED / "network.json"
+DEMO_CASES = paths.DERIVED / "demo_cases.csv"
 CHECKED = 500  # test forecasts on which the numpy forward pass is checked against PyTorch
 
 
@@ -117,6 +119,9 @@ def run():
         f"Training: {len(train.histories):,} cases, {len(train.cuts):,} cuts. Test: {len(test.histories):,} "
         f"cases, {len(at):,} scored cuts ({time.time() - start:.0f} s)"
     )
+    chosen = examples.demo_cases(test)
+    chosen.to_csv(DEMO_CASES, index=False, lineterminator="\n")
+    print(f"Wrote the demo's {len(chosen):,} real past cases to {DEMO_CASES}")
     forecasts = {}
     for name, fit in MODELS.items():
         forecasts[name] = fit(train, test, at)

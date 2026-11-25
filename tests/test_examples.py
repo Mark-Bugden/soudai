@@ -162,3 +162,20 @@ def test_held_out_cases_are_a_fixed_random_share():
     held = examples.held_out(histories)
     assert held.mean() == pytest.approx(examples.VALIDATION, abs=0.01)
     assert (held == examples.held_out(histories)).all()
+
+
+def test_the_demos_cases_are_drawn_per_court_by_weight():
+    rows = []
+    for court, n in [("A", 200), ("B", 3)]:
+        for number in range(n):
+            rows.append(
+                {"id": len(rows), "court": court, "senate": 1, "number": number, "year": 2024}
+                | {"weight": 100.0 if number < 20 else 1.0, "filed": START, "span": 10, "ended": True}
+            )
+    test = examples.Examples(pd.DataFrame(rows), None, None)
+    chosen = examples.demo_cases(test, per_court=10)
+    assert chosen["court"].value_counts().to_dict() == {"A": 10, "B": 3}  # B has only 3
+    # A's first 20 cases weigh 100 each and the other 180 weigh 1, so nearly all the draws are among them
+    assert (chosen.loc[chosen["court"] == "A", "number"] < 20).sum() >= 8
+    assert chosen.equals(examples.demo_cases(test, per_court=10))
+    assert chosen.columns.tolist() == ["court", "senate", "number", "year", "filed", "span", "ended"]

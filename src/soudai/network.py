@@ -157,7 +157,17 @@ def evaluate(model, data):
 
 def fit(train, sequence=True, log=print, seed=examples.SEED):
     """The network fitted on the training cases, stopped on the held-out ones. Returns (network, the
-    held-out loss after each pass)."""
+    held-out loss after each pass). It's trained on one thread: PyTorch's sums over several threads come
+    out slightly different from run to run, and the network is too small to gain from them."""
+    threads = torch.get_num_threads()
+    torch.set_num_threads(1)
+    try:
+        return _fit(train, sequence, log, seed)
+    finally:
+        torch.set_num_threads(threads)
+
+
+def _fit(train, sequence, log, seed):
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
     held = examples.held_out(train.histories)[train.cuts["id"].to_numpy()]
