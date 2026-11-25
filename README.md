@@ -35,6 +35,7 @@ Each stage runs as `uv run soudai <stage>`, in this order. The stages from miles
 | `decisions` | List every published decision since 2020, and parse them into `data/derived/decisions.parquet`. | 3 |
 | `senates`, `intake` | Find each court's senates, and count the cases each one registered per year. | 4 |
 | `sample` | Fetch the timelines of a random sample of cases. | 5 |
+| `official` | Compare the case counts with the Ministry of Justice's official statistics. | 6 |
 | `analyse` | Compute the journeys: how many cases take each route, and how long each step takes. | 6 |
 | `model`, `export` | Train and score the forecasting models, and write the demo's data. | 7–8 |
 | `status` | Report each stage's progress. | 2 |

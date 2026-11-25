@@ -7,7 +7,7 @@ import argparse
 import sys
 from datetime import date
 
-from . import courts, decisions, events, intake, journey, sample, senates, status
+from . import courts, decisions, events, intake, journey, official, sample, senates, status
 from .http import NotCached, StopRun, UnexpectedResponse
 
 
@@ -29,6 +29,7 @@ def main(argv=None):
         "sample", help="fetch the timelines of a random sample of cases, and parse them"
     )
     stage.add_argument("--parse-only", action="store_true", help="parse what's cached, fetching nothing")
+    stages.add_parser("official", help="compare intake with the Ministry's official statistics, S_AS_40")
     stages.add_parser("analyse", help="compute the journey numbers, for all courts and for each court")
     stages.add_parser("status", help="report each stage's progress, from the cache and the tables")
     args = parser.parse_args(argv)
@@ -45,6 +46,8 @@ def main(argv=None):
             return intake.run()
         if args.stage == "sample":
             return sample.run(parse_only=args.parse_only)
+        if args.stage == "official":
+            return official.run()
         if args.stage == "analyse":
             return journey.run()
         return status.run()

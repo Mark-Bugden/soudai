@@ -26,5 +26,19 @@
   "court_map": {
     "url": "https://raw.githubusercontent.com/Mark-Bugden/SOUDAI_data_scraping/a9f5ba3751e25926fc014166efaee870e33973e8/references/court_map.yaml",
     "commit": "a9f5ba3751e25926fc014166efaee870e33973e8"
+  },
+  "infodata": {
+    "form": "https://cslav.justice.cz/InfoData/prehledy-agend.html",
+    "report": "S_AS_40, \"Přehled o vyřizování agendy C u OS\" (Tabulka č. 40)",
+    "query": "POST, as a web form: sestavaQry=S_AS_40, obdobiOdQry=01.01.YYYY, obdobiDoQry=31.12.YYYY, jenVykCeleObdQry=on, vyhledatPrehlAg=Vyhledat",
+    "computed": {
+      "2020": "2021-01-25",
+      "2021": "2022-01-18",
+      "2022": "2023-01-15",
+      "2023": "2024-01-08",
+      "2024": "2025-01-09",
+      "2025": "2026-01-08"
+    },
+    "checked": "2026-11-25"
   }
 }

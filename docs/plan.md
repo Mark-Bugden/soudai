@@ -100,6 +100,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, 10 h 8 min (step 4) |
 | Intake | senates, binary search | `data/derived/intake.csv` | 7,670 senate-years: 92,195 requests, 25 h 42 min (step 4) |
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
+| Official statistics | InfoData's S_AS_40 report, intake | `data/derived/official.csv` | 13 requests (step 6) |
 | Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
@@ -114,6 +115,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - No judge's name appears anywhere in `data/derived/` or the export.
 - The German tank estimator and its interval match a brute-force simulation.
 - The stage model gives the right path and dates for real histories, including revivals, appeals, suspensions and odd dates.
+- The official statistics parse from the real 2022 report, every court appears once, and the courts add up to the national totals.
 - The weighted Kaplan–Meier and Aalen–Johansen estimates match hand-worked cases and lifelines, and the journey numbers match a few cases worked by hand.
 - The export matches its schema and stays under its size budget.
 
@@ -234,7 +236,7 @@ Compare national and court intake with the Ministry of Justice's official statis
   - **Coverage:** one file per year for register C, with all 86 courts (Městský soud v Brně appears as "Brno"), kraj totals and a national total. The portal says the data go back to 2008.
   - **Format:** XML Spreadsheet 2003, PDF or HTML.
   - **Columns:** nápad, obživlo, vyřízeno, nevyřízeno by age, and pravomocně/nepravomocně.
-  - **Editions seen:** the 2020, 2022 and 2025 files, computed on 2021-01-25, 2023-01-15 and 2026-01-08.
+  - **Editions used** (step 6): one per year, computed on 2021-01-25 (2020), 2022-01-18, 2023-01-15, 2024-01-08, 2025-01-09 and 2026-01-08 (2025). `reference/sources.json` records them.
   - **National nápad, register C:** 286,801 in 2020, 295,311 in 2022 and 272,434 in 2025.
 - **The breakdown: V(MS)-114, "Výkaz o pohybu agendy rejstříku C u okresních soudů".**
   - At https://cslav.justice.cz/InfoData/vykazy-soudu-a-statnich-zastupitelstvi.html, one file per court and period, keyed by infosoud's own court codes.
@@ -298,12 +300,13 @@ src/soudai/
   events.py                    event log and stage model
   tank.py                      German tank estimates and intervals
   survival.py                  weighted Kaplan–Meier and Aalen–Johansen
+  official.py                  the Ministry's official statistics (S_AS_40), against intake
   journey.py                   the journey numbers: stages, moves, waits, curves and paths
   model.py                     the remaining-time network and its comparison models
   backlog.py                   Little's law and the direct count
   export.py                    writes demo/public/data/ and the JS fixtures
   status.py                    progress of each stage, from the cache and derived tables
-  cli.py                       `uv run soudai <stage>`: courts, events, decisions, senates, intake, sample, analyse, model, export, status
+  cli.py                       `uv run soudai <stage>`: courts, events, decisions, senates, intake, sample, official, analyse, model, export, status
 reference/                     courts.csv, events.csv, sources.json (hand-checked, committed)
 data/raw/                      cache.sqlite and logs (gitignored)
 data/derived/                  parsed tables, no judges' names (committed while small)
@@ -576,7 +579,21 @@ Built before the run (2026-11-22), with tests on fake dockets:
     - Hradec Králové records a hearing in only 22% of cases, against 80% nationally: 14–24% in 2020–2024 and 41% in 2025. Chomutov records one in 92%.
     - At Prague 2, 26.5% of cases reach the appeal stage, against 6.3% nationally, and 23.1% go to the appeal court (Městský soud v Praze), against 4.3%.
     - Whether that's practice or record-keeping isn't known, and the project makes no claims about why.
-- [ ] Compare the exact intake with the official statistics, court by court and nationally (see "External check"). Every case's weight comes from those counts. It takes about 6 downloads from InfoData, one per year.
+- [x] Compare the exact intake with the official statistics, court by court and nationally (see "External check"). Every case's weight comes from those counts. It takes about 6 downloads from InfoData, one per year.
+  - **In code:** `official.py` and `uv run soudai official` search InfoData's report form for S_AS_40, one year at a time, download each year's report as XML, and write `data/derived/official.csv`. That's our count beside the report's nápad, revived, disposed and pending, for every court-year and nationally. The client can now POST a web form, keyed in the cache apart from JSON. There are 7 new tests, on the real 2022 report.
+  - **The runs:** 15 requests to cslav.justice.cz, with no failures. Runs 30–32 explored the form (4 requests), and run 33 did the rest (11). A run from scratch makes 13: the form page, then a search and a download per year. Each year's search lists exactly one report.
+  - **The report's layout.** It has a block per region and a row per court, with 22 numbers under numbered columns. Nápad is the 2nd, and revived cases are split between the 1st and 3rd (by the rules before and after 2009). Náchod 2022 gives nápad 2,309 and 108 revived, as V(MS)-114 does. Every court appears once, and all four numbers add up to the national total in every year.
+  - **Nationally, our counts run 0.43–0.53% above nápad every year:**
+
+    | | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | Our count | 288,307 | 292,486 | 296,731 | 288,244 | 286,255 | 273,649 |
+    | Nápad | 286,801 | 291,049 | 295,311 | 286,885 | 285,021 | 272,434 |
+    | Gap | +0.53% | +0.49% | +0.48% | +0.47% | +0.43% | +0.45% |
+
+  - **Court by court** (516 court-years), the median gap is +0.33% (8 cases). 95% are within +1.13%, and 24 match exactly. The largest is Šumperk in 2020, at +2.9% (52 cases). Only Pelhřimov in 2025 is below, by 5 cases (−0.6%), with no flag in intake. A small senate outside the searched range, or hidden numbers at the top of a senate's docket, could explain it; it isn't checked.
+  - So the counts are registrations, a little above nápad everywhere, as step 4 found at Náchod ("zapsáno" against "nápad"), and the weights stand.
+  - **Kept for step 10:** the report's cases disposed in the year, and pending at its end, nationally 130,342 at the end of 2020, falling to 96,558 at the end of 2025. That's an official backlog to set beside ours.
 - [ ] Record the headline figures here, and draft notes for the write-up in `docs/writeup.md`.
 
 Reordered with Mark on 2026-11-25: the model comes before the demo, and the Courts tab (German tank estimate, backlog and map) comes after the demo goes live.
@@ -645,7 +662,7 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
   - **Strays.** About a dozen single decisions sit far outside any series, such as 11297 at Náchod and 9249 at Liberec. They're probably typos.
   - **Still open:** what the hundreds mean.
   - **What step 4 needs.** Its rule probes every senate from 1 to the highest seen + 10, so one stray would cost thousands of probes, and the 1–250 sweep can't see the 300s or 2100s. The rule has to work by series instead, and since step 4 it does (see "Exact intake").
-- **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Step 4 answered which measure the counts match: "zapsáno". Náchod 2022 counts 2,326, against zapsáno 2,327 and nápad 2,309, and the national counts run about 0.5% above S_AS_40's nápad. Step 6 compares every court.
+- **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Step 4 answered which measure the counts match: "zapsáno". Náchod 2022 counts 2,326, against zapsáno 2,327 and nápad 2,309, and the national counts run about 0.5% above S_AS_40's nápad. Step 6 compared every court: settled, see step 6.
 - **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit. Step 3's decisions table (10.9 MB) stays local for now. Its subjects sometimes give a person's date of birth or address, so it can't be published as it is. Mark decided on 2026-11-22 to keep it private: nothing in the demo needs it.
 - **Model card.** There's a model now (see "The remaining-time model"). Whether to add a model card for it is Mark's call. Its scores against the comparison models would be the figures in it.
 - **Claim amounts.** `predmetRizeni` often gives the amount claimed, though 51,796 subjects have `[částka]` in its place (step 3). It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
