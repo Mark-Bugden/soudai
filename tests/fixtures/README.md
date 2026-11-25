@@ -16,3 +16,4 @@ Real responses, saved from the cache (`data/raw/cache.sqlite`) on 2026-11-22, so
 | `rozhodnuti/day_2023_03_15_page_0.json` | The first page of 2023-03-15's decisions, with every `autor` (the judge's name) replaced by `REDACTED`. |
 | `infodata/results_2022.html` | InfoData's search results for S_AS_40 in 2022 (saved 2026-11-25), cut to the results table. |
 | `infodata/s_as_40_2022.xml.gz` | The 2022 S_AS_40 report itself, as InfoData's XML spreadsheet, gzipped. |
+| `network/forward.json` | Not a response: a network with random weights, and its PyTorch forecasts at every cut of three made-up cases, to check the numpy forward pass (and later the demo's JavaScript) against. `tests/test_network.py` writes it. |

@@ -61,9 +61,11 @@ class FakeClient:
 
 @pytest.fixture
 def fixture_client():
-    """A FakeClient serving every saved JSON response in tests/fixtures/."""
+    """A FakeClient serving every saved JSON response in tests/fixtures/ (network/ holds no responses)."""
     client = FakeClient()
     for path in FIXTURES.rglob("*.json"):
+        if path.parent.name == "network":
+            continue
         record, response = load(path.relative_to(FIXTURES).as_posix())
         client.add(record["method"], record["url"], record["body"], response)
     return client

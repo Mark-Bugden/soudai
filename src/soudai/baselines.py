@@ -40,6 +40,8 @@ TREES = {  # LightGBM's settings
     "verbose": -1,
     "seed": examples.SEED,
 }
+FEATURES = ["since_filing", "since_last", "in_stage", "hearings", "decided", "appealed", "revived"]
+FEATURES += [f"in_{stage}" for stage in events.STAGES[1:-1]]  # the stage, but "filed" (and "final")
 TREE_ROUNDS, TREE_PATIENCE = 2000, 50  # at most, and stopping when the held-out loss stalls this long
 
 
@@ -99,7 +101,7 @@ def features(cuts):
     )
     for stage in events.STAGES[1:-1]:
         out[f"in_{stage}"] = (cuts["stage"].to_numpy() == stage).astype(float)
-    return out
+    return out[FEATURES]
 
 
 def _draw(cuts, n):
