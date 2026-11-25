@@ -102,7 +102,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
 | Official statistics | InfoData's S_AS_40 report, intake | `data/derived/official.csv` | 13 requests (step 6) |
 | Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
-| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv` | No requests: about 2 minutes for the four comparison models (step 7) |
+| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv`, `network.json` | No requests: about 4 minutes for all six models (step 7) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -119,6 +119,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - The official statistics parse from the real 2022 report, every court appears once, and the courts add up to the national totals.
 - The weighted Kaplan–Meier and Aalen–Johansen estimates match hand-worked cases and lifelines, and the journey numbers match a few cases worked by hand.
 - The forecasting examples cut real-looking histories on the right days, with the right features and outcomes, and the split cuts the training records off at 31 December 2023.
+- The numpy forward pass matches PyTorch's forecasts on made-up cases, the network's loss matches a hand-worked case, its batches point each forecast at its last event, and it learns a made-up pattern.
 - Concordance matches lifelines unweighted, and a weight counts as that many copies. The Brier score, its censoring weights and calibration match cases worked by hand, and so do the court average and the process map.
 - The export matches its schema and stays under its size budget.
 
@@ -186,6 +187,7 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   - **The output layers.** At the moment of a forecast they take 37 numbers: the last hidden state, the court (4 learned numbers, from a 4 × 86 matrix) and log(1 + days since the last event). They go through a fully connected layer of 32 with ReLU, then one of 36, each through a sigmoid.
   - **The outputs.** Output k, p_k, is the chance the case ends in month k, given that it's open at the start of that month. The chance it's still open after k months is (1 − p₁)…(1 − p_k).
   - **Size:** about 7,100 weights and biases, small enough to run in the demo.
+  - **As built in step 7** (`network.py`): as above, with one more input to the output layers, log(1 + days since filing) at the forecast, so they take 38 numbers. 7,228 weights and biases. Tuning didn't change the sizes (see step 7).
 - **The training data** is step 5's sample of timelines:
   1. Read the events as the stage model does (`events.log`): cancelled ones and those dated before the filing are dropped, and the rest are sorted by date, then by `poradi`. Mark confirmed on 2026-11-25 that cancellations stay out of the model.
   2. A case finishes when it becomes legally final, or at its closing if it's closed without that (settled 2026-11-25; see "The journey").
@@ -201,6 +203,8 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
 - **Training.** One pass through a case gives a hidden state after every event, so all its cuts are scored together.
   - **The loss.** For a case that ended in month k, it's −[log(1 − p₁) + … + log(1 − p_{k−1}) + log p_k]. For a case still open after n months, it's −[log(1 − p₁) + … + log(1 − p_n)].
   - **Backpropagation through time.** The chain of steps is unrolled, and each shared weight's gradient is the sum of its contributions from all the steps. The GRU and the output layers are trained together.
+  - **As built:** Adam with a learning rate of 0.001, batches of 256 cases (of similar lengths, to save padding), gradients clipped to a norm of 1. Training stops when the held-out cases' loss hasn't improved for 5 passes over the data, and keeps the best pass. The loss is reported per month a case is known to be open, as LightGBM's is, so the two compare directly. A pass takes about 3 s on this machine's CPU, and training about 90 s.
+  - **For the demo:** `uv run soudai model` writes the trained weights to `data/derived/network.json` (95 KB). `forward.py` runs the network in plain numpy, one case at a time. It's the reference for the JavaScript port, and each run checks it against PyTorch on 500 test forecasts.
 - **Comparison models,** each knowing more about the case than the one before:
   1. **The court average:** a Kaplan–Meier curve per court.
      - As built (`baselines.py`): the court's curve from filing to the end, over its training cases, read from the day of the cut: S(day + t) / S(day). Where fewer than 20 of the court's sampled cases were still open on that day, it's read from the last day that had 20.
@@ -324,6 +328,7 @@ src/soudai/
   journey.py                   the journey numbers: stages, moves, waits, curves and paths
   model.py                     fits and scores every model: `uv run soudai model`
   network.py                   the GRU network, in PyTorch (an optional dependency)
+  forward.py                   the network's forward pass in numpy: the reference for the demo's JS
   backlog.py                   Little's law and the direct count
   export.py                    writes demo/public/data/ and the JS fixtures
   status.py                    progress of each stage, from the cache and derived tables
@@ -635,13 +640,27 @@ Built before the run (2026-11-22), with tests on fake dockets:
 Reordered with Mark on 2026-11-25: the model comes before the demo, and the Courts tab (German tank estimate, backlog and map) comes after the demo goes live.
 
 ### 7. The remaining-time model (PR)
-- [ ] Build the comparison models and the GRU network (see "The remaining-time model"). Train and score them all on the same split: earlier registration years for training, later ones for testing.
+- [x] Build the comparison models and the GRU network (see "The remaining-time model"). Train and score them all on the same split: earlier registration years for training, later ones for testing.
   - **First PR (2026-11-25): the examples, the scores, and the two simplest methods.** `examples.py` cuts the histories, `scoring.py` scores forecasts, `baselines.py` has the court average and the process map, and `model.py` runs them as `uv run soudai model`, in about 40 s. 21 new tests. Decided here, and written into "The remaining-time model": the monthly cuts, the split on 1 January 2024, the validation share, and how each score is computed.
   - **Second PR (2026-11-25): Cox and gradient-boosted trees** (see "Comparison models"). 4 new tests. `uv run soudai model` now takes about 2 minutes.
     - **Heavy dependencies are optional.** LightGBM is in a `model` dependency group, and PyTorch will join it. `uv sync --group model` installs it. CI installs only the default groups, so its install stays light, and the tests that need the group skip without it.
     - **Tuning the trees** on the held-out training cases changed little: the held-out loss ran from 0.3286 to 0.3289 over 31 to 127 leaves and learning rates of 0.05 and 0.1. Fitting on all 1.1M training cuts rather than 500,000 gave 0.3284, so they're all used, with 63 leaves and a rate of 0.05. Training stopped at about 230 rounds.
     - A test caught the stage columns "decided" and "revived" overwriting the features of the same names before the first scores were recorded. They're `in_decided` and so on now.
-  - **Still to come:** the GRU, in PyTorch with CPU-only wheels.
+  - **Third PR (2026-11-25): the GRU network, and the same output layers on the hand-made features** (the "optional extra" above). `network.py` and `forward.py`, with 6 new tests. `uv run soudai model` now takes about 4 minutes.
+    - **PyTorch 2.15, CPU-only,** from PyTorch's own package index, in the `model` group. The network is small enough that a GPU wouldn't help.
+    - **Tuning,** on the held-out training cases, by their loss (lower is better; the trees' is 0.3284):
+
+      | Network | Weights | Held-out loss |
+      | --- | --- | --- |
+      | The plan's sizes, learning rate 0.002, stopping after 3 passes without improvement | 7,228 | 0.3280 |
+      | The same, learning rate 0.001, stopping after 5 | 7,228 | 0.3265 (0.3274 with another seed) |
+      | The same, learning rate 0.0005, stopping after 6 | 7,228 | 0.3269 |
+      | Hidden state, layer and court all doubled, event type 16 | 23,804 | 0.3264 |
+      | Halving the learning rate when the loss stalls (hidden state of 16, 32 or 64) | 3,836–18,620 | 0.3291–0.3299 |
+      | The output layers on the hand-made features | 2,140 | 0.3340 (0.3348 with another seed) |
+
+      So the plan's sizes stay, with a learning rate of 0.001. Two training runs that differ only in their random start differ by about 0.001.
+    - **The forward pass in numpy matches PyTorch** to 4 × 10⁻⁷ on 500 test forecasts, and to 1.7 × 10⁻⁸ on the fixture. The gap is PyTorch's 32-bit arithmetic.
   - **Cases have got faster,** so every model trained on 2020–2023 expects the test cases to take longer than they did. The share of cases not yet finished 6 months after filing, by Kaplan–Meier with full follow-up, by year registered:
 
     | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
@@ -649,7 +668,7 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     | 54.7% | 55.4% | 50.3% | 50.4% | 49.7% | 42.9% |
 
     The calibration tables show it: where the court average forecast a 45% chance of finishing within 6 months, 58% did. All the models train on the same years, so the comparison between them stays fair. Weighting recent years more, or correcting the forecasts afterwards, could reduce the gap. Neither is done yet.
-- [ ] Record the scores here, model by model, by court and by how far into a case the forecast is made.
+- [x] Record the scores here, model by model, by court and by how far into a case the forecast is made.
   - **Over all test forecasts** (234,784, at filing and 1, 3, 6 and 12 months in). Higher concordance is better, and lower Brier and calibration error:
 
     | Model | Concordance | Brier 1 mo | 3 mo | 6 mo | 12 mo | 24 mo | Calibration error 6 mo | 12 mo |
@@ -658,6 +677,8 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     | Process map | 0.636 | 0.043 | 0.158 | 0.197 | 0.090 | 0.043 | 6.6% | 2.5% |
     | Cox | 0.606 | 0.058 | 0.179 | 0.202 | 0.096 | 0.046 | 4.6% | 6.7% |
     | Trees | 0.638 | 0.040 | 0.153 | 0.193 | 0.089 | 0.042 | 5.3% | 2.0% |
+    | Network on the hand-made features | 0.637 | 0.042 | 0.157 | 0.195 | 0.089 | 0.043 | 4.7% | 1.2% |
+    | GRU network | 0.642 | 0.038 | 0.150 | 0.192 | 0.089 | 0.043 | 4.0% | 1.6% |
 
   - **By how far into a case.** At filing a case has only its court, and every method but Cox scores the same (concordance 0.604). Further in, the methods that read the case pull ahead. Concordance:
 
@@ -667,10 +688,21 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     | Process map | 0.604 | 0.625 | 0.669 | 0.720 | 0.733 |
     | Cox | 0.564 | 0.591 | 0.650 | 0.719 | 0.719 |
     | Trees | 0.604 | 0.624 | 0.671 | 0.741 | 0.750 |
+    | Network on the hand-made features | 0.605 | 0.624 | 0.668 | 0.728 | 0.730 |
+    | GRU network | 0.605 | 0.630 | 0.678 | 0.740 | 0.759 |
 
-    The trees' Brier score at 6 months is 0.228 at filing, 0.162 at 3 months in and 0.184 at 12, against the process map's 0.230, 0.170 and 0.201.
-  - **By court.** Within one court, the court average gives every case at a landmark the same forecast, so its concordance there is 0.5, a coin toss: its 0.602 overall comes from ranking the courts. Within a court, the process map's runs from 0.531 to 0.571 and the trees' from 0.534 to 0.575. The process map's Brier score at 6 months is lower than the court average's in 83 of the 86 courts, and the trees' lower than the process map's in 81.
-- [ ] A Python reference and fixtures for what the demo recomputes: the network's forward pass, for made-up cases.
+    The trees' Brier score at 6 months is 0.228 at filing, 0.162 at 3 months in and 0.184 at 12, against the process map's 0.230, 0.170 and 0.201, and the GRU's 0.229, 0.159 and 0.181.
+  - **By court.** Within one court, the court average gives every case at a landmark the same forecast, so its concordance there is 0.5, a coin toss: its 0.602 overall comes from ranking the courts. Within a court, the process map's runs from 0.531 to 0.571 and the trees' from 0.534 to 0.575. The process map's Brier score at 6 months is lower than the court average's in 83 of the 86 courts, and the trees' lower than the process map's in 81. The GRU's concordance within a court runs from 0.534 to 0.577. It ranks better than the trees in 69 courts, and its Brier score is lower in 54 at 6 months and 51 at 12.
+  - **The GRU doesn't clearly beat the trees.** It ranks cases better, and its forecasts a few months ahead are better, but the 6- and 12-month forecasts are about as good as the trees':
+    - **Concordance:** 0.642 against 0.638. A bootstrap over the test cases (resampling them, 40 times here) puts the gap at 0.0032 to 0.0045, and a second network, trained from another random start, also beats the trees (0.641).
+    - **Brier score at 3 months:** 0.1500 against 0.1528, a gap of −0.0032 to −0.0026 over 200 bootstrap samples. The second network is better too (0.1517).
+    - **At 6 and 12 months:** the first network is better by 0.0014 and 0.0005, and the bootstrap says that isn't luck in the test cases. But the second network is 0.0007 worse than the trees at 6 months, and level at 12. So the gap is within what a different training run changes.
+    - **Reading the sequence is what helps, not a neural network as such.** The same output layers fed the hand-made features do worse than the trees (concordance 0.637; held-out loss 0.3340 against 0.3284).
+    - **Where it's better:** 1 to 12 months into a case, the GRU ranks best at every landmark but 6 months, where it ties the trees.
+    - **Possible next steps,** not done: averaging several networks trained from different random starts (an ensemble), which would remove most of the run-to-run noise and costs the demo a few more forward passes; and weighting recent training years more, for the drift above.
+- [x] A Python reference and fixtures for what the demo recomputes: the network's forward pass, for made-up cases.
+  - `forward.py` is the reference, in plain numpy. `tests/fixtures/network/forward.json` holds a network with random weights and PyTorch's forecasts at all 27 cuts of three made-up cases (filed, heard, decided, appealed, revived, suspended and censored). CI checks `forward.py` against it without PyTorch, and with PyTorch installed a test checks the fixture is still what PyTorch gives. The demo's JavaScript will be checked against the same file in step 8.
+  - The trained network is in `data/derived/network.json`, with its event codes and courts in the order of its rows.
 - [ ] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
 
 ### 8. Forecast and process map: release status `in-progress`

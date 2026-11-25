@@ -3,26 +3,74 @@ test cases (see `examples` for the split, and `scoring` for the scores).
 
 Writes data/derived/model_scores.csv, with each model's scores for all courts and for each court, over
 all the landmarks and at each (`court` and `landmark` are "all" for all of them), and
-data/derived/model_calibration.csv, with each model's calibration tables over all of them.
+data/derived/model_calibration.csv, with each model's calibration tables over all of them. The network's
+weights go to data/derived/network.json, for the demo.
+
+The trees and the networks need the optional `model` dependency group: `uv sync --group model`.
 
     uv run soudai model
 """
 
+import json
 import time
 
 import numpy as np
 import pandas as pd
 
-from . import baselines, examples, journey, paths, scoring
+from . import baselines, examples, forward, journey, paths, scoring
 
-MODELS = {
-    "court average": baselines.court_average,
-    "process map": baselines.process_map,
-    "cox": baselines.cox,
-    "trees": baselines.trees,
-}
 SCORES = paths.DERIVED / "model_scores.csv"
 CALIBRATION = paths.DERIVED / "model_calibration.csv"
+NETWORK = paths.DERIVED / "network.json"
+CHECKED = 500  # test forecasts on which the numpy forward pass is checked against PyTorch
+
+
+def features_network(train, test, at):
+    """The network's output layers, fed the hand-made features instead of the GRU's hidden state."""
+    from . import network
+
+    model, _ = network.fit(train, sequence=False)
+    return network.still_open(model, network.Data(test, at))
+
+
+def gru(train, test, at):
+    """The GRU network. Its weights are written for the demo, and the numpy forward pass checked on them."""
+    from . import network
+
+    model, _ = network.fit(train)
+    weights = network.weights(model)
+    NETWORK.write_text(json.dumps(weights, separators=(",", ":")) + "\n", encoding="utf-8")
+    still = network.still_open(model, network.Data(test, at))
+    gap = check_forward(weights, test, at, still)
+    print(f"  the numpy forward pass matches PyTorch on {CHECKED} test forecasts, to {gap:.1e}")
+    return still
+
+
+MODELS = {
+    "court average": lambda train, test, at: baselines.court_average(train, at),
+    "process map": lambda train, test, at: baselines.process_map(train, at),
+    "cox": lambda train, test, at: baselines.cox(train, at),
+    "trees": lambda train, test, at: baselines.trees(train, at),
+    "features network": features_network,
+    "gru": gru,
+}
+
+
+def check_forward(weights, test, at, still, n=CHECKED):
+    """The largest gap between `forward` and PyTorch's forecasts, on n of the scored cuts drawn at random.
+    Raises if it's over 1e-5."""
+    rows = np.random.default_rng(examples.SEED).choice(len(at), min(n, len(at)), replace=False)
+    first = np.searchsorted(test.steps["id"].to_numpy(), at["id"].to_numpy()[rows])
+    gap = 0.0
+    for row, start in zip(rows, first, strict=True):
+        cut = at.iloc[row]
+        steps = test.steps.iloc[start : cut["step"] + 1]
+        events = list(zip(steps["code"], steps["day"], strict=True))
+        ours = forward.still_open(weights, cut["court"], events, cut["day"])
+        gap = max(gap, np.abs(ours - still[row]).max())
+    if gap > 1e-5:
+        raise AssertionError(f"the numpy forward pass is {gap:.1e} off PyTorch's")
+    return gap
 
 
 def prepare():
@@ -71,7 +119,7 @@ def run():
     )
     forecasts = {}
     for name, fit in MODELS.items():
-        forecasts[name] = fit(train, at)
+        forecasts[name] = fit(train, test, at)
         print(f"Fitted {name} ({time.time() - start:.0f} s)")
     scores, calibration = score_tables(forecasts, at)
     scores.to_csv(SCORES, index=False, float_format="%.6g", lineterminator="\n")

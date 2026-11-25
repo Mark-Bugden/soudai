@@ -23,9 +23,19 @@ dev = [
     "pytest>=9.2",
     "ruff>=0.17",
 ]
-model = [
+model = [   # the heavier models: uv sync --group model
     "lightgbm>=4.6",
+    "torch>=2.9",
 ]
+
+# PyTorch comes from its CPU-only index: the network is small, and CUDA builds are several GB.
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
