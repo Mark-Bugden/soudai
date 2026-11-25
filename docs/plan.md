@@ -197,6 +197,7 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   5. Split by time: train on earlier registration years, and test on later ones.
      - **Settled in step 7: the split is 1 January 2024.** The models train on cases registered 2020–2023, as their records stood on 31 December 2023: anything dated later is cut off, and a case still open then is censored there. They're tested on cases registered 2024–2025, followed to the snapshot. So the scores are those of models built on 1 January 2024 and used on the cases that came after, with nothing seen from after that day. Two test years rather than one give twice the test cases, and 2024's have at least 22 months of follow-up.
      - **Validation.** A fixed random 10% of the training cases is held out, to stop training and to tune.
+     - **Recent examples count more** (Mark, 2026-11-25; see step 7). Each training cut's weight halves for every year between the day it was made and the split, and each case's, for the court average, from its filing date.
   6. In a batch, pad shorter cases to the same length, and mark which steps are real.
 
   `examples.py` builds them. Training: 138,815 cases (those still open at the end of their filing day), 551,117 events and 1,245,125 cuts. Test: 69,336 cases, 285,826 events and 603,472 cuts. A case has at most 49 events before its end.
@@ -668,9 +669,9 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     | --- | --- | --- | --- | --- | --- |
     | 54.7% | 55.4% | 50.3% | 50.4% | 49.7% | 42.9% |
 
-    The calibration tables show it: where the court average forecast a 45% chance of finishing within 6 months, 58% did. All the models train on the same years, so the comparison between them stays fair. Weighting recent years more, or correcting the forecasts afterwards, could reduce the gap. Neither is done yet.
+    The calibration tables show it: where the court average forecast a 45% chance of finishing within 6 months, 58% did. All the models train on the same years, so the comparison between them stays fair. Weighting recent years more reduces the gap: see the box on recency below.
 - [x] Record the scores here, model by model, by court and by how far into a case the forecast is made.
-  - **Over all test forecasts** (234,784, at filing and 1, 3, 6 and 12 months in). Higher concordance is better, and lower Brier and calibration error:
+  - **Over all test forecasts, before recency weighting** (234,784, at filing and 1, 3, 6 and 12 months in). Higher concordance is better, and lower Brier and calibration error. The box on recency below has the scores with it:
 
     | Model | Concordance | Brier 1 mo | 3 mo | 6 mo | 12 mo | 24 mo | Calibration error 6 mo | 12 mo |
     | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -707,6 +708,37 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
 - [x] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
   - **Fourth PR (2026-11-25).** `examples.demo_cases` draws 35 test cases from each court, 3,010 in all, with chances in proportion to their weights, so each court's draw stands for all its registered cases rather than the sample. `uv run soudai model` writes them to `data/derived/demo_cases.csv`: the case, its filing date, the days to its end or censoring, and whether it finished. 1 new test.
   - **What the export adds in step 8:** each case's events (`examples.build` on the test cases gives them, as the network reads them) and how it ended. The demo runs the network on them itself, so no forecasts are stored, and the forecast at any point in a case's life is the one the demo would give for a made-up case with the same history.
+
+Added with Mark on 2026-11-25, after the first four PRs: weighting recent training years more, an ensemble of networks, and a model card for the demo.
+
+- [x] Weight recent training examples more, for the drift (`examples.recent`).
+  - **How:** each training cut's weight halves for every `HALF_LIFE` years between the day it was made and the split, and each case's (used by the court average) from its filing date. Every model gets the same weights. The test cases' weights are unchanged.
+  - **Choosing the half-life** without touching the test years: each candidate was fitted on cases registered 2020–2022 as they stood on 31 December 2022, and checked on the 2023 cases as they stood on 31 December 2023. Held-out loss (lower is better), and calibration error at 6 months:
+
+    | Half-life | Trees: loss | GRU: loss | Trees: calibration error | GRU: calibration error |
+    | --- | --- | --- | --- | --- |
+    | None | 0.36343 | 0.36006 | 2.1% | 2.4% |
+    | 4 years | 0.36300 | 0.35992 | 1.7% | 2.0% |
+    | 2 years | 0.36264 | 0.35953 | 1.4% | 1.7% |
+    | 1 year | 0.36217 | 0.35926 | 2.0% | 2.6% |
+    | 6 months | 0.36208 | 0.36258 | 3.1% | 3.6% |
+
+    **1 year,** by the loss, the criterion every other choice was tuned on: it's best for the GRU, and within 0.0001 of best for the trees. At 6 months old cases count for too little, and the GRU, which needs more data, gets worse. Calibration at 6 months alone would pick 2 years.
+  - **On the test years,** before → after:
+
+    | Model | Concordance | Brier 3 mo | Brier 6 mo | Brier 12 mo | Calibration error 6 mo | 12 mo |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | Court average | 0.602 → 0.606 | 0.174 → 0.172 | 0.203 → 0.199 | 0.094 → 0.093 | 5.8% → 3.2% | 2.2% → 0.7% |
+    | Process map | 0.636 → 0.640 | 0.158 → 0.156 | 0.197 → 0.192 | 0.090 → 0.089 | 6.6% → 4.2% | 2.5% → 1.0% |
+    | Cox | 0.606 → 0.607 | 0.179 → 0.179 | 0.202 → 0.199 | 0.096 → 0.095 | 4.6% → 4.5% | 6.7% → 5.9% |
+    | Trees | 0.638 → 0.643 | 0.153 → 0.151 | 0.193 → 0.189 | 0.089 → 0.088 | 5.3% → 2.6% | 2.0% → 0.7% |
+    | Network on the hand-made features | 0.637 → 0.640 | 0.157 → 0.154 | 0.195 → 0.191 | 0.089 → 0.089 | 4.8% → 2.2% | 1.2% → 1.7% |
+    | GRU network | 0.642 → 0.645 | 0.150 → 0.150 | 0.192 → 0.192 | 0.089 → 0.088 | 4.0% → 5.5% | 1.5% → 1.2% |
+
+  - **Every model ranks better, and all but the GRU forecast better.** The trees gain most: their Brier score at 6 months is now lower than the GRU's (0.189 against 0.192), and lower than the process map's in 82 of the 86 courts.
+  - **The single GRU got no better at 6 months, and its calibration got worse:** at filing it forecasts 7.3 points too few cases finishing within 6 months, against the trees' 2.9. With old cases weighted down, fewer cases really count, and its held-out loss jumps around from pass to pass (0.3395 to 0.3418 over its last eight). That's the run-to-run noise the ensemble is for. It still ranks best: 0.645, and better than the trees in 58 of the 86 courts.
+- [ ] An ensemble of GRU networks: several trained from different random starts, their forecasts averaged. The demo runs them all.
+- [ ] A model card for the demo: facts drafted in `docs/` for Mark to write it from.
 
 ### 8. Forecast and process map: release status `in-progress`
 - [ ] Move the demo to the latest demo-kit (see "Look") and bump `version`.
@@ -768,7 +800,7 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
   - **What step 4 needs.** Its rule probes every senate from 1 to the highest seen + 10, so one stray would cost thousands of probes, and the 1–250 sweep can't see the 300s or 2100s. The rule has to work by series instead, and since step 4 it does (see "Exact intake").
 - **Official statistics.** Found: InfoData's S_AS_40 report, with V(MS)-114 for the breakdown (see "External check"). Step 4 answered which measure the counts match: "zapsáno". Náchod 2022 counts 2,326, against zapsáno 2,327 and nápad 2,309, and the national counts run about 0.5% above S_AS_40's nápad. Step 6 compared every court: settled, see step 6.
 - **Publishing the snapshot.** The API can change or disappear, so it may be worth publishing the derived tables, for example as a release asset, if they're too large to commit. Step 3's decisions table (10.9 MB) stays local for now. Its subjects sometimes give a person's date of birth or address, so it can't be published as it is. Mark decided on 2026-11-22 to keep it private: nothing in the demo needs it.
-- **Model card.** There's a model now (see "The remaining-time model"). Whether to add a model card for it is Mark's call. Its scores against the comparison models would be the figures in it.
+- **Model card.** Settled with Mark on 2026-11-25: the demo has one. Agents draft its facts in `docs/`, and Mark writes it (see step 7).
 - **Claim amounts.** `predmetRizeni` often gives the amount claimed, though 51,796 subjects have `[částka]` in its place (step 3). It's kept but not analysed. Splitting journeys by claim size would be a natural extension, if Mark wants it later.
 - **Judges.** Discussed 2026-11-22: a judge-level aggregate (how much of the variation comes from the judge, with no names) was floated, and the scope Mark chose leaves judges out. The raw cache keeps `autor`; nothing derived does.
 - **API stability.** If infosoud's API changes during a run, stop, record what changed here, and adapt the client. The cache keeps everything already fetched.

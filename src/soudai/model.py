@@ -76,10 +76,10 @@ def check_forward(weights, test, at, still, n=CHECKED):
 
 
 def prepare():
-    """(training examples, test examples)."""
+    """(training examples, weighted for recency; test examples)."""
     cases, table = journey.load()
     train, test = examples.split(cases)
-    return examples.build(train, table), examples.build(test, table)
+    return examples.recent(examples.build(train, table)), examples.build(test, table)
 
 
 def censoring_weights(at):

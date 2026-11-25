@@ -179,3 +179,27 @@ def test_the_demos_cases_are_drawn_per_court_by_weight():
     assert (chosen.loc[chosen["court"] == "A", "number"] < 20).sum() >= 8
     assert chosen.equals(examples.demo_cases(test, per_court=10))
     assert chosen.columns.tolist() == ["court", "senate", "number", "year", "filed", "span", "ended"]
+
+
+def test_recent_cuts_count_more():
+    until = date(2024, 1, 1)
+    four_years = 4 * 365  # + 1 leap day = 1,461 days, exactly 4 years of 365.25 days
+    filed = until - timedelta(days=2 * (four_years + 1))  # filed 8 years before the split
+    histories = pd.DataFrame({"id": [0], "filed": [filed], "weight": [8.0]})
+    cuts = pd.DataFrame(
+        {"id": [0, 0, 0], "day": [0, four_years + 1, 2 * (four_years + 1)], "weight": [8.0] * 3}
+    )
+    train = examples.Examples(histories, pd.DataFrame(), cuts)
+    assert examples.recent(train, None, until) is train
+    weighted = examples.recent(train, 4, until)  # halving every 4 years
+    assert weighted.cuts["weight"].tolist() == pytest.approx([2, 4, 8])
+    assert weighted.histories["weight"].tolist() == pytest.approx([2])
+    assert examples.recent(train, 8, until).cuts["weight"].tolist() == pytest.approx([4, 8 / 2**0.5, 8])
+
+
+def test_the_split_can_be_moved():
+    late = case(2, ("ZAHAJ_RIZ", 0), year=2023, start=date(2022, 12, 1))
+    cases = pd.DataFrame([row for row, _ in (HEARD, late)])
+    train, test = examples.split(cases, on=date(2023, 1, 1))
+    assert train["number"].tolist() == [1] and test["number"].tolist() == [2]
+    assert train["valid_to"].tolist() == [date(2022, 12, 31)]
