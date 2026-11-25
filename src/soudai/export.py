@@ -4,6 +4,7 @@ the demo without running the pipeline, so the file is committed too.
 It holds only what the demo's tabs need:
 - `courts` and `codes`: the 86 courts and the 28 event codes, in the order of the network's rows, with each
   court's name and area, and each code's English gloss and stage on the journey map (null if it has none).
+  A court's name is infosoud's, with its okres spelled as in `area` (`name`).
 - `network`: the ensemble's weights (data/derived/network.json). Each matrix is stored as 16-bit integers
   with one scale, so a weight is its integer × the scale, in base64, little-endian. That's 96 KB against
   469 KB at 9 digits, and it moves no forecast of the demo's real cases by more than 0.0001.
@@ -193,6 +194,14 @@ def journeys(tables, registered):
     return out
 
 
+def name(court):
+    """infosoud's name for a court, with its okres spelled as in `area`: infosoud writes three with a
+    capital after the hyphen, such as "Okresní soud Praha-Východ" for Praha-východ."""
+    if court["name"].lower().endswith(" " + court["area"].lower()):
+        return court["name"][: -len(court["area"])] + court["area"]
+    return court["name"]
+
+
 def build(weights, cases, table, chosen, scores_table, calibration_table, journey_tables, intake):
     """The demo's data, as a dict."""
     courts = {row["code"]: row for row in reference.courts()}
@@ -209,7 +218,7 @@ def build(weights, cases, table, chosen, scores_table, calibration_table, journe
         "stages": PLACES,
         "endings": ENDINGS,
         "courts": [
-            {"code": c, "name": courts[c]["name"], "area": courts[c]["area"]} for c in weights["courts"]
+            {"code": c, "name": name(courts[c]), "area": courts[c]["area"]} for c in weights["courts"]
         ],
         "codes": [{"code": c, "gloss": glosses[c], "stage": events.STAGE.get(c)} for c in weights["codes"]],
         "network": network(weights),

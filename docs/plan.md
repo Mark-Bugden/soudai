@@ -21,9 +21,9 @@ The project was first planned as purely descriptive. On 2026-11-23 Mark decided 
 1. **Read this plan to the end**, then check the state of the repo and of other sessions: `git status`, `git log --oneline -10`, `gh pr list`, and the site's `scripts/status.sh` (in the site clone, `Mark-Bugden.github.io`). Other sessions work in this repo, the site, demo-kit and the other project repos at the same time. An open PR, or a branch with commits that aren't in main, usually means someone is working there.
 2. **Find where things stand.** The first milestone with an unchecked box is the current one. The notes under each checked box say what was done and found. For the data stages, `uv run soudai status` (built in step 2) reports each stage's progress from the cache, and every stage resumes where it stopped.
 3. **Record as you go.** When you finish something, tick its box and add sub-bullets with the result: counts, dates, sizes, decisions, surprises. Put decisions made with Mark here with their date. Settle or add items under "Open questions". Do this in the same PR as the work.
-4. **One PR per change, and merging it puts it live.** Never push to `main` and never create tags. A PR that changes anything in `demo/` (other than tests and Markdown) bumps `version` in `demo/package.json`, or CI fails. Before opening a PR, run CI's checks locally, because every failed run emails Mark. `CLAUDE.md` lists them: today `npm run build` and `npx demo-kit validate dist/` in `demo/`; from step 1 also `uv run pytest`, and `npm test` once the demo has tests.
+4. **One PR per change, and merging it puts it live.** Never push to `main` and never create tags. A PR that changes anything in `demo/` (other than tests and Markdown) bumps `version` in `demo/package.json`, or CI fails. Before opening a PR, run CI's checks locally, because every failed run emails Mark. `CLAUDE.md` lists them: `uv run pytest`, and `npm run build`, `npm test` (since step 8) and `npx demo-kit validate dist/` in `demo/`.
 5. **Long runs** (the scrapes in steps 3–5) run in the background and log to `data/raw/logs/`. Never delete the cache. Never run two scrapers at once: the 1 request per second limit is for the whole project, not per process.
-6. **Copy.** Mark writes the English copy himself: the manifest's tagline, summary and `about`, and the write-up. Agents may draft it in `docs/writeup.md` for him to edit. Don't write new prose about Mark or his work.
+6. **Copy.** Mark writes the English copy himself: the manifest's tagline and summary, and the write-up. The demos have no "How this works" (`about`) since 2026-11-26 (see step 8). Agents may draft it in `docs/writeup.md` for him to edit. Don't write new prose about Mark or his work.
 7. **Other repos.** Read the sibling repos and the site freely, but don't change them. Tell Mark what the site needs (see "For Mark, on the site").
 
 ## What changes from the old project
@@ -87,7 +87,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
   - rozhodnuti items name the judge (`autor`). The parse step drops it, so no derived table, export or demo holds judges' names.
   - rozhodnuti's subjects (`predmetRizeni`) sometimes name other people, with a date of birth or an address (step 3). So the decisions table isn't committed, and no export or demo shows a subject.
   - Full texts of decisions are never fetched.
-- **Snapshot.** Each case keeps its `platneK`. The snapshot date, i.e. the end of the timeline scrape, goes into the export, "How this works" and the write-up. Censoring is at each case's `platneK`.
+- **Snapshot.** Each case keeps its `platneK`. The snapshot date, i.e. the end of the timeline scrape, goes into the export and the write-up. Censoring is at each case's `platneK`.
 - **What's committed.** `reference/` (hand-checked tables) and `data/derived/` (tables from the parse steps, with no judges' names). Any derived file over about 10 MB stays out of git (see "Open questions").
 
 ### Stages
@@ -288,7 +288,7 @@ Compare national and court intake with the Ministry of Justice's official statis
 | Court panel (step 10) | For the selected court: exact intake by year beside the German tank estimate and its interval, and its backlog. |
 | Tank explainer (step 10) | Stretch goal: reveal a court's published case numbers a few at a time and watch the estimate close in on the exact count. |
 | Status line | What's selected, with its headline numbers. |
-| How this works | Sources and snapshot date, what's counted (district courts, register C, registered 2020–2025), the methods and the model in brief, and that it isn't legal advice. |
+| How this works | None, in any of the demos (Mark, 2026-11-26): the write-up is in the site's "More info" tab. The sources and snapshot date, what's counted, the methods and the model, and that this isn't legal advice, all go there (step 9). |
 | Language | The interface is in English. Court names stay in Czech. Event names use the English glosses from `reference/events.csv`. |
 
 ## Look
@@ -308,6 +308,8 @@ Compare national and court intake with the Ministry of Justice's official statis
 ```
 demo/                          the site bundle, built with demo-kit (see the site contract)
   src/main.js                  frame, controls, view switching and shared state
+  src/controls.js              the tab switch and the court search (adapted from doctor-who-ratings')
+  src/courts.js, data.js, format.js   court search, lookups over the data, and the status line's text
   src/views/                   forecast, process map, courts
   src/forecast.js              the network's forward pass, ported from Python, for made-up cases
   src/tank.js                  German tank estimator, ported from Python (only if the demo recomputes it)
@@ -782,7 +784,16 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - **Rounding.** Shares and scores keep 4 significant digits, so a move made by a handful of cases keeps its size. The time curves keep 3 decimal places, since they're only drawn.
   - **Left out:** the ensemble's first network alone, since the demo runs the ensemble.
   - **The tests** check that a rebuild gives the same file, that the exported network forecasts as the full one does, the real cases' histories, the journeys, the scores, and that the file holds no free text: every string is a court's name or area, an event's code or gloss, a name the export gives, a date, or the weights. So no judge's or party's name can be in it.
-- [ ] The frame, the tabs, the court selector, the status line and "How this works".
+- [x] The frame, the tabs, the court selector and the status line (v0.4.0).
+  - **No "How this works"** (Mark, 2026-11-26): it's gone from every demo, since the write-up is in the site's "More info" tab. So the manifest has no `about`, and what that panel was to hold goes in the write-up (step 9). The kit draws no panel without an `about`, so nothing else changes.
+  - **The frame.** `main.js` mounts the kit's frame with two controls in the rail: the tab switch at the top (Forecast, then Process map, each with an icon), and the court search. Each tab shows "Not built yet." until its box is done, and the rail shows only the controls the current tab uses.
+  - **The controls.** `controls.js` adapts doctor-who-ratings' button row and search box. The search box lists all courts, then every court in order of area, when it's opened empty, with each court's count of cases registered. Picking "All courts", or clearing the box, goes back to the whole country.
+  - **Court search** (`courts.js`) matches the area first, then the full name, and ignores diacritics and case, so "Decin" finds Děčín and "praha" the 12 Prague courts. Areas sort as Czech does: "ch" after "h", and Praha 2 before Praha 10.
+  - **The status line** names what's selected, with its headline numbers. For all courts: "All 86 courts: 1,725,672 cases registered in 2020–2025. Median time from filing to a decision 149 days, and to legally final 184 days."
+  - **Court names** are infosoud's, but it writes three okres names with a capital after the hyphen. The export now spells them as `area` does: Okresní soud Praha-východ, Praha-západ and Plzeň-město. 1 new Python test.
+  - **Fitting the window.** On wide frames the stage is the manifest's 560 px, but shrinks so that it and the status line fit in the window (`--dk-fit-height`, set by the site), and stays at least 22rem tall. On phones it's 26rem tall rather than the kit's 16:9.
+  - **Tests.** `npm test` runs 11 node:test tests on the committed data: the court search, the lookups and the status line. `tests.yml` has a JS job for them, and `CLAUDE.md` lists `npm test` among the checks.
+  - **Checked in Edge,** with the built bundle: both themes, at 1280 × 800 and at a phone's 390 px, searching, picking a court and "All courts", switching tabs and clearing the search. No console errors.
 - [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
 - [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
 - [ ] The Process map tab and its time curves.
