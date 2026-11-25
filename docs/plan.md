@@ -594,7 +594,22 @@ Built before the run (2026-11-22), with tests on fake dockets:
   - **Court by court** (516 court-years), the median gap is +0.33% (8 cases). 95% are within +1.13%, and 24 match exactly. The largest is Šumperk in 2020, at +2.9% (52 cases). Only Pelhřimov in 2025 is below, by 5 cases (−0.6%), with no flag in intake. A small senate outside the searched range, or hidden numbers at the top of a senate's docket, could explain it; it isn't checked.
   - So the counts are registrations, a little above nápad everywhere, as step 4 found at Náchod ("zapsáno" against "nápad"), and the weights stand.
   - **Kept for step 10:** the report's cases disposed in the year, and pending at its end, nationally 130,342 at the end of 2020, falling to 96,558 at the end of 2025. That's an official backlog to set beside ours.
-- [ ] Record the headline figures here, and draft notes for the write-up in `docs/writeup.md`.
+- [x] Record the headline figures here, and draft notes for the write-up in `docs/writeup.md`.
+  - **Headline figures:**
+
+    | | |
+    | --- | --- |
+    | Cases registered, 2020–2025 | 1,725,672, 0.43–0.53% above the official *nápad* each year |
+    | Sampled case histories | 208,227, with 1,391,808 events |
+    | Main routes | filed → hearing → decided → legally final 71.8%; the same with no hearing 15.6% |
+    | Filing to a decision | median 149 days (quartiles 103 and 222) |
+    | Filing to legally final | median 184 days (quartiles 133 and 265) |
+    | Undecided after a year | 9.7% (not legally final: 13.1%) |
+    | Courts' median to a decision | 92 days (Jeseník) to 238 (Prague 1, Litoměřice); the median court 144 |
+    | Still open at the snapshot | 2.2% |
+
+  - **`docs/writeup.md`** holds notes for Mark to write from: terms, the data, how it's counted, what it shows, and the caveats to keep. They're facts and figures, not copy.
+  - **Fixed:** the journey tables were written with 6 significant digits, which rounded the national total to 1,725,210. They're written with 8 now.
 
 Reordered with Mark on 2026-11-25: the model comes before the demo, and the Courts tab (German tank estimate, backlog and map) comes after the demo goes live.
 
