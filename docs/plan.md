@@ -102,7 +102,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
 | Official statistics | InfoData's S_AS_40 report, intake | `data/derived/official.csv` | 13 requests (step 6) |
 | Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
-| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv`, `network.json`, `demo_cases.csv` | No requests: about 4 minutes for all six models (step 7) |
+| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv`, `network.json`, `demo_cases.csv` | No requests: about 11 minutes for all seven models, with the ensemble's five networks trained at once (step 7) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -204,8 +204,9 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
 - **Training.** One pass through a case gives a hidden state after every event, so all its cuts are scored together.
   - **The loss.** For a case that ended in month k, it's −[log(1 − p₁) + … + log(1 − p_{k−1}) + log p_k]. For a case still open after n months, it's −[log(1 − p₁) + … + log(1 − p_n)].
   - **Backpropagation through time.** The chain of steps is unrolled, and each shared weight's gradient is the sum of its contributions from all the steps. The GRU and the output layers are trained together.
-  - **As built:** Adam with a learning rate of 0.001, batches of 256 cases (of similar lengths, to save padding), gradients clipped to a norm of 1. Training stops when the held-out cases' loss hasn't improved for 5 passes over the data, and keeps the best pass. The loss is reported per month a case is known to be open, as LightGBM's is, so the two compare directly. A pass takes about 3 s on this machine's CPU, and training about 90 s.
-  - **For the demo:** `uv run soudai model` writes the trained weights to `data/derived/network.json` (95 KB). `forward.py` runs the network in plain numpy, one case at a time. It's the reference for the JavaScript port, and each run checks it against PyTorch on 500 test forecasts.
+  - **As built:** Adam with a learning rate of 0.0005, batches of 256 cases (of similar lengths, to save padding), gradients clipped to a norm of 1. Training stops when the held-out cases' loss hasn't improved for 8 passes over the data, and keeps the best pass. (It was 0.001 and 5 passes until the ensemble: see step 7.) The loss is reported per month a case is known to be open, as LightGBM's is, so the two compare directly. A pass takes about 3 s on one thread of this machine's CPU, and a network 2–6 minutes.
+  - **The ensemble** (Mark, 2026-11-25): 5 networks trained the same way from different random starts, whose forecasts are averaged. The demo runs all five.
+  - **For the demo:** `uv run soudai model` writes the ensemble's weights to `data/derived/network.json`: 469 KB, at 9 significant digits. The export will need them smaller (fewer digits, or binary). `forward.py` runs the networks in plain numpy, one case at a time, and averages them. It's the reference for the JavaScript port, and each run checks it against PyTorch on 500 test forecasts.
 - **Comparison models,** each knowing more about the case than the one before:
   1. **The court average:** a Kaplan–Meier curve per court.
      - As built (`baselines.py`): the court's curve from filing to the end, over its training cases, read from the day of the cut: S(day + t) / S(day). Where fewer than 20 of the court's sampled cases were still open on that day, it's read from the last day that had 20.
@@ -703,8 +704,8 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     - **Where it's better:** 1 to 12 months into a case, the GRU ranks best at every landmark but 6 months, where it ties the trees.
     - **Possible next steps,** not done: averaging several networks trained from different random starts (an ensemble), which would remove most of the run-to-run noise and costs the demo a few more forward passes; and weighting recent training years more, for the drift above.
 - [x] A Python reference and fixtures for what the demo recomputes: the network's forward pass, for made-up cases.
-  - `forward.py` is the reference, in plain numpy. `tests/fixtures/network/forward.json` holds a network with random weights and PyTorch's forecasts at all 27 cuts of three made-up cases (filed, heard, decided, appealed, revived, suspended and censored). CI checks `forward.py` against it without PyTorch, and with PyTorch installed a test checks the fixture is still what PyTorch gives. The demo's JavaScript will be checked against the same file in step 8.
-  - The trained network is in `data/derived/network.json`, with its event codes and courts in the order of its rows.
+  - `forward.py` is the reference, in plain numpy. `tests/fixtures/network/forward.json` holds an ensemble of two networks with random weights (since the ensemble PR) and PyTorch's forecasts at all 27 cuts of three made-up cases (filed, heard, decided, appealed, revived, suspended and censored). CI checks `forward.py` against it without PyTorch, and with PyTorch installed a test checks the fixture is still what PyTorch gives. The demo's JavaScript will be checked against the same file in step 8.
+  - The trained networks are in `data/derived/network.json`, with their event codes and courts in the order of their rows.
 - [x] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
   - **Fourth PR (2026-11-25).** `examples.demo_cases` draws 35 test cases from each court, 3,010 in all, with chances in proportion to their weights, so each court's draw stands for all its registered cases rather than the sample. `uv run soudai model` writes them to `data/derived/demo_cases.csv`: the case, its filing date, the days to its end or censoring, and whether it finished. 1 new test.
   - **What the export adds in step 8:** each case's events (`examples.build` on the test cases gives them, as the network reads them) and how it ended. The demo runs the network on them itself, so no forecasts are stored, and the forecast at any point in a case's life is the one the demo would give for a made-up case with the same history.
@@ -737,7 +738,23 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
 
   - **Every model ranks better, and all but the GRU forecast better.** The trees gain most: their Brier score at 6 months is now lower than the GRU's (0.189 against 0.192), and lower than the process map's in 82 of the 86 courts.
   - **The single GRU got no better at 6 months, and its calibration got worse:** at filing it forecasts 7.3 points too few cases finishing within 6 months, against the trees' 2.9. With old cases weighted down, fewer cases really count, and its held-out loss jumps around from pass to pass (0.3395 to 0.3418 over its last eight). That's the run-to-run noise the ensemble is for. It still ranks best: 0.645, and better than the trees in 58 of the 86 courts.
-- [ ] An ensemble of GRU networks: several trained from different random starts, their forecasts averaged. The demo runs them all.
+- [x] An ensemble of GRU networks: several trained from different random starts, their forecasts averaged. The demo runs them all.
+  - **How:** `network.fit_ensemble` trains 5 networks from the seeds SEED to SEED + 4. They train at the same time in separate processes, on one thread each, so they come out exactly as they would one after another: a test checks it, and the held-out losses match the earlier one-by-one runs to 6 decimals. The forecast is the mean of their chances of a case still being open, and `forward.py` averages them the same way.
+  - **How many.** Eight networks at the first setting, by held-out loss of the average of the first k: 0.3395 (1), 0.3391 (2), 0.3393 (3), 0.3394 (4), 0.3390 (5), 0.3389 (6), 0.3389 (7), 0.3392 (8). Little changes after 5, so 5.
+  - **A gentler learning rate.** With old cases weighted down, single networks varied more: held-out losses of 0.3393 to 0.3447 over eight seeds, and one stopped after 14 passes on a noisy loss. A learning rate of 0.0005 with 8 passes of patience, on the same four seeds, took the mean of each from 0.3408 to 0.3398 and the four averaged from 0.3394 to 0.3388. So that's the setting now, at about twice the training time.
+  - **On the test years,** with recency weighting:
+
+    | Model | Concordance | Brier 1 mo | 3 mo | 6 mo | 12 mo | 24 mo | Calibration error 6 mo | 12 mo |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | Trees | 0.643 | 0.040 | 0.151 | 0.1887 | 0.0878 | 0.042 | 2.6% | 0.7% |
+    | One GRU network | 0.646 | 0.038 | 0.149 | 0.1887 | 0.0888 | 0.043 | 2.5% | 2.4% |
+    | Ensemble of 5 | 0.647 | 0.038 | 0.149 | 0.1890 | 0.0884 | 0.043 | 2.5% | 1.7% |
+
+    The court average, process map, Cox and the network on hand-made features are as in the box on recency, but for the last, now trained at the gentler rate: concordance 0.640, Brier at 6 months 0.190, calibration error 2.0% and 2.1%.
+  - **The ensemble against the trees,** with 95% intervals from a bootstrap over the test cases (200 resamples; 40 for concordance): concordance +0.0040 to +0.0055; Brier score at 1 month −0.0023 to −0.0019, at 3 months −0.0021 to −0.0015, at 6 months −0.0000 to +0.0005, at 12 months +0.0003 to +0.0008, and at 24 months +0.0008 to +0.0013.
+  - **So the GRU still doesn't clearly beat the trees.** The ensemble ranks cases better and forecasts the next 1 to 3 months better, ties at 6 months, and is slightly worse at 12 and 24. It ranks better than the trees in 66 of the 86 courts, and has the lower Brier score at 6 months in 36 and at 12 months in 29.
+  - **By how far into a case,** concordance at filing and 1, 3, 6 and 12 months in: the ensemble 0.610, 0.635, 0.684, 0.742, 0.757; the trees 0.608, 0.629, 0.676, 0.745, 0.752.
+  - **Calibration at 6 months:** where the ensemble forecast under 60%, more cases finished than it said, by 3 to 8 points. Above that it's within 1.2 points.
 - [ ] A model card for the demo: facts drafted in `docs/` for Mark to write it from.
 
 ### 8. Forecast and process map: release status `in-progress`

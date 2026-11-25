@@ -67,11 +67,12 @@ Facts and figures from steps 1–6, gathered for Mark to write the write-up from
   - A Cox model on hand-made features ranks 61% right. It assumes each feature scales the chance of finishing by the same factor at every time, which the stages break.
   - Gradient-boosted trees on the same features rank 64% right overall, and 74–75% for cases 6 or 12 months in.
   - At filing, a case has only its court, and every method ranks about 60% right.
-- **The GRU network** reads a case's events one by one. It has 7,228 weights and trains in about 90 seconds on one CPU thread.
-  - It ranks 64.2% right, against the trees' 63.8%, and 76% for cases 12 months in, against 75%.
-  - **It doesn't clearly beat the trees.** It's better at ranking cases and at forecasts 3 months ahead. At 6 and 12 months its forecasts are about as good as the trees': a second network, trained the same way from another random start, does slightly worse than the trees at 6 months.
-  - The same network fed the hand-made features instead of the events does worse than the trees. So what helps is reading the sequence of events, not a neural network as such.
-  - Its calibration is the best of the methods: where it forecast a given chance of finishing within 6 months, the share that did was 4.0 points off on average, against 5.3 for the trees. Where it forecast under 70%, more cases finished than it said, by 3 to 10 points, which fits cases having got faster after the training years.
+- **The GRU network** reads a case's events one by one. Each network has 7,228 weights. The demo uses an ensemble of five, trained the same way from different random starts, with their forecasts averaged. Each trains in 2 to 6 minutes on one CPU thread, and the five train at once.
+  - The ensemble ranks 64.7% of pairs right, against the trees' 64.3%, and 75.7% for cases 12 months in, against 75.2%.
+  - **It doesn't clearly beat the trees.** Its forecasts are better 1 and 3 months ahead, the same 6 months ahead, and slightly worse 12 and 24 months ahead. A bootstrap over the test cases bears out each of these.
+  - The same network fed the hand-made features instead of the events does worse than the trees: it ranks 64.0% right. So what helps is reading the sequence of events, not a neural network as such.
+  - Calibration at 6 months: its forecasts are 2.5 points off on average, against 2.6 for the trees. Where it forecast under 60%, more cases finished than it said, by 3 to 8 points, which fits cases having got faster after the training years.
+  - Before recent cases were weighted up and the ensemble added, a single network ranked 64.2% right against the trees' 63.8%, with the same pattern.
 
 - **Recent cases count more in training.** A training example's weight halves for every year before 1 January 2024. The half-life was chosen on the training years alone: fitted on 2020–2022, checked on 2023. It makes every model's forecasts better calibrated: the trees' gap between forecast and outcome at 6 months falls from 5.3 to 2.6 points.
 - **The demo's real past cases:** 3,010 cases registered in 2024–2025, 35 from each court, none of them seen in training.

@@ -19,8 +19,12 @@ hazard"). The chance it's still open after k months is the product of 1 − thos
 `sequence=False` gives the same output layers fed the hand-made features (`baselines.features`) instead of
 the hidden state: it separates "a neural network helps" from "reading the sequence helps".
 
-`weights` writes the network as plain numbers, for `forward`, which runs it without PyTorch, as the demo
-does.
+**The ensemble** is MEMBERS networks trained the same way from different random starts, whose forecasts
+are averaged: the chance a case is still open after k months is the mean of the members' chances. It
+evens out the differences between training runs.
+
+`weights` writes the networks as plain numbers, for `forward`, which runs them without PyTorch, as the
+demo does.
 """
 
 import copy
@@ -36,7 +40,9 @@ from .examples import HORIZON, MONTH
 CODES = sorted(row["code"] for row in reference.events() if row["kind"] == "event")
 COURTS = sorted(row["code"] for row in reference.courts())
 CODE, HIDDEN, COURT, LAYER = 8, 32, 4, 32
-BATCH, RATE, EPOCHS, PATIENCE = 256, 1e-3, 80, 5
+BATCH, RATE, EPOCHS, PATIENCE = 256, 5e-4, 80, 8
+MEMBERS = 5  # networks in the ensemble
+SETTINGS = ["CODE", "HIDDEN", "COURT", "LAYER", "BATCH", "RATE", "EPOCHS", "PATIENCE"]
 
 
 class Network(nn.Module):
@@ -210,11 +216,59 @@ def still_open(model, data):
     return back
 
 
-def weights(model):
-    """The network as plain lists of numbers, to 9 significant digits (all a 32-bit float has), with the
-    event codes and courts its rows stand for."""
-    state = {
+def _member(train, seed, settings):
+    globals().update(settings)  # a new process starts from the module's own settings
+    model, history = fit(train, log=lambda _: None, seed=seed)
+    return model.state_dict(), history
+
+
+def fit_ensemble(train, members=MEMBERS, log=print):
+    """`members` networks, trained from the random starts SEED, SEED + 1, ... They're trained at the same
+    time, in separate processes on one thread each, so they come out as they would one after another."""
+    from concurrent.futures import ProcessPoolExecutor
+
+    seeds = [examples.SEED + member for member in range(members)]
+    settings = {name: globals()[name] for name in SETTINGS}
+    with ProcessPoolExecutor(max_workers=members) as pool:
+        trained = list(pool.map(_member, [train] * members, seeds, [settings] * members))
+    models = []
+    for seed, (state, history) in zip(seeds, trained, strict=True):
+        model = Network()
+        model.load_state_dict(state)
+        models.append(model)
+        best = int(np.argmin(history))
+        log(f"  seed {seed}: held-out loss {history[best]:.6f}, at pass {best + 1} of {len(history)}")
+    return models
+
+
+def ensemble_still_open(models, data):
+    """The ensemble's forecasts: the mean of its networks' chances of a case still being open."""
+    return np.mean([still_open(model, data) for model in models], axis=0)
+
+
+def held_out_loss(still, data):
+    """The loss of any forecasts (chances of still being open) at the cuts in `data`, per month a case is
+    known to be open at the start of, as `evaluate` gives for one network."""
+    still = still[data.order]  # from the order given into `data`'s, by case
+    start = np.concatenate([np.ones((len(still), 1)), still], axis=1)
+    rows = np.arange(len(still))
+    finished, known = data.finished, data.known
+    chance = np.where(
+        finished > 0, start[rows, np.maximum(finished - 1, 0)] - start[rows, finished], start[rows, known]
+    )
+    loss = -np.log(np.maximum(chance, 1e-12))
+    return (data.weight * loss).sum() / (data.weight * (known + (finished > 0))).sum()
+
+
+def _numbers(model):
+    """One network's weights as plain lists, to 9 significant digits (all a 32-bit float has)."""
+    return {
         name: np.vectorize(lambda x: float(f"{x:.9g}"), otypes=[float])(value.numpy()).tolist()
         for name, value in model.state_dict().items()
     }
-    return {"codes": CODES, "courts": COURTS, "horizon": HORIZON, "state": state}
+
+
+def weights(models):
+    """The ensemble's networks as plain lists of numbers, with the event codes and courts their rows
+    stand for."""
+    return {"codes": CODES, "courts": COURTS, "horizon": HORIZON, "members": [_numbers(m) for m in models]}

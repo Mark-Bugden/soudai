@@ -4,7 +4,7 @@ test cases (see `examples` for the split, and `scoring` for the scores).
 Writes data/derived/model_scores.csv, with each model's scores for all courts and for each court, over
 all the landmarks and at each (`court` and `landmark` are "all" for all of them), and
 data/derived/model_calibration.csv, with each model's calibration tables over all of them. For the demo,
-the network's weights go to data/derived/network.json, and the real past cases it carries to
+the ensemble of networks' weights go to data/derived/network.json, and the real past cases it carries to
 data/derived/demo_cases.csv.
 
 The trees and the networks need the optional `model` dependency group: `uv sync --group model`.
@@ -36,16 +36,19 @@ def features_network(train, test, at):
 
 
 def gru(train, test, at):
-    """The GRU network. Its weights are written for the demo, and the numpy forward pass checked on them."""
+    """The ensemble of GRU networks, and its first network alone, as {name: forecasts}. The ensemble's
+    weights are written for the demo, and the numpy forward pass checked on them."""
     from . import network
 
-    model, _ = network.fit(train)
-    weights = network.weights(model)
+    models = network.fit_ensemble(train)
+    weights = network.weights(models)
     NETWORK.write_text(json.dumps(weights, separators=(",", ":")) + "\n", encoding="utf-8")
-    still = network.still_open(model, network.Data(test, at))
+    data = network.Data(test, at)
+    each = [network.still_open(model, data) for model in models]
+    still = np.mean(each, axis=0)
     gap = check_forward(weights, test, at, still)
     print(f"  the numpy forward pass matches PyTorch on {CHECKED} test forecasts, to {gap:.1e}")
-    return still
+    return {"gru": each[0], "gru ensemble": still}
 
 
 MODELS = {
@@ -124,7 +127,8 @@ def run():
     print(f"Wrote the demo's {len(chosen):,} real past cases to {DEMO_CASES}")
     forecasts = {}
     for name, fit in MODELS.items():
-        forecasts[name] = fit(train, test, at)
+        out = fit(train, test, at)
+        forecasts.update(out if isinstance(out, dict) else {name: out})
         print(f"Fitted {name} ({time.time() - start:.0f} s)")
     scores, calibration = score_tables(forecasts, at)
     scores.to_csv(SCORES, index=False, float_format="%.6g", lineterminator="\n")
