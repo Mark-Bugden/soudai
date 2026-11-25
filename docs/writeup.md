@@ -67,11 +67,13 @@ Facts and figures from steps 1–6, gathered for Mark to write the write-up from
   - A Cox model on hand-made features ranks 61% right. It assumes each feature scales the chance of finishing by the same factor at every time, which the stages break.
   - Gradient-boosted trees on the same features rank 64% right overall, and 74–75% for cases 6 or 12 months in.
   - At filing, a case has only its court, and every method ranks about 60% right.
-- **The GRU network** reads a case's events one by one. It has 7,228 weights and trains in about 90 seconds on a laptop's CPU.
+- **The GRU network** reads a case's events one by one. It has 7,228 weights and trains in about 90 seconds on one CPU thread.
   - It ranks 64.2% right, against the trees' 63.8%, and 76% for cases 12 months in, against 75%.
   - **It doesn't clearly beat the trees.** It's better at ranking cases and at forecasts 3 months ahead. At 6 and 12 months its forecasts are about as good as the trees': a second network, trained the same way from another random start, does slightly worse than the trees at 6 months.
   - The same network fed the hand-made features instead of the events does worse than the trees. So what helps is reading the sequence of events, not a neural network as such.
   - Its calibration is the best of the methods: where it forecast a given chance of finishing within 6 months, the share that did was 4.0 points off on average, against 5.3 for the trees. Where it forecast under 70%, more cases finished than it said, by 3 to 10 points, which fits cases having got faster after the training years.
+
+- **The demo's real past cases:** 3,010 cases registered in 2024–2025, 35 from each court, none of them seen in training.
 
 ## Caveats to keep
 

@@ -31,6 +31,7 @@ SPLIT = date(2024, 1, 1)
 LANDMARKS = [0, 1, 3, 6, 12]  # months after filing at which forecasts are scored
 VALIDATION = 0.1  # the share of training cases held out to stop training and tune
 SEED = 20261125
+DEMO_PER_COURT = 35  # real past cases the demo carries, per court
 
 APPEAL = {code for code, stage in events.STAGE.items() if stage == "appeal"}
 DECISION = {"VYD_ROZH", "ST_VEC_VYR"}
@@ -136,3 +137,18 @@ def scored(cuts):
     days = {months_day(m): m for m in LANDMARKS}
     at = cuts[cuts["day"].isin(days)]
     return at.assign(landmark=at["day"].map(days))
+
+
+def demo_cases(test, per_court=DEMO_PER_COURT, seed=SEED):
+    """The real past cases the demo carries: `per_court` test cases from each court, drawn at random with
+    chances in proportion to their weights, so they stand for all the court's registered cases rather than
+    the sample. One row per case: the case, its filing date, the days to its end or censoring, and whether
+    it finished."""
+    rng = np.random.default_rng(seed)
+    histories = test.histories
+    chosen = []
+    for _, rows in sorted(histories.groupby("court").indices.items()):
+        weight = histories["weight"].to_numpy()[rows]
+        n = min(per_court, len(rows))
+        chosen.append(np.sort(rng.choice(rows, n, replace=False, p=weight / weight.sum())))
+    return histories.iloc[np.concatenate(chosen)][events.CASE + ["filed", "span", "ended"]]

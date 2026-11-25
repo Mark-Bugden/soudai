@@ -102,7 +102,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
 | Official statistics | InfoData's S_AS_40 report, intake | `data/derived/official.csv` | 13 requests (step 6) |
 | Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
-| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv`, `network.json` | No requests: about 4 minutes for all six models (step 7) |
+| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv`, `network.json`, `demo_cases.csv` | No requests: about 4 minutes for all six models (step 7) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -648,6 +648,7 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     - A test caught the stage columns "decided" and "revived" overwriting the features of the same names before the first scores were recorded. They're `in_decided` and so on now.
   - **Third PR (2026-11-25): the GRU network, and the same output layers on the hand-made features** (the "optional extra" above). `network.py` and `forward.py`, with 6 new tests. `uv run soudai model` now takes about 4 minutes.
     - **PyTorch 2.15, CPU-only,** from PyTorch's own package index, in the `model` group. The network is small enough that a GPU wouldn't help.
+    - **Trained on one thread** (added in the fourth PR). PyTorch's sums over several threads came out slightly different from run to run: a rerun moved the GRU's scores by up to 0.0008 in one court's concordance, and changed every weight. On one thread two runs give identical weights and scores, and a pass takes the same 3 s. The figures here are from the single-thread run.
     - **Tuning,** on the held-out training cases, by their loss (lower is better; the trees' is 0.3284):
 
       | Network | Weights | Held-out loss |
@@ -677,8 +678,8 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     | Process map | 0.636 | 0.043 | 0.158 | 0.197 | 0.090 | 0.043 | 6.6% | 2.5% |
     | Cox | 0.606 | 0.058 | 0.179 | 0.202 | 0.096 | 0.046 | 4.6% | 6.7% |
     | Trees | 0.638 | 0.040 | 0.153 | 0.193 | 0.089 | 0.042 | 5.3% | 2.0% |
-    | Network on the hand-made features | 0.637 | 0.042 | 0.157 | 0.195 | 0.089 | 0.043 | 4.7% | 1.2% |
-    | GRU network | 0.642 | 0.038 | 0.150 | 0.192 | 0.089 | 0.043 | 4.0% | 1.6% |
+    | Network on the hand-made features | 0.637 | 0.042 | 0.157 | 0.195 | 0.089 | 0.043 | 4.8% | 1.2% |
+    | GRU network | 0.642 | 0.038 | 0.150 | 0.192 | 0.089 | 0.042 | 4.0% | 1.5% |
 
   - **By how far into a case.** At filing a case has only its court, and every method but Cox scores the same (concordance 0.604). Further in, the methods that read the case pull ahead. Concordance:
 
@@ -688,22 +689,24 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
     | Process map | 0.604 | 0.625 | 0.669 | 0.720 | 0.733 |
     | Cox | 0.564 | 0.591 | 0.650 | 0.719 | 0.719 |
     | Trees | 0.604 | 0.624 | 0.671 | 0.741 | 0.750 |
-    | Network on the hand-made features | 0.605 | 0.624 | 0.668 | 0.728 | 0.730 |
+    | Network on the hand-made features | 0.605 | 0.624 | 0.668 | 0.727 | 0.729 |
     | GRU network | 0.605 | 0.630 | 0.678 | 0.740 | 0.759 |
 
     The trees' Brier score at 6 months is 0.228 at filing, 0.162 at 3 months in and 0.184 at 12, against the process map's 0.230, 0.170 and 0.201, and the GRU's 0.229, 0.159 and 0.181.
-  - **By court.** Within one court, the court average gives every case at a landmark the same forecast, so its concordance there is 0.5, a coin toss: its 0.602 overall comes from ranking the courts. Within a court, the process map's runs from 0.531 to 0.571 and the trees' from 0.534 to 0.575. The process map's Brier score at 6 months is lower than the court average's in 83 of the 86 courts, and the trees' lower than the process map's in 81. The GRU's concordance within a court runs from 0.534 to 0.577. It ranks better than the trees in 69 courts, and its Brier score is lower in 54 at 6 months and 51 at 12.
+  - **By court.** Within one court, the court average gives every case at a landmark the same forecast, so its concordance there is 0.5, a coin toss: its 0.602 overall comes from ranking the courts. Within a court, the process map's runs from 0.531 to 0.571 and the trees' from 0.534 to 0.575. The process map's Brier score at 6 months is lower than the court average's in 83 of the 86 courts, and the trees' lower than the process map's in 81. The GRU's concordance within a court runs from 0.534 to 0.577. It ranks better than the trees in 67 courts, and its Brier score is lower in 54 at 6 months and 51 at 12.
   - **The GRU doesn't clearly beat the trees.** It ranks cases better, and its forecasts a few months ahead are better, but the 6- and 12-month forecasts are about as good as the trees':
     - **Concordance:** 0.642 against 0.638. A bootstrap over the test cases (resampling them, 40 times here) puts the gap at 0.0032 to 0.0045, and a second network, trained from another random start, also beats the trees (0.641).
     - **Brier score at 3 months:** 0.1500 against 0.1528, a gap of −0.0032 to −0.0026 over 200 bootstrap samples. The second network is better too (0.1517).
-    - **At 6 and 12 months:** the first network is better by 0.0014 and 0.0005, and the bootstrap says that isn't luck in the test cases. But the second network is 0.0007 worse than the trees at 6 months, and level at 12. So the gap is within what a different training run changes.
+    - **At 6 and 12 months:** the first network is better by 0.0014 and 0.0005, and the bootstrap says that isn't luck in the test cases. But the second network is 0.0008 worse than the trees at 6 months, and 0.0001 worse at 12. So the gap is within what a different training run changes.
     - **Reading the sequence is what helps, not a neural network as such.** The same output layers fed the hand-made features do worse than the trees (concordance 0.637; held-out loss 0.3340 against 0.3284).
     - **Where it's better:** 1 to 12 months into a case, the GRU ranks best at every landmark but 6 months, where it ties the trees.
     - **Possible next steps,** not done: averaging several networks trained from different random starts (an ensemble), which would remove most of the run-to-run noise and costs the demo a few more forward passes; and weighting recent training years more, for the drift above.
 - [x] A Python reference and fixtures for what the demo recomputes: the network's forward pass, for made-up cases.
   - `forward.py` is the reference, in plain numpy. `tests/fixtures/network/forward.json` holds a network with random weights and PyTorch's forecasts at all 27 cuts of three made-up cases (filed, heard, decided, appealed, revived, suspended and censored). CI checks `forward.py` against it without PyTorch, and with PyTorch installed a test checks the fixture is still what PyTorch gives. The demo's JavaScript will be checked against the same file in step 8.
   - The trained network is in `data/derived/network.json`, with its event codes and courts in the order of its rows.
-- [ ] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
+- [x] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
+  - **Fourth PR (2026-11-25).** `examples.demo_cases` draws 35 test cases from each court, 3,010 in all, with chances in proportion to their weights, so each court's draw stands for all its registered cases rather than the sample. `uv run soudai model` writes them to `data/derived/demo_cases.csv`: the case, its filing date, the days to its end or censoring, and whether it finished. 1 new test.
+  - **What the export adds in step 8:** each case's events (`examples.build` on the test cases gives them, as the network reads them) and how it ended. The demo runs the network on them itself, so no forecasts are stored, and the forecast at any point in a case's life is the one the demo would give for a made-up case with the same history.
 
 ### 8. Forecast and process map: release status `in-progress`
 - [ ] Move the demo to the latest demo-kit (see "Look") and bump `version`.
