@@ -80,6 +80,17 @@ def test_courts_and_codes_are_in_the_networks_order(data, weights):
     assert {c["stage"] for c in data["codes"]} == set(events.STAGES) | {None}
 
 
+def test_court_names_spell_their_okres_officially(data):
+    names = {court["code"]: court["name"] for court in data["courts"]}
+    assert names["OSSTCPY"] == "Okresní soud Praha-východ"  # infosoud: "Praha-Východ"
+    assert names["OSZPCPM"] == "Okresní soud Plzeň-město"
+    assert names["OSSEMFM"] == "Okresní soud Frýdek-Místek"
+    assert names["OSJIMBM"] == "Městský soud Brno"  # its area is Brno-město
+    assert names["OSPHA10"] == "Obvodní soud Praha 10"
+    changed = {row["code"] for row in reference.courts() if row["name"] != names[row["code"]]}
+    assert changed == {"OSSTCPY", "OSSTCPZ", "OSZPCPM"}
+
+
 def test_the_real_cases(data):
     rows = data["cases"]["rows"]
     assert data["cases"]["columns"] == [

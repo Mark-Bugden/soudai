@@ -12,6 +12,7 @@ npm run dev
 ## Build and check the bundle
 
 ```sh
+npm test                    # node:test, on the committed data
 npm run build
 npx demo-kit validate dist/
 npx vite preview            # serves dist/ at http://localhost:4173
@@ -24,6 +25,8 @@ The files to edit:
 | File | What to change |
 | --- | --- |
 | `public/manifest.json` | The demo's metadata. |
-| `src/main.js` | Controls, drawing and the `mount()` call. |
-| `public/data/`, `public/model/` | Runtime files. |
+| `src/main.js` | The controls, the tabs and the `mount()` call. |
+| `src/views/` | The tabs, which draw the stage. |
+| `public/data/soudai.json` | The demo's data, written by `uv run soudai export` (don't edit it by hand). |
+| `test/` | Tests of the modules that don't touch the page, with `node --test`. |
 | `public/static.webp`, `thumb.webp`, `og.jpg` | Images. |
