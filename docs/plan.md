@@ -6,14 +6,13 @@ It is also the handover document. Any agent should be able to read it, find the 
 
 ## The goal
 
-The demo shows how civil cases move through Czech district courts, and where they pile up. A visitor:
+The demo shows how civil cases move through Czech district courts, and how long they take. It has three tabs (settled with Mark on 2026-11-25):
 
-1. opens on the journey of a civil case, from filing to a final decision: the routes cases take, how many take each one, and how long each step lasts
-2. picks a court and compares its journey with the national one
-3. switches to a map of the district courts, coloured by cases registered per year, backlog or typical time to a decision
-4. sees how close an estimate of a court's caseload, made from its published decisions alone (the German tank method), gets to the exact count.
+1. **Forecast,** the opening tab. A model gives the chance that a case ends within 1, 3, 6 or 12 months, from its history so far (see "The remaining-time model"). The visitor tries it on a real past case, picked at random or by court and case number, or on a made-up case they describe. The tab also shows how well the model does against simpler methods.
+2. **Process map.** The journey of a civil case from filing to a legally final decision: the routes cases take, how many take each one, and how long each step lasts. A visitor can compare one court with the whole country.
+3. **Courts,** added after the demo goes live. A map of the district courts, coloured by cases registered per year, backlog or typical time to a decision. Beside it, how close an estimate of a court's caseload, made from its published decisions alone (the German tank method), gets to the exact count.
 
-The project was first planned as purely descriptive. On 2026-11-23 Mark decided that it also predicts: a model forecasts how much longer a case will take, from its history so far (see "The remaining-time model"). How the demo shows that is still to be settled. The project makes no claims about why courts differ, and isn't legal advice.
+The project was first planned as purely descriptive. On 2026-11-23 Mark decided that it also predicts, and on 2026-11-25 that the model matters more than the backlog, so it comes first. The project makes no claims about why courts differ, and isn't legal advice.
 
 ## Working on this plan
 
@@ -101,6 +100,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, 10 h 8 min (step 4) |
 | Intake | senates, binary search | `data/derived/intake.csv` | 7,670 senate-years: 92,195 requests, 25 h 42 min (step 4) |
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
+| Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -114,7 +114,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - No judge's name appears anywhere in `data/derived/` or the export.
 - The German tank estimator and its interval match a brute-force simulation.
 - The stage model gives the right path and dates for real histories, including revivals, appeals, suspensions and odd dates.
-- The weighted Kaplan–Meier matches hand-worked cases.
+- The weighted Kaplan–Meier and Aalen–Johansen estimates match hand-worked cases and lifelines, and the journey numbers match a few cases worked by hand.
 - The export matches its schema and stays under its size budget.
 
 ## Methods
@@ -147,7 +147,7 @@ From published decisions alone: for a senate-year with k distinct published case
   | Suspended | `ST_VEC_PRE` | 3.2% |
   | Legally final | `ST_VEC_PUK` | 97.4% |
 
-  - **Order.** A case's events are read by date, then `poradi`, with the filing first on its day. Cancelled events are left off, and so are events dated before the filing.
+  - **Order.** A case's events are read by date, then `poradi`, with the filing first on its day. Cancelled events are left off, and so are events dated before the filing or after the record's `platneK`.
   - **Visits.** A visit is a run of events in one stage, so repeated hearings are one visit, and each visit keeps its number of events.
   - **Going back.** Cases can return to a stage, from revived to hearing, say. 5.5% do, and the map draws those as edges going back.
   - **The end.** A path stops at the first "legally final". Later events are left off, such as an appeal about costs after the main decision became final.
@@ -159,9 +159,15 @@ From published decisions alone: for a senate-year with k distinct published case
   - A case finishes at its first `ST_VEC_PUK`. The 0.31% closed in the register without one finish at their closing. A case still open is censored at its `platneK`.
   - **Disposal** stays as the time-to-a-decision curve and the map's measure, since it's the district court's own time. It's a case's latest `ST_VEC_VYR`, unless the case was revived after it and is still open. It's never later than the case's end: 340 cases show a disposal after their legal force. A case that finished with no disposal date counts as disposed when it finished.
 - **Weights.** The sample is stratified by court and year, so each case carries the weight intake / sample size. Every share and curve is weighted.
-- **Edges.** The weighted share of cases taking each transition, and the wait on it from a weighted Kaplan–Meier fit (median and interquartile range). A case that hasn't reached its next event is censored at its `platneK`.
-- **Curves.** Time from filing to disposal, and to legal force, as "share still open after t months", per court and nationally.
-- **Variants.** The most common full paths, with their shares.
+- **Events that haven't happened yet** are left off: those dated after the record's `platneK`, 532 in 528 cases, nearly all hearings booked ahead.
+- **Moves** (the map's edges, `journey_moves.csv`). For each move from one stage to another:
+  - **its share:** the weighted share of cases making it at least once;
+  - **its wait:** the median and quartiles, in days, of the wait among the cases that make it. It comes from every visit to the starting stage, by the Aalen–Johansen estimate: each next stage is a way out, and a visit still going when the record runs out is censored at its `platneK`. That's a Kaplan–Meier curve shared out between the ways out, so cases still waiting count for as long as they're known to wait. The wait is only given where at least 20 sampled cases made the move.
+  - A few cases were closed in the register and then carried on (7 moves). Their last visit leaves for "closed" on the day it began.
+- **Curves** (`journey_curves.csv`). The weighted share of cases not yet decided, and not yet finished, each month after filing, from 0 to 72, by Kaplan–Meier. `journey_summary.csv` gives their quartiles in days.
+- **Stages** (`journey_stages.csv`). The weighted share of cases reaching each stage.
+- **Variants** (`journey_paths.csv`). The commonest full paths, with how they ended (legally final, closed or still open) and their shares: the top 30 nationally, and the top 10 for each court.
+- `uv run soudai analyse` writes all five tables in about 45 s. The scope "all" is the whole country, and any other is a court's code.
 
 ### The remaining-time model
 
@@ -205,8 +211,11 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   - step 5's sample size: settled with Mark on 2026-11-24 at 400 cases per court-year, 208k in all (see step 5). More can be added later by drawing further down each senate-year's order, if the learning curve says it would help;
   - whether intake's hole probes, which are 3 random cases per senate-year and come with their full timelines, can add to the training data, with the right weights;
   - modelling the different endings (judgment, withdrawal) as competing risks;
-  - a transformer as a further comparison;
-  - how the demo shows the model, to be settled with Mark.
+  - a transformer as a further comparison.
+- **In the demo** (settled with Mark on 2026-11-25). The model is the opening Forecast tab, and it's built before the backlog.
+  - **Real past cases:** a few thousand from the test years, carried in the demo with their histories and what happened next. A visitor picks one at random or by court and case number.
+  - **Made-up cases:** the visitor gives the court and the events so far, and the demo runs the network itself, so its forward pass is ported to JS and checked against the Python.
+  - **How well it does:** the scores of the model and the simpler methods side by side, and its calibration.
 
 ### Backlog
 
@@ -243,15 +252,17 @@ Compare national and court intake with the Ministry of Justice's official statis
 
 | | |
 | --- | --- |
-| Views | Journey (opening) and Courts, switched with buttons at the top of the controls rail. The rail shows only the controls the current view uses. |
-| Journey | A flow diagram of the stages a civil case passes through, with the appeal loop as a side branch. Each edge's thickness is the share of cases that take it, and its label is the median wait. Hovering an edge gives its share, median and interquartile range. |
-| Time to disposal | Beside the diagram: the share of cases still open t months after filing, for the selected court against all courts. |
-| Court selector | All courts, or one court, with search by name. Search ignores diacritics, so "Decin" finds Děčín. The selection is shared by both views. |
-| Courts | A map of the district courts (see "Open questions" for areas or seats), coloured by the chosen measure: cases registered per year, backlog, or median time to disposal. Clicking a court selects it. |
-| Court panel | For the selected court: exact intake by year beside the German tank estimate and its interval, and its backlog. |
-| Tank explainer | Stretch goal: reveal a court's published case numbers a few at a time and watch the estimate close in on the exact count. |
+| Tabs | Forecast (opening) and Process map, then Courts after the demo goes live (step 10). They're switched with buttons at the top of the controls rail, and the rail shows only the controls the current tab uses. |
+| Forecast | Pick a real past case, at random or by court and case number, or describe a made-up one: its court and its events so far. It shows the case's history so far and the chances it ends within 1, 3, 6 and 12 months. For a real case, it also shows what happened next. |
+| How well it does | Under the forecast: the scores of the model and the simpler methods side by side, and a calibration chart. |
+| Process map | A flow diagram of the stages a civil case passes through, with the appeal loop as a side branch. Each edge's thickness is the share of cases that take it, and its label is the median wait. Hovering an edge gives its share, median and interquartile range. |
+| Time to a decision | Beside the diagram: the share of cases not yet decided, and not yet legally final, t months after filing, for the selected court against all courts. |
+| Court selector | All courts, or one court, with search by name. Search ignores diacritics, so "Decin" finds Děčín. The selection is shared by all the tabs. |
+| Courts (step 10) | A map of the district courts (see "Open questions" for areas or seats), coloured by the chosen measure: cases registered per year, backlog, or median time to a decision. Clicking a court selects it. |
+| Court panel (step 10) | For the selected court: exact intake by year beside the German tank estimate and its interval, and its backlog. |
+| Tank explainer (step 10) | Stretch goal: reveal a court's published case numbers a few at a time and watch the estimate close in on the exact count. |
 | Status line | What's selected, with its headline numbers. |
-| How this works | Sources and snapshot date, what's counted (district courts, register C, registered 2020–2025), the methods in brief, and that it isn't legal advice. |
+| How this works | Sources and snapshot date, what's counted (district courts, register C, registered 2020–2025), the methods and the model in brief, and that it isn't legal advice. |
 | Language | The interface is in English. Court names stay in Czech. Event names use the English glosses from `reference/events.csv`. |
 
 ## Look
@@ -271,7 +282,8 @@ Compare national and court intake with the Ministry of Justice's official statis
 ```
 demo/                          the site bundle, built with demo-kit (see the site contract)
   src/main.js                  frame, controls, view switching and shared state
-  src/views/                   journey, courts
+  src/views/                   forecast, process map, courts
+  src/forecast.js              the network's forward pass, ported from Python, for made-up cases
   src/tank.js                  German tank estimator, ported from Python (only if the demo recomputes it)
   public/data/soudai.json      written by the export, and committed
   test/                        node:test, including fixtures from the Python reference
@@ -285,12 +297,13 @@ src/soudai/
   sample.py                    the stratified timeline sample
   events.py                    event log and stage model
   tank.py                      German tank estimates and intervals
-  survival.py                  weighted Kaplan–Meier
+  survival.py                  weighted Kaplan–Meier and Aalen–Johansen
+  journey.py                   the journey numbers: stages, moves, waits, curves and paths
   model.py                     the remaining-time network and its comparison models
   backlog.py                   Little's law and the direct count
   export.py                    writes demo/public/data/ and the JS fixtures
   status.py                    progress of each stage, from the cache and derived tables
-  cli.py                       `uv run soudai <stage>`: courts, events, decisions, senates, intake, sample, analyse, export, status
+  cli.py                       `uv run soudai <stage>`: courts, events, decisions, senates, intake, sample, analyse, model, export, status
 reference/                     courts.csv, events.csv, sources.json (hand-checked, committed)
 data/raw/                      cache.sqlite and logs (gitignored)
 data/derived/                  parsed tables, no judges' names (committed while small)
@@ -520,7 +533,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
 
   - **Median days from filing to disposal,** weighted, among disposed cases: 159 (2020), 158, 148, 147, 146 and 131 (2025). The recent years are biased low by their open tail. Step 6's Kaplan–Meier corrects that.
 
-### 6. Analysis (PR)
+### 6. Journey numbers (PR)
 - [x] Settle the stage model (see "The journey") and write it here.
   - **Settled with Mark on 2026-11-25:** the seven stages and their rules (see "The journey"), and legally final as "finished". Cancelled events stay out of the model too. The gloss of `NAR_JED` is now "Hearing" instead of "Hearing scheduled", since its date is the hearing's own.
   - **In code:** `events.log` gives the events the journey reads. `events.journey` gives one row per stage visit: 832,772 for the 208,151 cases with a filing. `events.outcomes` gives each case's filing, disposal and end dates, with how it ended: 202,851 legally final, 650 closed in the register without that, and 4,650 still open. 25 tests run on real histories.
@@ -536,40 +549,72 @@ Built before the run (2026-11-22), with tests on fake dockets:
     - **Suspensions:** 3.2% of cases, resumed after a median of 281 days. 29% of those are still suspended.
     - **11 of the 28 codes never appear:** the four `PNS_*` notes, `PREVD_SPIS`, `PR_VEC_NS`, `SPIS_K_SC`, `SPIS_K_SO`, `SPIS_OD_SC`, `SPIS_OD_SO` and `VR_SP_NS`.
     - **Odd dates.** 143 of the cases' own events, in 127 cases, are dated before the filing, including the three typos (years 0023, 1021 and 1023), and are left off. The 76 cases with no filing have no events and no status at all, and are left out (466 cases by weight, 0.03%). Filings long before the case year are kept: 387 cases were filed 2 or more years before their case year, the earliest in 1999. They were probably moved in from another court or register.
-- [ ] Journey: weighted transition shares, Kaplan–Meier waits and curves, and the top variants, per court and nationally.
-- [ ] Exact intake by court-year and nationally, and the external check.
+- [x] Journey: weighted transition shares, Kaplan–Meier waits and curves, and the top variants, per court and nationally.
+  - **In code:** `survival.py` holds the weighted Kaplan–Meier and Aalen–Johansen estimates, written here because lifelines jitters tied days at random in Aalen–Johansen. They match lifelines (with weights, and with ties for Kaplan–Meier) and hand-worked cases. `journey.py` and `uv run soudai analyse` write the five tables (see "The journey"). There are 19 new tests.
+  - **The whole country** (1,725,206 cases registered, 208,151 sampled):
+    - **From filing to a decision:** median 149 days (quartiles 103 and 222).
+    - **From filing to legally final:** median 184 days (quartiles 133 and 265).
+    - **Still open:** 2.2% of cases.
+  - **Share not yet decided, and not yet legally final, by months after filing:**
+
+    | Months | 3 | 6 | 9 | 12 | 24 | 36 | 60 |
+    | --- | --- | --- | --- | --- | --- | --- | --- |
+    | Not decided | 80.1% | 36.0% | 16.7% | 9.7% | 3.3% | 2.0% | 0.9% |
+    | Not legally final | 89.5% | 50.7% | 23.4% | 13.1% | 4.3% | 2.6% | 1.3% |
+
+  - **The main moves,** with their share of cases and median wait:
+    - filed → hearing: 76.1%, 148 days;
+    - filed → decided: 19.8%, 79 days;
+    - hearing → decided: 79.4%, the same day;
+    - decided → appeal: 5.1%, 58 days;
+    - decided → revived: 2.7%, 155 days;
+    - appeal → revived: 1.7%, 45 days;
+    - filed → suspended: 2.3%, 152 days;
+    - suspended → decided: 1.2%, 656 days.
+  - **Courts differ a lot.** The median from filing to a decision runs from 92 days (Jeseník) and 93 (Prague 5) to 238 (Prague 1 and Litoměřice); the median court takes 144. To legally final, it runs from 127 days (Jeseník) to 293 (Prague 1). Still open: from 0.9% to 5.0% (Městský soud v Brně). 1,087 of the 2,116 court-level moves have enough cases for a wait.
+  - **Courts also differ in what their records show.**
+    - Hradec Králové records a hearing in only 22% of cases, against 80% nationally: 14–24% in 2020–2024 and 41% in 2025. Chomutov records one in 92%.
+    - At Prague 2, 26.5% of cases reach the appeal stage, against 6.3% nationally, and 23.1% go to the appeal court (Městský soud v Praze), against 4.3%.
+    - Whether that's practice or record-keeping isn't known, and the project makes no claims about why.
+- [ ] Compare the exact intake with the official statistics, court by court and nationally (see "External check"). Every case's weight comes from those counts. It takes about 6 downloads from InfoData, one per year.
+- [ ] Record the headline figures here, and draft notes for the write-up in `docs/writeup.md`.
+
+Reordered with Mark on 2026-11-25: the model comes before the demo, and the Courts tab (German tank estimate, backlog and map) comes after the demo goes live.
+
+### 7. The remaining-time model (PR)
+- [ ] Build the comparison models and the GRU network (see "The remaining-time model"). Train and score them all on the same split: earlier registration years for training, later ones for testing.
+- [ ] Record the scores here, model by model, by court and by how far into a case the forecast is made.
+- [ ] A Python reference and fixtures for what the demo recomputes: the network's forward pass, for made-up cases.
+- [ ] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
+
+### 8. Forecast and process map: release status `in-progress`
+- [ ] Move the demo to the latest demo-kit (see "Look") and bump `version`.
+- [ ] Export `demo/public/data/soudai.json` (aim for under 500 KB; the bundle must stay under 2 MB).
+- [ ] The frame, the tabs, the court selector, the status line and "How this works".
+- [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
+- [ ] The Process map tab and its time curves.
+- [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.
+- [ ] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
+
+### 9. Write-up: release status `live`
+- [ ] Draft the write-up in `docs/writeup.md` for Mark, including a plain statement that nothing here is legal advice.
+- [ ] Set `status: "live"` once Mark agrees, in a PR that bumps the version.
+
+### 10. The Courts tab (after the demo is live)
+- [ ] Settle the map geometry (see "Open questions") and record its source and licence.
 - [ ] German tank estimates and intervals, compared with the exact counts by year, plus the undercount from senates with no published decisions.
   - `tank.py` was written ahead of this step, on 2026-11-22, with 61 tests against exact sums and brute-force simulation. The upper bound is the largest N with C(m, k)/C(N, k) ≥ 5%, found in floating point and settled exactly with whole numbers.
   - A court's upper bound is the 95th percentile of simulated totals. Each senate's N is drawn from its confidence distribution (P(draw ≥ n) = C(m, k)/C(n, k)), so for one senate the simulation gives back its exact bound.
   - In simulation the court bound covers the true total about 95% of the time when every senate has many published numbers. When some have only 1–3 it covers more often, with very wide bounds: sparse years such as 2020 will show that.
   - A senate with no published numbers can't be estimated, so `court_total` refuses it, and the undercount is reported separately.
 - [ ] Backlog by Little's law, against the direct count.
-- [ ] A Python reference and fixtures for any maths the demo recomputes.
-- [ ] Record the headline figures here, and draft notes for the write-up in `docs/writeup.md`.
-
-### 7. Courts view: release status `in-progress`
-- [ ] Move the demo to the latest demo-kit (see "Look") and bump `version`.
-- [ ] Settle the map geometry (see "Open questions") and record its source and licence.
-- [ ] Export `demo/public/data/soudai.json` (aim for under 500 KB; the bundle must stay under 2 MB).
-- [ ] The frame, the court selector, the Courts view and the court panel, the status line and "How this works". Test the JS against the Python fixtures.
-- [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.
-- [ ] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
-
-### 8. Journey view and write-up: release status `live`
-- [ ] The Journey view and the time-to-disposal curve, sharing the court selection. Journey becomes the opening view, and the stills are redone.
-- [ ] Draft the write-up in `docs/writeup.md` for Mark, including a plain statement that nothing here is legal advice.
-- [ ] Set `status: "live"` once Mark agrees, in a PR that bumps the version.
-
-### 9. The remaining-time model (PR)
-- [ ] Build the comparison models and the GRU network (see "The remaining-time model"). Train and score them all on the same split.
-- [ ] Record the scores here, model by model, by court and by how far into a case the forecast is made.
-- [ ] Settle with Mark how the demo shows the model, then build it. A PR that changes the demo bumps `version`.
+- [ ] The Courts tab, the court panel and, as a stretch, the tank explainer, with a Python reference and fixtures for any maths the demo recomputes. Bump `version`.
 
 ## For Mark, on the site
 
 - **The write-up.** `content/projects/soudai.md` is a draft with a TODO, which asks for a plain statement that the predictions aren't legal advice. The project makes predictions again, since 2026-11-23 (see "The remaining-time model"), so the statement matters.
 - **The copy.** The tagline and summary ("Predicting how long court cases in the Czech Republic take") describe the old project. Mark rewrites them for the manifest and the site.
-- **The README.** It says the project "makes no predictions about individual cases", which no longer holds since 2026-11-23. Mark rewords it.
+- **The README.** Reworded for the three tabs and the model on 2026-11-25, at Mark's request, keeping his wording where it still held. He edits it.
 - **Status.** The site lists the project once a release is `in-progress` or `live` and the write-up is out of draft.
 
 ## Open questions

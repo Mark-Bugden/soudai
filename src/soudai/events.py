@@ -88,24 +88,26 @@ def run():
     return 0
 
 
-def log(events):
-    """The events the journey reads, in order: those not cancelled and dated on or after the case's
-    filing (its first filing event), sorted by date, then `poradi`, with the filing first on its day. An
-    event dated before the filing is left off, and so is a case with no filing."""
+def log(cases, events):
+    """The events the journey reads, in order: those not cancelled, dated on or after the case's filing
+    (its first filing event) and no later than the day its record runs to (`valid_to`), sorted by date,
+    then `poradi`, with the filing first on its day. So an event dated before the filing is left off, and
+    so is one that hasn't happened yet, such as a hearing booked ahead. A case with no filing is left out."""
     events = events[~events["cancelled"]]
     filed = events[events["code"] == "ZAHAJ_RIZ"].groupby(CASE)["date"].min().rename("filed")
-    events = events.join(filed, on=CASE, how="inner")
-    events = events[events["date"] >= events["filed"]].assign(later=events["code"] != "ZAHAJ_RIZ")
+    events = events.join(filed, on=CASE, how="inner").join(cases.set_index(CASE)["valid_to"], on=CASE)
+    events = events[(events["date"] >= events["filed"]) & (events["date"] <= events["valid_to"])]
+    events = events.assign(later=events["code"] != "ZAHAJ_RIZ")
     events = events.sort_values(CASE + ["date", "later", "poradi"], kind="stable")
-    return events.drop(columns=["filed", "later"]).reset_index(drop=True)
+    return events.drop(columns=["filed", "valid_to", "later"]).reset_index(drop=True)
 
 
-def journey(events):
+def journey(cases, events):
     """Each case's path through the stages: one row per visit, in order, with the case, the stage, the
     day the case entered it (`date`) and how many events the visit holds (`events`). A visit is a run of
     events in one stage, so repeated hearings are one visit. The path starts at the filing and stops at
     the first "legally final": later events, such as an appeal about costs, are left off."""
-    events = log(events)
+    events = log(cases, events)
     events = events[events["code"].isin(STAGE)]
     events = events.assign(stage=events["code"].map(STAGE))
     final = (events["stage"] == "final").astype(int)
@@ -128,7 +130,7 @@ def outcomes(cases, events):
       case that finished without a disposal date counts as disposed when it finished;
     - `until`: its end, or for an open case the day its record runs to (`valid_to`), where it's censored.
     """
-    events = log(events)
+    events = log(cases, events)
 
     def first(code):
         return events[events["code"] == code].groupby(CASE)["date"].first()
