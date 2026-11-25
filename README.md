@@ -27,7 +27,7 @@ uv sync
 uv run pytest
 ```
 
-Each stage runs as `uv run soudai <stage>`, in this order. `model` is being built, and so far fits and scores the two simplest methods. `export` isn't built yet. The plan gives each stage's inputs, outputs and rough cost.
+Each stage runs as `uv run soudai <stage>`, in this order. `model` is being built, and so far fits and scores the four comparison methods. It needs the optional dependencies: `uv sync --group model`. `export` isn't built yet. The plan gives each stage's inputs, outputs and rough cost.
 
 | Stage | What it does | Milestone |
 | --- | --- | --- |

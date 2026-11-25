@@ -102,7 +102,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
 | Official statistics | InfoData's S_AS_40 report, intake | `data/derived/official.csv` | 13 requests (step 6) |
 | Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
-| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv` | No requests: about 40 s for the two simplest methods (step 7) |
+| Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv` | No requests: about 2 minutes for the four comparison models (step 7) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -207,10 +207,12 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   2. **The process map:** per court, the stage reached and the time spent in it.
      - As built: the Kaplan–Meier curve of the time left, over the training cuts in the same court and stage, with about as long in it: 0 days, 1–30, 31–91, 92–182, 183–365 or more. Where the court has fewer than 50 such cuts, all courts' are used, and failing that, all courts' in the stage. It knows nothing of the time since filing, as the map doesn't.
   3. **A Cox proportional hazards model** on hand-made features.
+     - As built: stratified by court, so each court has its own baseline curve, and fitted with lifelines on 200,000 training cuts drawn at random. The features scale a court's hazard by the same factor at every time, which the stages break badly: a decided case's chance of finishing is high in its first month and low after.
   4. **Gradient-boosted trees** (XGBoost or LightGBM) on the same features, predicting the same 36 monthly chances.
+     - As built: LightGBM, with the court as a category and the month as a feature. Each training cut becomes one row per month it's known to be open at the start of, up to the month it finished (a discrete-time hazard, as the network has): 6.9M rows. Training stops when the loss on the held-out cases hasn't improved for 50 rounds.
   5. **The GRU network.**
 
-  The hand-made features are the court, the current stage, the time since filing and since the last event, the number of hearings so far, whether there has been an appeal, and whether a decision has been issued. An optional extra is the network's output layers fed the hand-made features instead of the sequence. It separates "a neural network helps" from "reading the sequence helps". If the GRU doesn't clearly beat the trees, the write-up says so.
+  The hand-made features are the court, the current stage, the time since filing and since the last event, the number of hearings so far, whether there has been an appeal, and whether a decision has been issued. Step 7 added the days in the current stage, which the process map uses, and whether the case has been revived. Days are on a log scale, log(1 + days), and hearings are capped at 5. An optional extra is the network's output layers fed the hand-made features instead of the sequence. It separates "a neural network helps" from "reading the sequence helps". If the GRU doesn't clearly beat the trees, the write-up says so.
 - **Scoring.** Every model is scored the same way, on the same held-out later years:
   - **concordance:** how often the model correctly ranks which of two cases finishes first;
   - **the Brier score** at 6, 12 and 24 months, corrected for censoring;
@@ -635,7 +637,11 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
 ### 7. The remaining-time model (PR)
 - [ ] Build the comparison models and the GRU network (see "The remaining-time model"). Train and score them all on the same split: earlier registration years for training, later ones for testing.
   - **First PR (2026-11-25): the examples, the scores, and the two simplest methods.** `examples.py` cuts the histories, `scoring.py` scores forecasts, `baselines.py` has the court average and the process map, and `model.py` runs them as `uv run soudai model`, in about 40 s. 21 new tests. Decided here, and written into "The remaining-time model": the monthly cuts, the split on 1 January 2024, the validation share, and how each score is computed.
-  - **Still to come:** Cox and gradient-boosted trees (LightGBM), then the GRU. PyTorch and LightGBM go in an optional dependency group, so CI's install stays light.
+  - **Second PR (2026-11-25): Cox and gradient-boosted trees** (see "Comparison models"). 4 new tests. `uv run soudai model` now takes about 2 minutes.
+    - **Heavy dependencies are optional.** LightGBM is in a `model` dependency group, and PyTorch will join it. `uv sync --group model` installs it. CI installs only the default groups, so its install stays light, and the tests that need the group skip without it.
+    - **Tuning the trees** on the held-out training cases changed little: the held-out loss ran from 0.3286 to 0.3289 over 31 to 127 leaves and learning rates of 0.05 and 0.1. Fitting on all 1.1M training cuts rather than 500,000 gave 0.3284, so they're all used, with 63 leaves and a rate of 0.05. Training stopped at about 230 rounds.
+    - A test caught the stage columns "decided" and "revived" overwriting the features of the same names before the first scores were recorded. They're `in_decided` and so on now.
+  - **Still to come:** the GRU, in PyTorch with CPU-only wheels.
   - **Cases have got faster,** so every model trained on 2020–2023 expects the test cases to take longer than they did. The share of cases not yet finished 6 months after filing, by Kaplan–Meier with full follow-up, by year registered:
 
     | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
@@ -644,15 +650,26 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
 
     The calibration tables show it: where the court average forecast a 45% chance of finishing within 6 months, 58% did. All the models train on the same years, so the comparison between them stays fair. Weighting recent years more, or correcting the forecasts afterwards, could reduce the gap. Neither is done yet.
 - [ ] Record the scores here, model by model, by court and by how far into a case the forecast is made.
-  - **The two simplest methods,** over all test forecasts (234,784, at filing and 1, 3, 6 and 12 months in). Higher concordance is better, and lower Brier and calibration error:
+  - **Over all test forecasts** (234,784, at filing and 1, 3, 6 and 12 months in). Higher concordance is better, and lower Brier and calibration error:
 
     | Model | Concordance | Brier 1 mo | 3 mo | 6 mo | 12 mo | 24 mo | Calibration error 6 mo | 12 mo |
     | --- | --- | --- | --- | --- | --- | --- | --- | --- |
     | Court average | 0.602 | 0.069 | 0.174 | 0.203 | 0.094 | 0.043 | 5.8% | 2.2% |
     | Process map | 0.636 | 0.043 | 0.158 | 0.197 | 0.090 | 0.043 | 6.6% | 2.5% |
+    | Cox | 0.606 | 0.058 | 0.179 | 0.202 | 0.096 | 0.046 | 4.6% | 6.7% |
+    | Trees | 0.638 | 0.040 | 0.153 | 0.193 | 0.089 | 0.042 | 5.3% | 2.0% |
 
-  - **By how far into a case.** At filing both know only the court, and score the same (concordance 0.604). Further in, the process map pulls ahead: concordance 0.625 against 0.604 at 1 month, 0.669 against 0.612 at 3, 0.720 against 0.547 at 6, and 0.733 against 0.540 at 12.
-  - **By court.** Within one court, the court average gives every case at a landmark the same forecast, so its concordance there is 0.5, a coin toss: its 0.602 overall comes from ranking the courts. The process map's runs from 0.531 to 0.571 within a court. Its Brier score at 6 months is lower in 83 of the 86 courts.
+  - **By how far into a case.** At filing a case has only its court, and every method but Cox scores the same (concordance 0.604). Further in, the methods that read the case pull ahead. Concordance:
+
+    | Months after filing | 0 | 1 | 3 | 6 | 12 |
+    | --- | --- | --- | --- | --- | --- |
+    | Court average | 0.604 | 0.604 | 0.612 | 0.546 | 0.540 |
+    | Process map | 0.604 | 0.625 | 0.669 | 0.720 | 0.733 |
+    | Cox | 0.564 | 0.591 | 0.650 | 0.719 | 0.719 |
+    | Trees | 0.604 | 0.624 | 0.671 | 0.741 | 0.750 |
+
+    The trees' Brier score at 6 months is 0.228 at filing, 0.162 at 3 months in and 0.184 at 12, against the process map's 0.230, 0.170 and 0.201.
+  - **By court.** Within one court, the court average gives every case at a landmark the same forecast, so its concordance there is 0.5, a coin toss: its 0.602 overall comes from ranking the courts. Within a court, the process map's runs from 0.531 to 0.571 and the trees' from 0.534 to 0.575. The process map's Brier score at 6 months is lower than the court average's in 83 of the 86 courts, and the trees' lower than the process map's in 81.
 - [ ] A Python reference and fixtures for what the demo recomputes: the network's forward pass, for made-up cases.
 - [ ] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
 

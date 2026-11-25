@@ -18,6 +18,8 @@ from . import baselines, examples, journey, paths, scoring
 MODELS = {
     "court average": baselines.court_average,
     "process map": baselines.process_map,
+    "cox": baselines.cox,
+    "trees": baselines.trees,
 }
 SCORES = paths.DERIVED / "model_scores.csv"
 CALIBRATION = paths.DERIVED / "model_calibration.csv"

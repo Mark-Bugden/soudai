@@ -61,7 +61,12 @@ Facts and figures from steps 1–6, gathered for Mark to write the write-up from
 - **The split.** The models learn from cases registered 2020–2023, as their records stood on 31 December 2023, and are tested on cases registered 2024–2025, followed to November 2026. So they're scored as if built on 1 January 2024 and used on the cases that came after.
 - **Where forecasts are scored:** each test case at its filing, and 1, 3, 6 and 12 months after, while it's still open.
 - **Cases have got faster.** The share not yet finished 6 months after filing, by year registered, is 54.7% (2020), 55.4%, 50.3%, 50.4%, 49.7% and 42.9% (2025). So models that learn from the earlier years expect later cases to take longer than they do.
-- **The two simplest methods so far.** The court average (the court's typical curve, from the time since filing) ranks cases right 60% of the time, and only by ranking courts: within one court it's a coin toss. The process map (the court, the stage a case is in, and how long it has been there) ranks 64% right overall, and 72–73% for cases 6 or 12 months in.
+- **The comparison methods so far.** Concordance is the share of pairs of cases ranked right: which of the two finishes first.
+  - The court average (the court's typical curve, from the time since filing) ranks 60% right, and only by ranking courts: within one court it's a coin toss.
+  - The process map (the court, the stage a case is in, and how long it has been there) ranks 64% right overall, and 72–73% for cases 6 or 12 months in.
+  - A Cox model on hand-made features ranks 61% right. It assumes each feature scales the chance of finishing by the same factor at every time, which the stages break.
+  - Gradient-boosted trees on the same features rank 64% right overall, and 74–75% for cases 6 or 12 months in.
+  - At filing, a case has only its court, and every method ranks about 60% right.
 
 ## Caveats to keep
 
