@@ -28,6 +28,7 @@ MONTH = 365.25 / 12  # days
 HORIZON = 36  # months a forecast covers
 MONTHLY = 60  # months after filing with a monthly cut
 SPLIT = date(2024, 1, 1)
+HALF_LIFE = 1  # years over which a training example's weight halves, the further it is before SPLIT
 LANDMARKS = [0, 1, 3, 6, 12]  # months after filing at which forecasts are scored
 VALIDATION = 0.1  # the share of training cases held out to stop training and tune
 SEED = 20261125
@@ -48,10 +49,29 @@ def as_of(cases, day):
     return cases.assign(valid_to=[min(valid_to, day) for valid_to in cases["valid_to"]])
 
 
-def split(cases):
-    """(training cases, as they stood the day before SPLIT; test cases, followed to the snapshot)."""
-    train = cases[cases["year"] < SPLIT.year]
-    return as_of(train, SPLIT - timedelta(days=1)), cases[cases["year"] >= SPLIT.year]
+def split(cases, on=SPLIT):
+    """(training cases, those registered before `on` as they stood the day before it; test cases, those
+    registered from `on`'s year on, followed to the snapshot)."""
+    train = cases[cases["year"] < on.year]
+    return as_of(train, on - timedelta(days=1)), cases[cases["year"] >= on.year]
+
+
+def recent(train, half_life=HALF_LIFE, until=SPLIT):
+    """Training examples weighted for recency: each cut's weight halves for every `half_life` years
+    between the day it was made and `until`, and so does each case's in `histories`, from its filing date.
+    Cases got faster over the years (see docs/plan.md, step 7), so recent cuts are the better guide to
+    the cases that come after. `half_life` None leaves the weights as they are."""
+    if half_life is None:
+        return train
+    histories, cuts = train.histories, train.cuts
+    filed = _days(np.full(len(histories), until), histories["filed"])  # days from filing to `until`
+    before = filed[cuts["id"].to_numpy()] - cuts["day"].to_numpy()  # days from each cut to `until`
+    years = 365.25 * half_life
+    return Examples(
+        histories.assign(weight=histories["weight"] * 0.5 ** (filed / years)),
+        train.steps,
+        cuts.assign(weight=cuts["weight"] * 0.5 ** (before / years)),
+    )
 
 
 def _days(later, earlier):

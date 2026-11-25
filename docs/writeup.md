@@ -73,6 +73,7 @@ Facts and figures from steps 1–6, gathered for Mark to write the write-up from
   - The same network fed the hand-made features instead of the events does worse than the trees. So what helps is reading the sequence of events, not a neural network as such.
   - Its calibration is the best of the methods: where it forecast a given chance of finishing within 6 months, the share that did was 4.0 points off on average, against 5.3 for the trees. Where it forecast under 70%, more cases finished than it said, by 3 to 10 points, which fits cases having got faster after the training years.
 
+- **Recent cases count more in training.** A training example's weight halves for every year before 1 January 2024. The half-life was chosen on the training years alone: fitted on 2020–2022, checked on 2023. It makes every model's forecasts better calibrated: the trees' gap between forecast and outcome at 6 months falls from 5.3 to 2.6 points.
 - **The demo's real past cases:** 3,010 cases registered in 2024–2025, 35 from each court, none of them seen in training.
 
 ## Caveats to keep
