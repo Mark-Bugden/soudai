@@ -42,7 +42,7 @@ def run(*histories):
     the order of the table."""
     table = pd.concat(histories, ignore_index=True).sample(frac=1, random_state=1)
     cases = table[events.CASE].drop_duplicates().assign(valid_to=VALID_TO)
-    visits = events.journey(table)
+    visits = events.journey(cases, table)
     outcomes = events.outcomes(cases, table)
     paths = visits.groupby("number")["stage"].agg(list).to_dict()
     return paths, visits, outcomes.set_index("number")
@@ -250,6 +250,14 @@ def test_events_before_the_filing_are_left_off_and_the_filing_comes_first_on_its
     assert paths[11] == ["filed", "decided", "final"]
     assert outcomes.loc[11, "filed"] == date(2021, 1, 4)
     assert outcomes.loc[11, "end"] == date(2021, 2, 15)
+
+
+def test_events_after_the_record_runs_to_havent_happened_yet():
+    booked = history(13, ("ZAHAJ_RIZ", "2026-03-02"), ("NAR_JED", "2026-10-01"), ("NAR_JED", "2027-02-15"))
+    paths, visits, outcomes = run(booked)
+    assert paths[13] == ["filed", "hearing"]
+    assert visits["events"].tolist() == [1, 1]  # the hearing booked for 2027 isn't counted
+    assert outcomes.loc[13, "until"] == VALID_TO
 
 
 def test_a_case_with_no_filing_is_left_out():
