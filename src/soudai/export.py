@@ -27,7 +27,7 @@ import pandas as pd
 
 from . import events, examples, journey, model, paths, reference
 
-MAX_BYTES = 600_000  # the bundle's limit is 2 MB, for everything (see docs/plan.md, step 8)
+MAX_BYTES = 500_000  # the bundle's limit is 2 MB, for everything
 LEVELS = 32767  # the largest 16-bit integer
 ENDINGS = ["final", "closed", "open"]
 PLACES = events.STAGES + ["closed"]  # where a move can go: a stage, or closed in the register

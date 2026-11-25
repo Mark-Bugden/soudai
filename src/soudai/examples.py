@@ -32,7 +32,7 @@ HALF_LIFE = 1  # years over which a training example's weight halves, the furthe
 LANDMARKS = [0, 1, 3, 6, 12]  # months after filing at which forecasts are scored
 VALIDATION = 0.1  # the share of training cases held out to stop training and tune
 SEED = 20261125
-DEMO_PER_COURT = 35  # real past cases the demo carries, per court
+DEMO_PER_COURT = 20  # real past cases the demo carries, per court
 
 APPEAL = {code for code, stage in events.STAGE.items() if stage == "appeal"}
 DECISION = {"VYD_ROZH", "ST_VEC_VYR"}

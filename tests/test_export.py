@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from soudai import events, export, forward, journey, model, paths, reference
+from soudai import events, examples, export, forward, journey, model, paths, reference
 
 
 @pytest.fixture(scope="module")
@@ -95,7 +95,7 @@ def test_the_real_cases(data):
     assert len(rows) == len(pd.read_csv(model.DEMO_CASES))
     codes = [c["code"] for c in data["codes"]]
     per_court = np.bincount([row[0] for row in rows], minlength=len(data["courts"]))
-    assert (per_court == 35).all()
+    assert (per_court == examples.DEMO_PER_COURT).all()
     for court, senate, number, year, filed, span, ended, pairs in rows:
         history = [(codes[pairs[i]], pairs[i + 1]) for i in range(0, len(pairs), 2)]
         days = [day for _, day in history]

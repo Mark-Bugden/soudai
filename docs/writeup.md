@@ -75,7 +75,7 @@ Facts and figures from steps 1–6, gathered for Mark to write the write-up from
   - Before recent cases were weighted up and the ensemble added, a single network ranked 64.2% right against the trees' 63.8%, with the same pattern.
 
 - **Recent cases count more in training.** A training example's weight halves for every year before 1 January 2024. The half-life was chosen on the training years alone: fitted on 2020–2022, checked on 2023. It makes every model's forecasts better calibrated: the trees' gap between forecast and outcome at 6 months falls from 5.3 to 2.6 points.
-- **The demo's real past cases:** 3,010 cases registered in 2024–2025, 35 from each court, none of them seen in training.
+- **The demo's real past cases:** 1,720 cases registered in 2024–2025, 20 from each court, none of them seen in training.
 
 ## Caveats to keep
 
