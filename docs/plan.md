@@ -444,6 +444,9 @@ Built before the run (2026-11-22), with tests on fake dockets:
     - **Weights.** Each case's weight is its senate-year's count / the cases sampled from it, so the weights add up to intake's counts.
     - **A small imperfection.** Numbers 1 and the top are slightly less likely to be drawn, since the probes never ask them. That's 2 numbers in a senate-year's median of 234.
   - **The cost:** 186,000 new requests at 3 a second, about 18 h. The run started on 2026-11-24 at 21:27.
+  - **Run 28 stopped** on 2026-11-25 at 09:20, after 127,624 requests with no failures, on an unexpected answer. Asked for 5 C 294/2020 at Nymburk, infosoud gave that case's 7 events plus a stray "hearing scheduled" of 2018-10-26 stamped "5 C 294/20", whose year (20) became the record's, with no status.
+    - `infosoud.find_case` now raises `WrongCase` for a record of another case. The sample skips it like a hidden number, and any other unexpected answer still stops a run.
+    - The run was resumed from the cache as run 29.
   - **Found before the run.** The probes' 22,000 timelines show nearly all cases registered 2020–2025 are already disposed:
 
     | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
@@ -452,6 +455,13 @@ Built before the run (2026-11-22), with tests on fake dockets:
 
     The share legally final is 99% for 2020 and 92% for 2025. The 2025 cases took a median of 126 days from filing to disposal, and 90% took 258 days or less. So unfinished cases are a small tail, not most of the recent years.
 - [ ] Parse to `data/derived/cases.parquet` (case, court, filing date, status, status date, `platneK`, weight) and `data/derived/events.parquet` (case, code, date, `poradi`, cancelled).
+  - **A case's history includes its linked cases' events.** Of 173,486 cached records, 9,115 (5.3%) hold events stamped (`znackaId`) with another case's number:
+    - 10,552 appeals (`ODVOLANI`), at the regional court's `Co` register;
+    - about 1,100 other higher-court proceedings (`NAD_RIZENI`, registers `Nc`, `Ncp` and `Ncd`);
+    - 2 Supreme Court reviews (`DOVOL_RIZ`);
+    - and the one stray above.
+
+    So `events.parquet` gains `linked_court` and `linked_case`: null for the case's own events, and the other case's court code and number for these. The appeal loop on the map comes from them.
 - [ ] Check that every case has a filing event in its case year and that events order sensibly, and record the share still open by filing year.
 
 ### 6. Analysis (PR)

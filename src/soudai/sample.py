@@ -55,6 +55,10 @@ EVENT_SCHEMA = pyarrow.schema(
         ("date", pyarrow.date32()),
         ("poradi", pyarrow.int16()),  # the order of events on the same day
         ("cancelled", pyarrow.bool_()),  # `zruseno`
+        # For an event of a linked case (`znackaId` differs), that case's court code and number, such as
+        # an appeal (ODVOLANI) at the regional court, "21 CO 123/2023". Null for the case's own events.
+        ("linked_court", pyarrow.string()),
+        ("linked_case", pyarrow.string()),
     ]
 )
 
@@ -142,19 +146,34 @@ def case_row(court, senate, year, number, case, weight, source):
 
 
 def event_rows(court, senate, year, number, case):
-    return [
-        {
-            "court": court,
-            "senate": senate,
-            "number": number,
-            "year": year,
-            "code": event["udalost"],
-            "date": _date(event["datum"]),
-            "poradi": event["poradi"],
-            "cancelled": bool(event["zruseno"]),
-        }
-        for event in infosoud.sorted_events(case)
-    ]
+    rows = []
+    for event in infosoud.sorted_events(case):
+        mark = event.get("znackaId") or {}
+        own = (mark.get("organizace"), mark.get("cisloSenatu"), mark.get("bcVec"), mark.get("rocnik")) == (
+            court,
+            senate,
+            number,
+            year,
+        )
+        rows.append(
+            {
+                "court": court,
+                "senate": senate,
+                "number": number,
+                "year": year,
+                "code": event["udalost"],
+                "date": _date(event["datum"]),
+                "poradi": event["poradi"],
+                "cancelled": bool(event["zruseno"]),
+                "linked_court": None if own else mark.get("organizace"),
+                "linked_case": None if own else _case_number(mark),
+            }
+        )
+    return rows
+
+
+def _case_number(mark):
+    return f"{mark.get('cisloSenatu')} {mark.get('druhVeci')} {mark.get('bcVec')}/{mark.get('rocnik')}"
 
 
 def _date(text):

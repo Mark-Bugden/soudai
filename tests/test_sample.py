@@ -145,3 +145,18 @@ def test_a_record_for_another_case_is_skipped_like_a_failure():
     numbers = sample.order("OSSTCNB", 5, 2020, 300)
     found, hidden, failed = sample.draw(finder(wrong={numbers[3]}), "OSSTCNB", 5, 2020, 300, wanted=5)
     assert (len(found), hidden, failed) == (5, 0, [numbers[3]])
+
+
+def test_an_appeal_is_marked_with_the_regional_courts_case():
+    case = case_record("case_appealed.json")  # 8 C 1/2023 at Náchod, appealed to Hradec Králové
+    events = sample.event_rows("OSVYCNA", 8, 2023, 1, case)
+    linked = [(e["code"], e["linked_court"], e["linked_case"]) for e in events if e["linked_court"]]
+    assert linked == [
+        ("ODVOLANI", "KSVYCHK", next(_case(e) for e in case["udalosti"] if e["udalost"] == "ODVOLANI"))
+    ]
+    assert all(e["linked_case"] is None for e in events if e["code"] != "ODVOLANI")
+
+
+def _case(event):
+    mark = event["znackaId"]
+    return f"{mark['cisloSenatu']} {mark['druhVeci']} {mark['bcVec']}/{mark['rocnik']}"
