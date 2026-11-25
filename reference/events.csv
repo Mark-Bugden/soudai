@@ -1,7 +1,7 @@
 kind,code,label_cs,tooltip_cs,description_cs,gloss_en
 event,DOVOL_RIZ,Řízení o opravném prostředku na Nejvyšším soudu ČR,Řízení o opravném prostředku na Nejvyšším soudu ČR se myslí zahájení dovolacího řízení na Nejvyšším soudu,Ve spisu byl podán opravný prostředek,Supreme Court review opened
 event,NAD_RIZENI,Řízení u nadřízeného soudu,Řízení u nadřízeného soudu se myslí zahájení souvisejícího řízení na nadřízeném soudu,Ve spisu byl podán opravný prostředek,Proceedings at a higher court opened
-event,NAR_JED,Nařízení jednání,Nařízení jednání je naplánování jednání do jednacího kalendáře soudu,Bylo nařízeno jednání ve věci,Hearing scheduled
+event,NAR_JED,Nařízení jednání,Nařízení jednání je naplánování jednání do jednacího kalendáře soudu,Bylo nařízeno jednání ve věci,Hearing
 event,ODES_SPIS,Odeslání spisu,Odesláním spisu se rozumí: např.: odeslání nadřízenému soudu k prostudování,Spis byl odeslán,File sent out
 event,ODVOLANI,Řízení o opravném prostředku u krajského a vrchního soudu,Řízení o opraveném prostředku u krajského a vrchního soudu se myslí zahájení odvolacího řízení,Ve spisu byl podán opravný prostředek,Appeal opened at the regional or high court
 event,PNS_NASTUP,Poznámka o procesních opatřeních - Procesní nástupnictví,Druhem rozhodnutí ve věci bylo rozhodnutí o procesním nástupnictvím,,Note: succession of a party
