@@ -1,0 +1,180 @@
+{
+ "method": "POST",
+ "url": "https://infosoud.gov.cz/api/v1/rizeni/vyhledej",
+ "body": {
+  "bcVec": 1,
+  "cisloSenatu": 8,
+  "druhOrganizace": "KSVYCHK",
+  "druhVeci": "C",
+  "okresniSoud": "OSVYCNA",
+  "rocnik": 2023
+ },
+ "status": 200,
+ "content_type": "application/json",
+ "response": {
+  "cislo": 8,
+  "druh": "C",
+  "rocnik": 2023,
+  "bcVec": 1,
+  "nadrizenaOrganizace": "Krajský soud Hradec Králové",
+  "organizace": "Okresní soud Náchod",
+  "typOrganizace": "os",
+  "stav": "Odškrtnutá - evidenčně ukončená věc",
+  "stavDatum": "15.06.2023",
+  "napad": null,
+  "udalosti": [
+   {
+    "udalostId": null,
+    "udalost": "ZAHAJ_RIZ",
+    "poradi": 1,
+    "datum": "2022-05-02",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "VYD_ROZH",
+    "poradi": 6,
+    "datum": "2023-02-07",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_VYR",
+    "poradi": 21,
+    "datum": "2023-02-07",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "POD_OP_PR",
+    "poradi": 8,
+    "datum": "2023-02-20",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_PUK",
+    "poradi": 25,
+    "datum": "2023-02-28",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ODES_SPIS",
+    "poradi": 13,
+    "datum": "2023-03-16",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ODVOLANI",
+    "poradi": 1,
+    "datum": "2023-03-21",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 47,
+     "druhVeci": "CO",
+     "bcVec": 55,
+     "rocnik": 2023,
+     "organizace": "KSVYCHK"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "VYR_OP_PR",
+    "poradi": 15,
+    "datum": "2023-03-24",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "VRAC_SPIS",
+    "poradi": 14,
+    "datum": "2023-04-11",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   },
+   {
+    "udalostId": null,
+    "udalost": "ST_VEC_ODS",
+    "poradi": 24,
+    "datum": "2023-06-15",
+    "zruseno": false,
+    "znackaId": {
+     "cisloSenatu": 8,
+     "druhVeci": "C",
+     "bcVec": 1,
+     "rocnik": 2023,
+     "organizace": "OSVYCNA"
+    },
+    "jednani": []
+   }
+  ],
+  "navazneVeci": [],
+  "platneK": "2026-11-22T18:30:00+01:00"
+ }
+}

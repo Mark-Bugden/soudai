@@ -79,10 +79,16 @@ def islands(docket, top):
     return [top + d for d in ABOVE if docket(top + d)]
 
 
-def holes(docket, top, seed):
-    """The numbers below the top that don't exist, from 3 drawn with the seed."""
+def probe_numbers(top, seed):
+    """The 3 numbers below the top that the hole probes ask, drawn with the seed (none for a top of 2 or
+    less). Step 5's sample counts them in, since their timelines are in the cache."""
     below = range(2, top)
-    return [n for n in sorted(random.Random(seed).sample(below, min(HOLES, len(below)))) if not docket(n)]
+    return sorted(random.Random(seed).sample(below, min(HOLES, len(below))))
+
+
+def holes(docket, top, seed):
+    """The numbers below the top that don't exist, from the 3 the probes ask."""
+    return [n for n in probe_numbers(top, seed) if not docket(n)]
 
 
 def count(exists, court, senate, year, hint=None):

@@ -80,6 +80,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 - **Scope.** District-level courts (okresní and obvodní soudy and Městský soud v Brně: 86, confirmed in step 2), register `C`, cases registered 2020–2025, i.e. with case numbers of those years (decided 2026-11-22). Městský soud v Praze is a regional-level court and is out of scope.
 - **Intake is registrations** (decided with Mark, 2026-11-22). A case number's year is the year the case was entered in register C, which for about a quarter of sampled cases is the year after it was filed (see "Filing date and case year" under "Open questions"). Intake is the exact count of cases registered per senate-year, and the demo calls it "cases registered". The courts' official statistics count nearly the same thing. Step 4's counts match "zapsáno" (entered in the register), which runs about 0.5% above "nápad" (see "Official statistics" under "Open questions"). Waits are measured from `ZAHAJ_RIZ`, the filing date.
 - **Pacing.** 1 request a second across the whole project (decided 2026-11-22). On a connection error, wait 30, 60, then 90 s and retry. On any 429, or more than 5 failures in a row, stop the run and record it here. If 1 s draws 429s or keeps resetting, go back to 3 s and tell Mark.
+  - **Raised to 3 a second from step 5 on** (Mark, 2026-11-24). Over intake's 92,195 requests, infosoud answered in 0.15 s on average (found cases) with 4 failures, so one request at a time manages about 2.9 a second. The stop rules are unchanged. Spreading requests over several machines or addresses to go faster isn't done. For more than that, ask the Ministry of Justice, which runs infosoud.
 - **Identification.** User-Agent `soudai/<version> (+https://github.com/Mark-Bugden/soudai)`.
 - **Cache.** Every response, including not-found responses, goes into a SQLite cache at `data/raw/cache.sqlite`: request key, URL, body, status, the response gzipped, and the fetch time. Nothing that's cached is fetched again unless a stage asks to refresh it. The cache is the snapshot, so it's never deleted, and it's never committed.
 - **Privacy.**
@@ -99,7 +100,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Published decisions | rozhodnuti listing | `data/derived/decisions.parquet` | 7,517 requests, 6 h 20 min (step 3) |
 | Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, 10 h 8 min (step 4) |
 | Intake | senates, binary search | `data/derived/intake.csv` | 7,670 senate-years: 92,195 requests, 25 h 42 min (step 4) |
-| Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 60 per court-year: ~31k requests, ~9 h |
+| Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -179,7 +180,7 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   The scores are also broken down by court, and by how far into a case the forecast is made.
 - **Still open:**
   - which event counts as finished;
-  - step 5's sample size: 60 cases per court-year (~31k cases, ~9 h) may be small for the network, and each extra case costs one request;
+  - step 5's sample size: settled with Mark on 2026-11-24 at 400 cases per court-year, 208k in all (see step 5). More can be added later by drawing further down each senate-year's order, if the learning curve says it would help;
   - whether intake's hole probes, which are 3 random cases per senate-year and come with their full timelines, can add to the training data, with the right weights;
   - modelling the different endings (judgment, withdrawal) as competing risks;
   - a transformer as a further comparison;
@@ -434,10 +435,68 @@ Built before the run (2026-11-22), with tests on fake dockets:
 - **A first look at the German tank estimate.** From the published decisions alone, it gives national register C totals of 294,192 (2020), 292,409, 294,591, 287,539, 286,718 and 274,013 (2025). The official nápad is 286,801 for 2020, 295,311 for 2022 and 272,434 for 2025. These are senate-years with published decisions only, before any exact count. Step 6 does this properly.
 
 ### 5. Timeline sample (run, then PR)
-- [ ] Draw 60 cases per court-year, uniformly over the court-year's docket (all its senates' numbers together), with a recorded seed. Each case's weight is the court-year's intake / 60.
-  - Before drawing, settle the sample size with Mark: the remaining-time model may need more than 60 (see "The remaining-time model").
-- [ ] Parse to `data/derived/cases.parquet` (case, court, filing date, status, status date, `platneK`, weight) and `data/derived/events.parquet` (case, code, date, `poradi`, cancelled).
-- [ ] Check that every case has a filing event in its case year and that events order sensibly, and record the share still open by filing year.
+- [x] Draw 60 cases per court-year, uniformly over the court-year's docket (all its senates' numbers together), with a recorded seed. Each case's weight is the court-year's intake / 60.
+  - **Changed with Mark on 2026-11-24, before the run:**
+    - **400 cases per court-year** instead of 60, for the remaining-time model: 208,227 in all.
+    - **Drawn by senate-year** (one senate's cases in one year) rather than over the whole court-year. Each court-year's 400 are split between its senates in proportion to their counts, by largest remainders, with at least 1 each.
+    - **Intake's hole probes count in.** Those are 3 random numbers below each senate-year's top, 22,315 in all, already in the cache with their timelines.
+    - **The order numbers are tried in.** A senate-year's numbers are tried in a fixed order: the probes first, then the rest of 1 to its count, shuffled with the seed `sample-<court>-<senate>-<year>`. A hidden number is skipped, and the next one is drawn.
+    - **Weights.** Each case's weight is its senate-year's count / the cases sampled from it, so the weights add up to intake's counts.
+    - **A small imperfection.** Numbers 1 and the top are slightly less likely to be drawn, since the probes never ask them. That's 2 numbers in a senate-year's median of 234.
+  - **The cost:** 186,000 new requests at 3 a second, about 18 h. The run started on 2026-11-24 at 21:27.
+  - **Run 28 stopped** on 2026-11-25 at 09:20, after 127,624 requests with no failures, on an unexpected answer. Asked for 5 C 294/2020 at Nymburk, infosoud gave that case's 7 events plus a stray "hearing scheduled" of 2018-10-26 stamped "5 C 294/20", whose year (20) became the record's, with no status.
+    - `infosoud.find_case` now raises `WrongCase` for a record of another case. The sample skips it like a hidden number, and any other unexpected answer still stops a run.
+    - The run was resumed from the cache as run 29.
+  - **Runs 28 and 29.** Run 28 made 127,624 requests in 11 h 53 min before the stop, and run 29 made 56,619 in 5 h 16 min. That's 184,243 requests in all, at 2.97 a second, with no failures, no retries and no 429s. infosoud answered in 0.065 s on average.
+  - **208,227 cases,** 22,207 of them from step 4's probes, about 34,700 per year. The weights add up exactly to intake's counts in every year (288,307 for 2020, and so on).
+  - **Skipped:** 788 hidden numbers (0.38% of the numbers tried) and the 1 record for another case. No senate-year fell short of its target.
+  - **Found before the run.** The probes' 22,000 timelines show nearly all cases registered 2020–2025 are already disposed:
+
+    | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+    | --- | --- | --- | --- | --- | --- |
+    | 100% | 99% | 99% | 98% | 98% | 97% |
+
+    The share legally final is 99% for 2020 and 92% for 2025. The 2025 cases took a median of 126 days from filing to disposal, and 90% took 258 days or less. So unfinished cases are a small tail, not most of the recent years.
+- [x] Parse to `data/derived/cases.parquet` (case, court, filing date, status, status date, `platneK`, weight) and `data/derived/events.parquet` (case, code, date, `poradi`, cancelled).
+  - **A case's history includes its linked cases' events.** Of 173,486 cached records, 9,115 (5.3%) hold events stamped (`znackaId`) with another case's number:
+    - 10,552 appeals (`ODVOLANI`), at the regional court's `Co` register;
+    - about 1,100 other higher-court proceedings (`NAD_RIZENI`, registers `Nc`, `Ncp` and `Ncd`);
+    - 2 Supreme Court reviews (`DOVOL_RIZ`);
+    - and the one stray above.
+
+    So `events.parquet` gains `linked_court` and `linked_case`: null for the case's own events, and the other case's court code and number for these. The appeal loop on the map comes from them.
+  - **The tables.** `cases.parquet` is 0.98 MB and `events.parquet` 4.2 MB, with 1,391,808 events (a median of 6 per case, at most 89). `soudai sample --parse-only` rebuilds them from the cache in about 20 s. They hold codes, dates, numbers and infosoud's status labels, and no names.
+  - **Linked-case events** are in 9,783 of the sampled cases (4.7%).
+  - **Statuses (`stav`):**
+
+    | Status | Meaning | Cases |
+    | --- | --- | --- |
+    | Odškrtnutá – evidenčně ukončená věc | closed in the register | 202,543 |
+    | Přerušeno na dobu neurčitou | suspended indefinitely | 1,926 |
+    | Vyřízená věc | disposed | 1,548 |
+    | Nevyřízená věc | not yet disposed | 978 |
+    | Pravomocná věc | legally final | 826 |
+    | Obživlá věc | revived after its decision was quashed | 328 |
+    | none | | 78 |
+
+  - **The records' dates.** Each record is complete to its `platneK`, which is between 2026-11-20 and 2026-11-25. The snapshot spans the run.
+- [x] Check that every case has a filing event in its case year and that events order sensibly, and record the share still open by filing year.
+  - **Filing events.** 76 cases (0.04%) have none.
+    - None was filed after its case year.
+    - **20.0% were filed in an earlier year,** weighted. By court, that runs from 7.5% (Jeseník) to 35.4% (Ostrava), with a median of 18.9%. Those cases were filed a median of 61 days before 1 January, and 90% within 165 days. That fits the EPR transfers (see "Filing date and case year").
+  - **Order.** The case's own first event is the filing in 208,024 of the 208,151 cases that have one. 127 have own events dated before the filing (73 of them hearings). 365 have "legally final" dated before "disposed".
+  - **Odd dates.**
+    - 542 hearings are dated after the snapshot, up to 2028-02-08. They're hearings scheduled ahead, so they're kept.
+    - 3 dates are typos (years 0023, 1021 and 1023).
+    - 13 events fall between 1990 and 2009.
+  - **Still open,** weighted:
+
+    | | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | No disposal event | 0.4% | 0.8% | 0.9% | 1.2% | 1.8% | 3.5% |
+    | No legal-force event | 0.9% | 1.5% | 1.6% | 2.1% | 3.0% | 6.7% |
+
+  - **Median days from filing to disposal,** weighted, among disposed cases: 159 (2020), 158, 148, 147, 146 and 131 (2025). The recent years are biased low by their open tail. Step 6's Kaplan–Meier corrects that.
 
 ### 6. Analysis (PR)
 - [ ] Settle the stage model (see "The journey") and write it here.
@@ -493,7 +552,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
 - **Hidden case numbers** (step 4; settle with Mark before step 5). infosoud doesn't show every case number. In 78 senate-years, case 1 is missing while later numbers exist, and in 17 of them case 2 or 3 is missing too. A senate's counter never skips, so the highest number still counts its registrations, and intake now searches past hidden numbers. What's open:
   - **Why.** Perhaps cases moved to another register or court, cases entered by mistake, or cases infosoud keeps private.
   - **How often** (measured in step 4). 108 of 22,315 random probes below a senate's top were hidden (0.48%), and case 1 in 78 of ~7,620 real senate-years (1.0%). In 38 senate-years the search met a hidden number where it would have stopped, and carried on past it.
-  - **What it means for step 5.** Whether a hidden number should count in a court-year's sample frame. A sampled number that's hidden would be drawn again.
+  - **What it means for step 5** (settled with Mark, 2026-11-24). A sampled number that's hidden is skipped, and the next in the senate-year's order is drawn instead. Hidden numbers still count in the weights, since each senate-year's count includes them.
 - **Older open cases.** The sample covers cases registered 2020–2025, so the direct backlog count misses older cases still open. A small extra sample of 2015–2019 registrations would close the gap if the numbers need it.
 - **Senates above 100.** What are they (e.g. 112 at Okresní soud Ústí nad Orlicí)? Discovery has to cover them either way. A clue from step 2: one day's first page of decisions had senates 106, 112 and 117 at "Okresní soud v Karviné, pobočka Havířov" and 108 at Městský soud v Brně, so a branch's senates may be numbered from 100. Ústí nad Orlicí has no branch, though.
   - **Step 3's answer: they're common, and they come in series.** 22 courts have register C senates above 100 with cases of 2020–2025, usually the same endings under a new hundred.

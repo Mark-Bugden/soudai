@@ -222,5 +222,5 @@ def test_exists_refuses_a_found_case_that_isnt_the_one_asked_for():
     _, found = load("infosoud/case_found.json")  # 15 C 384/2022
     body = infosoud.case_request(*NACHOD, 385, 2022)
     client = FakeClient([(("POST", LOOKUP, body), found)])
-    with pytest.raises(UnexpectedResponse):
+    with pytest.raises(infosoud.WrongCase):  # an UnexpectedResponse, which stops a run
         infosoud.exists(client, *NACHOD, 385, 2022)
