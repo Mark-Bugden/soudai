@@ -81,6 +81,12 @@ class LookupFailed(Exception):
     """The API answered RIZENI_0001, "unexpected error", every time it was asked."""
 
 
+class WrongCase(UnexpectedResponse):
+    """The API answered with a case other than the one asked for. Seen once, in step 5: asked for
+    5 C 294/2020 at Nymburk, it gave that case's events plus a stray one from "5 C 294/20", whose year
+    became the record's."""
+
+
 def find_case(client, regional_code, district_code, register, senate, number, year, attempts=3):
     """A case's record, or None if the number doesn't exist. An error answer is asked again, up to
     `attempts` times in all. A found case must be the one asked for."""
@@ -96,7 +102,7 @@ def find_case(client, regional_code, district_code, register, senate, number, ye
                 number,
                 year,
             ):
-                raise UnexpectedResponse(f"asked for {senate} {register} {number}/{year}, got {case}"[:300])
+                raise WrongCase(f"asked for {senate} {register} {number}/{year}, got {case}"[:300])
             return case
     raise LookupFailed(f"{district_code} {senate} {register} {number}/{year}: {result.message}")
 

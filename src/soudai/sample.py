@@ -5,7 +5,8 @@ split between its senates in proportion to the cases each registered, with at le
 hole probes (3 random numbers below each senate-year's top) are counted in, since their timelines are
 already in the cache. So a senate-year's numbers are tried in this order: the probes first, then the
 rest of 1 to its count, shuffled with a seed made from the court, senate and year. A number infosoud
-hides is skipped, and the next one is tried. Each sampled case stands for count / sampled cases of its
+hides is skipped, and the next one is tried, and so is one whose record is for another case (see
+`infosoud.WrongCase`). Each sampled case stands for count / sampled cases of its
 senate-year: that's its weight.
 
 Writes data/derived/cases.parquet (one row per sampled case) and data/derived/events.parquet (one row
@@ -81,7 +82,8 @@ def order(court, senate, year, count):
 def draw(find, court, senate, year, count, wanted):
     """One senate-year's sample: try its numbers in order until `wanted` cases are found, and never fewer
     than the probes. `find(number)` gives the case's record, or None if infosoud hides the number.
-    Returns ([(number, record, source)], hidden numbers, numbers whose lookups kept failing)."""
+    Returns ([(number, record, source)], hidden numbers, numbers whose lookups kept failing or gave
+    another case's record)."""
     numbers = order(court, senate, year, count)
     probes = set(intake.probe_numbers(count, f"{court}-{senate}-{year}"))
     wanted = max(wanted, len(probes))
@@ -91,7 +93,7 @@ def draw(find, court, senate, year, count, wanted):
             break
         try:
             case = find(number)
-        except infosoud.LookupFailed:
+        except (infosoud.LookupFailed, infosoud.WrongCase):
             failed.append(number)
             continue
         if case is None:
@@ -233,6 +235,7 @@ def summary(cases, events, tally):
         f"with {len(events):,} events",
         "By year: " + ", ".join(f"{year}: {n:,}" for year, n in sorted(by_year.items())),
         "Weights add up to: " + ", ".join(f"{year}: {w:,.0f}" for year, w in sorted(weights.items())),
-        f"Hidden numbers skipped: {tally['hidden']:,}; lookups that kept failing: {tally['failed']:,}",
+        f"Hidden numbers skipped: {tally['hidden']:,}; "
+        f"lookups that kept failing or gave another case: {tally['failed']:,}",
         f"Senate-years short of their target: {tally['short']:,}",
     ]

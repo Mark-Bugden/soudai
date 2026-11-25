@@ -44,13 +44,15 @@ def test_the_order_starts_with_intakes_probes_and_covers_every_number(count):
         assert numbers != sample.order("OSVYCNA", 16, 2022, count)
 
 
-def finder(hidden=(), failing=()):
+def finder(hidden=(), failing=(), wrong=()):
     asked = []
 
     def find(number):
         asked.append(number)
         if number in failing:
             raise infosoud.LookupFailed(str(number))
+        if number in wrong:
+            raise infosoud.WrongCase(str(number))
         return None if number in hidden else {"number": number}
 
     find.asked = asked
@@ -137,3 +139,9 @@ def test_the_weights_add_up_to_the_counts(monkeypatch):
     assert events == []
     _, _, quiet = sample.sample_all(None, todo, courts, keep=False)
     assert quiet["probe"] + quiet["sample"] == len(cases)
+
+
+def test_a_record_for_another_case_is_skipped_like_a_failure():
+    numbers = sample.order("OSSTCNB", 5, 2020, 300)
+    found, hidden, failed = sample.draw(finder(wrong={numbers[3]}), "OSSTCNB", 5, 2020, 300, wanted=5)
+    assert (len(found), hidden, failed) == (5, 0, [numbers[3]])
