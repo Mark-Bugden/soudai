@@ -113,6 +113,7 @@ The tests never touch the network. They run on saved real responses in `tests/fi
 - Every sampled case has `ZAHAJ_RIZ`, and its date falls in the case's year or before. Record the share filed in an earlier year, and the lag, by court.
 - No judge's name appears anywhere in `data/derived/` or the export.
 - The German tank estimator and its interval match a brute-force simulation.
+- The stage model gives the right path and dates for real histories, including revivals, appeals, suspensions and odd dates.
 - The weighted Kaplan–Meier matches hand-worked cases.
 - The export matches its schema and stays under its size budget.
 
@@ -134,7 +135,29 @@ From published decisions alone: for a senate-year with k distinct published case
 
 ### The journey
 
-- **Stage model.** Define it from `reference/events.csv` and about 200 sampled timelines, and write it down here before computing anything. The working model: filing → hearing scheduled → decision → disposed → legally final, with the appeal loop as a branch. Cancelled events (`zruseno`) are dropped. Repeated hearings count once on the map, and their number is kept.
+- **Stage model** (settled with Mark on 2026-11-25, from all 208,227 sampled histories; in `events.py`). Seven stages, and the events that put a case in each. The share is of all cases registered, weighted:
+
+  | Stage | Events | Cases reaching it |
+  | --- | --- | --- |
+  | Filed | `ZAHAJ_RIZ` | 100% |
+  | Hearing | `NAR_JED` | 80.4% |
+  | Decided | `VYD_ROZH`, `ST_VEC_VYR` | 98.4% |
+  | Appeal | `POD_OP_PR`, `ODES_SPIS`, `ODVOLANI`, `NAD_RIZENI`, `DOVOL_RIZ`, `VYR_OP_PR`, `VRAC_SPIS` | 6.3% |
+  | Revived | `ST_VEC_OBZ` | 4.8% |
+  | Suspended | `ST_VEC_PRE` | 3.2% |
+  | Legally final | `ST_VEC_PUK` | 97.4% |
+
+  - **Order.** A case's events are read by date, then `poradi`, with the filing first on its day. Cancelled events are left off, and so are events dated before the filing.
+  - **Visits.** A visit is a run of events in one stage, so repeated hearings are one visit, and each visit keeps its number of events.
+  - **Going back.** Cases can return to a stage, from revived to hearing, say. 5.5% do, and the map draws those as edges going back.
+  - **The end.** A path stops at the first "legally final". Later events are left off, such as an appeal about costs after the main decision became final.
+  - **Not on the map:** cancelled events; "proceedings resumed" (`ST_VEC_UPR`), which only ends a suspension; "closed in the register" (`ST_VEC_ODS`), which is bookkeeping a median of 27 days after legal force; and the 11 codes the sample never uses.
+  - **"Appeal"** is any challenge to a decision: an appeal to the regional court (Městský soud v Praze for Prague's courts), an objection handled by the district court itself, or a higher court ruling on a side question, such as which court hears the case (`NAD_RIZENI`, 0.5% of cases).
+  - **"Decided"** reads the decision as well as the disposal, because infosoud overwrites a revived case's first disposal date (see step 6).
+  - **An edge's wait** runs from the day a case enters one stage to the day it enters the next.
+- **Finished means legally final** (Mark, 2026-11-25), both for the journey's end and for the model (`events.outcomes`).
+  - A case finishes at its first `ST_VEC_PUK`. The 0.31% closed in the register without one finish at their closing. A case still open is censored at its `platneK`.
+  - **Disposal** stays as the time-to-a-decision curve and the map's measure, since it's the district court's own time. It's a case's latest `ST_VEC_VYR`, unless the case was revived after it and is still open. It's never later than the case's end: 340 cases show a disposal after their legal force. A case that finished with no disposal date counts as disposed when it finished.
 - **Weights.** The sample is stratified by court and year, so each case carries the weight intake / sample size. Every share and curve is weighted.
 - **Edges.** The weighted share of cases taking each transition, and the wait on it from a weighted Kaplan–Meier fit (median and interquartile range). A case that hasn't reached its next event is censored at its `platneK`.
 - **Curves.** Time from filing to disposal, and to legal force, as "share still open after t months", per court and nationally.
@@ -145,7 +168,7 @@ From published decisions alone: for a senate-year with k distinct published case
 Decided with Mark on 2026-11-23. He wants the portfolio to show more machine learning, in particular deep learning and business value. Language models aren't needed. Any framing of the model is Mark's to write.
 
 - **The question.** Given everything that has happened to a case so far, what's the chance it finishes in each of the next 36 months? From those come the chances it finishes within 1, 3, 6 or 12 months.
-- **How it follows from the map.** The map gives averages: from each stage, what usually happens next and how long it takes. The model answers the same question for one case, from its whole history: every event, the gaps between them, and the court. That includes what the map simplifies away, such as repeated hearings and cancellations. The map is the yardstick. The model only earns its place if it beats the map's averages.
+- **How it follows from the map.** The map gives averages: from each stage, what usually happens next and how long it takes. The model answers the same question for one case, from its whole history: every event, the gaps between them, and the court. That includes what the map simplifies away, such as repeated hearings. The map is the yardstick. The model only earns its place if it beats the map's averages.
 - **The network.** A recurrent neural network of the GRU type (Cho et al. 2014), with a discrete-time survival output, also called "logistic hazard" (Gensheimer & Narasimhan 2019; Kvamme & Borgan 2021). The closest published model is Dynamic-DeepHit (Lee, Yoon & van der Schaar 2019). In process mining, the field is called predictive process monitoring (Tax, Verenich, La Rosa & Dumas 2017). The starting sizes, to be tuned:
   - **Each event is 10 numbers:** its type, one of 28, as 8 learned numbers (an 8 × 28 weight matrix applied to a one-hot vector); log(1 + days since the previous event); and log(1 + days since filing).
   - **The hidden state** is a vector of 32 numbers, starting at zeros. The GRU updates it once per event, with the same weights at every step.
@@ -153,9 +176,9 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   - **The outputs.** Output k, p_k, is the chance the case ends in month k, given that it's open at the start of that month. The chance it's still open after k months is (1 − p₁)…(1 − p_k).
   - **Size:** about 7,100 weights and biases, small enough to run in the demo.
 - **The training data** is step 5's sample of timelines:
-  1. Drop cancelled events, and sort by date, then by `poradi`.
-  2. Choose the event that counts as finished (still open: disposal or legal force).
-  3. Cut each case after each of its events before the end, making each cut one example. An example is the events so far, plus either the month the case ended in or "still open after n months", counted to its `platneK`.
+  1. Read the events as the stage model does (`events.log`): cancelled ones and those dated before the filing are dropped, and the rest are sorted by date, then by `poradi`. Mark confirmed on 2026-11-25 that cancellations stay out of the model.
+  2. A case finishes when it becomes legally final, or at its closing if it's closed without that (settled 2026-11-25; see "The journey").
+  3. Cut each case at the end of each day with events before the end, making each cut one example. A hearing and its decision usually share a date, so a cut between them would make the forecast trivial. And `NAR_JED` is dated the day the hearing is held, so the model only learns of a hearing when it happens, never ahead. An example is the events so far, plus either the month the case ended in or "still open after n months", counted to its `platneK`.
   4. Weight each example by its case's sampling weight.
   5. Split by time: train on earlier registration years, and test on later ones.
   6. In a batch, pad shorter cases to the same length, and mark which steps are real.
@@ -171,7 +194,7 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   4. **Gradient-boosted trees** (XGBoost or LightGBM) on the same features, predicting the same 36 monthly chances.
   5. **The GRU network.**
 
-  The hand-made features are the court, the current stage, the time since filing and since the last event, the number of hearings and of cancellations so far, whether there has been an appeal, and whether a decision has been issued. An optional extra is the network's output layers fed the hand-made features instead of the sequence. It separates "a neural network helps" from "reading the sequence helps". If the GRU doesn't clearly beat the trees, the write-up says so.
+  The hand-made features are the court, the current stage, the time since filing and since the last event, the number of hearings so far, whether there has been an appeal, and whether a decision has been issued. An optional extra is the network's output layers fed the hand-made features instead of the sequence. It separates "a neural network helps" from "reading the sequence helps". If the GRU doesn't clearly beat the trees, the write-up says so.
 - **Scoring.** Every model is scored the same way, on the same held-out later years:
   - **concordance:** how often the model correctly ranks which of two cases finishes first;
   - **the Brier score** at 6, 12 and 24 months, corrected for censoring;
@@ -179,7 +202,6 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
 
   The scores are also broken down by court, and by how far into a case the forecast is made.
 - **Still open:**
-  - which event counts as finished;
   - step 5's sample size: settled with Mark on 2026-11-24 at 400 cases per court-year, 208k in all (see step 5). More can be added later by drawing further down each senate-year's order, if the learning curve says it would help;
   - whether intake's hole probes, which are 3 random cases per senate-year and come with their full timelines, can add to the training data, with the right weights;
   - modelling the different endings (judgment, withdrawal) as competing risks;
@@ -327,7 +349,7 @@ pyproject.toml, uv.lock        a uv project
   - Hand-checked: the areas against the 76 okresy and Prague's 10 districts. Every district-level name in six whole days of decisions maps to one court, and 85 of 86 courts appeared. Hodonín's name is unconfirmed until step 3. `reference/README.md` has the details.
 - [x] `reference/events.csv`: each event code with its Czech label and tooltip from the app's bundle (the non-Supreme-Court set) and an English gloss. Add the status values. Mark checks the glosses.
   - 28 event codes from `chunk-KZJVN2ZT.js`, each with label, tooltip and description, and 4 statuses. The 54 timelines fetched in this step used 9 of them: `ZAHAJ_RIZ`, `NAR_JED`, `ZRUS_JED`, `VYD_ROZH`, `ST_VEC_VYR`, `ST_VEC_PUK`, `ST_VEC_ODS`, `ST_VEC_PRE` and `ST_VEC_UPR`. The feasibility check's other codes (`ODVOLANI`, `ODES_SPIS`, `VRAC_SPIS`, `POD_OP_PR`, `VYR_OP_PR`) are all in the bundle.
-  - **For Mark:** the glosses are short labels for the demo, e.g. `ZAHAJ_RIZ` "Case filed", `ST_VEC_VYR` "Case disposed", `ST_VEC_PUK` "Legally final", `ST_VEC_ODS` "Case closed in the register". Edit them in the CSV: `soudai events` keeps them.
+  - **For Mark:** the glosses are short labels for the demo, e.g. `ZAHAJ_RIZ` "Case filed", `ST_VEC_VYR` "Case disposed", `ST_VEC_PUK` "Legally final", `ST_VEC_ODS` "Case closed in the register". Edit them in the CSV: `soudai events` keeps them. Mark changed `NAR_JED` to "Hearing" on 2026-11-25 (see step 6). The rest are still to check.
 - [x] `reference/sources.json`: endpoints, the date checked and the backend version.
 - [x] `soudai status`, and the offline tests.
   - `uv run soudai <stage>` has `courts` (`--write`), `events` and `status`. `status` reports the cache, the last runs, the day pages cached against the cached month indexes, case lookups by the case number's year and by outcome (found, not found, error, or unexpected), the reference tables and the derived tables. It never creates the cache.
@@ -499,7 +521,21 @@ Built before the run (2026-11-22), with tests on fake dockets:
   - **Median days from filing to disposal,** weighted, among disposed cases: 159 (2020), 158, 148, 147, 146 and 131 (2025). The recent years are biased low by their open tail. Step 6's Kaplan–Meier corrects that.
 
 ### 6. Analysis (PR)
-- [ ] Settle the stage model (see "The journey") and write it here.
+- [x] Settle the stage model (see "The journey") and write it here.
+  - **Settled with Mark on 2026-11-25:** the seven stages and their rules (see "The journey"), and legally final as "finished". Cancelled events stay out of the model too. The gloss of `NAR_JED` is now "Hearing" instead of "Hearing scheduled", since its date is the hearing's own.
+  - **In code:** `events.log` gives the events the journey reads. `events.journey` gives one row per stage visit: 832,772 for the 208,151 cases with a filing. `events.outcomes` gives each case's filing, disposal and end dates, with how it ended: 202,851 legally final, 650 closed in the register without that, and 4,650 still open. 25 tests run on real histories.
+  - **What the histories show,** weighted:
+    - **Two routes cover 87.4% of cases:** filed → hearing → decided → legally final (71.8%), and filed → decided → legally final (15.6%). There are 1,221 distinct paths, and the 10 commonest cover 93.8%.
+    - **`NAR_JED` is dated the day the hearing is held,** not the day it was ordered. In 90% of cases the first decision comes the same day as the first hearing. Hearings are dated up to 2028, and cancellations a median of 6 days before the hearing they cancel.
+    - **Hearings:** 19.6% of cases have none, 74.8% one, and 5.7% two or more.
+    - **The decision and the disposal fall on the same day in 96% of cases.** Legal force follows a median of 30 days later with no appeal, and 123 days with one. Closing in the register follows a median of 27 days after legal force.
+    - **infosoud overwrites a case's disposal date when it's disposed again.** A case can only be revived after a disposal. Yet only 11% of revived cases that were later decided again show a disposal before the revival, against 98.8% of the 328 still waiting for a new decision. Only 0.01% of cases show two disposal dates.
+    - **Revivals:** 5.0% of cases. 87% of them involve no appeal court, and 78% have no hearing before them. The usual pattern is a decision a median of 7 weeks after filing, cancelled a median of 57 days later, then a hearing and a new decision. The first decision is probably a payment order the defendant objected to, but that's inferred.
+    - **Appeals:** 5.7% of cases have a remedy filed, and 4.3% reach an appeal court (`ODVOLANI`). Of those, 61% next become legally final and 14% are revived. The rest are still open, or the appeal came after the case was final.
+    - **Cancelled hearings:** 9.4% of cases. Each comes as a pair, both marked `zruseno`: the hearing at its planned date, and `ZRUS_JED` on the day it was called off.
+    - **Suspensions:** 3.2% of cases, resumed after a median of 281 days. 29% of those are still suspended.
+    - **11 of the 28 codes never appear:** the four `PNS_*` notes, `PREVD_SPIS`, `PR_VEC_NS`, `SPIS_K_SC`, `SPIS_K_SO`, `SPIS_OD_SC`, `SPIS_OD_SO` and `VR_SP_NS`.
+    - **Odd dates.** 143 of the cases' own events, in 127 cases, are dated before the filing, including the three typos (years 0023, 1021 and 1023), and are left off. The 76 cases with no filing have no events and no status at all, and are left out (466 cases by weight, 0.03%). Filings long before the case year are kept: 387 cases were filed 2 or more years before their case year, the earliest in 1999. They were probably moved in from another court or register.
 - [ ] Journey: weighted transition shares, Kaplan–Meier waits and curves, and the top variants, per court and nationally.
 - [ ] Exact intake by court-year and nationally, and the external check.
 - [ ] German tank estimates and intervals, compared with the exact counts by year, plus the undercount from senates with no published decisions.
