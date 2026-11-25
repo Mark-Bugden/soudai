@@ -182,7 +182,7 @@ def run():
     cases, log = load()
     tables = analyse(cases, log)
     for name, table in tables.items():
-        table.to_csv(OUT[name], index=False, float_format="%.6g", lineterminator="\n")
+        table.to_csv(OUT[name], index=False, float_format="%.8g", lineterminator="\n")
         print(f"Wrote {len(table):,} rows to {OUT[name]}")
     summary = tables["summary"].set_index("scope").loc["all"]
     print(

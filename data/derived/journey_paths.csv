@@ -1,891 +1,891 @@
 scope,path,ending,share,sampled
-all,filed > hearing > decided > final,final,0.718242,147156
-all,filed > decided > final,final,0.156219,33737
-all,filed > hearing > decided > appeal > final,final,0.0164188,3279
-all,filed > decided > revived > hearing > decided > final,final,0.0161627,4042
-all,filed > suspended > decided > final,final,0.0084458,1706
-all,filed > suspended,open,0.0073762,1524
-all,filed > decided > appeal > final,final,0.00450844,935
-all,filed > suspended > hearing > decided > final,final,0.00402901,825
-all,filed > decided > appeal > revived > hearing > decided > final,final,0.00393063,992
-all,filed > appeal > decided > appeal > final,final,0.00325139,682
-all,filed > revived > hearing > decided > final,final,0.00287206,604
-all,filed > hearing > decided > revived > final,final,0.00252851,498
-all,filed > decided > revived > decided > final,final,0.00248682,612
-all,filed > hearing > decided,open,0.00207603,413
-all,filed > decided,closed,0.00198246,384
-all,filed > hearing > decided > appeal > decided > appeal > final,final,0.00183123,480
-all,filed > hearing > suspended > decided > final,final,0.00181143,394
-all,filed > hearing > decided > appeal,open,0.00178364,357
-all,filed > decided > appeal > revived > decided > final,final,0.00171983,416
-all,filed > appeal > decided > final,final,0.00166692,344
-all,filed > appeal > hearing > decided > final,final,0.00164134,355
-all,filed > hearing > decided > revived > decided > final,final,0.00136235,286
-all,filed > hearing,open,0.00132012,306
-all,filed > hearing > appeal > hearing > decided > final,final,0.00119731,279
-all,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.00118536,282
-all,filed > appeal > hearing > decided > appeal > final,final,0.00102194,185
-all,filed > hearing > suspended,open,0.000982016,185
-all,filed,open,0.00093454,167
-all,filed > hearing > suspended > hearing > decided > final,final,0.000933977,208
-all,filed > hearing > appeal > hearing > decided > appeal > final,final,0.000834319,167
-OSJICCB,filed > hearing > decided > final,final,0.766921,1839
-OSJICCB,filed > decided > final,final,0.122058,294
-OSJICCB,filed > revived > hearing > decided > final,final,0.020727,51
-OSJICCB,filed > hearing > decided > appeal > final,final,0.0152561,36
-OSJICCB,filed > decided > appeal > final,final,0.00689478,17
-OSJICCB,filed > appeal > revived > hearing > decided > final,final,0.00561147,14
-OSJICCB,filed > appeal > revived > decided > final,final,0.00458452,11
-OSJICCB,filed > decided,closed,0.00339613,8
-OSJICCB,filed > appeal > decided > final,final,0.00327471,8
-OSJICCB,filed > suspended > decided > final,final,0.0032681,8
-OSJICCK,filed > hearing > decided > final,final,0.808519,1938
-OSJICCK,filed > decided > final,final,0.0954098,230
-OSJICCK,filed > decided > revived > hearing > decided > final,final,0.0217094,52
-OSJICCK,filed > hearing > decided > appeal > final,final,0.0108048,26
-OSJICCK,filed > suspended,open,0.00623769,15
-OSJICCK,filed > suspended > decided > final,final,0.00578514,14
-OSJICCK,filed > decided > appeal > revived > appeal > hearing > decided > final,final,0.00415584,10
-OSJICCK,filed > decided > revived > decided > final,final,0.00415449,10
-OSJICCK,filed > decided > appeal > final,final,0.00254909,6
-OSJICCK,filed > hearing > decided > appeal > decided > appeal > final,final,0.0025483,6
-OSJICJH,filed > decided > final,final,0.49717,1190
-OSJICJH,filed > hearing > decided > final,final,0.338487,818
-OSJICJH,filed > decided > revived > hearing > decided > final,final,0.0347268,83
-OSJICJH,filed > decided > revived > decided > final,final,0.0149219,35
-OSJICJH,filed > decided > appeal > revived > hearing > decided > final,final,0.0122647,29
-OSJICJH,filed > hearing > decided > appeal > final,final,0.0115175,28
-OSJICJH,filed > appeal > decided > appeal > final,final,0.00621964,15
-OSJICJH,filed > suspended,open,0.00559013,14
-OSJICJH,filed > hearing > decided > revived > decided > final,final,0.00558736,13
-OSJICJH,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.00497735,12
-OSJICPE,filed > hearing > decided > final,final,0.661129,1575
-OSJICPE,filed > decided > final,final,0.19889,480
-OSJICPE,filed > decided > revived > hearing > decided > final,final,0.0249603,61
-OSJICPE,filed > hearing > decided > appeal > final,final,0.0158594,38
-OSJICPE,filed > suspended > decided > final,final,0.00890249,21
-OSJICPE,filed > decided > appeal > revived > hearing > decided > final,final,0.00862753,21
-OSJICPE,filed > decided > appeal > final,final,0.00728748,17
-OSJICPE,filed > decided > appeal > revived > decided > final,final,0.00659272,16
-OSJICPE,filed > suspended,open,0.00634635,15
-OSJICPE,filed > appeal > decided > appeal > final,final,0.00502928,12
-OSJICPI,filed > hearing > decided > final,final,0.696115,1648
-OSJICPI,filed > decided > final,final,0.173877,431
-OSJICPI,filed > decided > revived > hearing > decided > final,final,0.022048,53
-OSJICPI,filed > hearing > decided > appeal > final,final,0.0135885,33
-OSJICPI,filed > suspended > decided > final,final,0.00582511,15
-OSJICPI,filed > suspended,open,0.00488247,11
-OSJICPI,filed > appeal > decided > appeal > final,final,0.00429119,11
-OSJICPI,filed > decided > revived > decided > final,final,0.00414441,11
-OSJICPI,filed > decided > appeal > final,final,0.0037838,9
-OSJICPI,filed > decided > appeal > revived > hearing > decided > final,final,0.00360931,10
-OSJICPT,filed > hearing > decided > final,final,0.764967,1818
-OSJICPT,filed > decided > final,final,0.128665,310
-OSJICPT,filed > decided > revived > hearing > decided > final,final,0.0220015,57
-OSJICPT,filed > hearing > decided > appeal > final,final,0.0158899,38
-OSJICPT,filed > decided > appeal > final,final,0.00948891,24
-OSJICPT,filed > suspended,open,0.00704403,17
-OSJICPT,filed > decided > appeal > revived > hearing > decided > final,final,0.00378137,9
-OSJICPT,filed > suspended > decided > final,final,0.00346361,8
-OSJICPT,filed > appeal > decided > appeal > final,final,0.0030161,7
-OSJICPT,filed > hearing,open,0.00274468,7
-OSJICST,filed > hearing > decided > final,final,0.69528,1659
-OSJICST,filed > decided > final,final,0.187779,456
-OSJICST,filed > decided > revived > hearing > decided > final,final,0.0201018,48
-OSJICST,filed > hearing > decided > appeal > final,final,0.0169873,40
-OSJICST,filed > decided > appeal > revived > hearing > decided > final,final,0.0101878,26
-OSJICST,filed > appeal > decided > appeal > final,final,0.00578492,14
-OSJICST,filed > decided > appeal > final,final,0.00536578,13
-OSJICST,filed > suspended > decided > final,final,0.00479205,12
-OSJICST,filed > decided,closed,0.00445586,11
-OSJICST,filed > decided > revived > decided > final,final,0.0037922,9
-OSJICTA,filed > hearing > decided > final,final,0.700396,1682
-OSJICTA,filed > decided > final,final,0.168053,404
-OSJICTA,filed > revived > hearing > decided > final,final,0.0264523,63
-OSJICTA,filed > decided > revived > hearing > decided > final,final,0.0210345,50
-OSJICTA,filed > hearing > decided > appeal > final,final,0.0132749,32
-OSJICTA,filed > decided > appeal > revived > hearing > decided > final,final,0.00515545,12
-OSJICTA,filed > suspended,open,0.00500615,12
-OSJICTA,filed > suspended > decided > final,final,0.00492578,12
-OSJICTA,filed > suspended > hearing > decided > final,final,0.00383602,9
+all,filed > hearing > decided > final,final,0.71824167,147156
+all,filed > decided > final,final,0.1562193,33737
+all,filed > hearing > decided > appeal > final,final,0.016418783,3279
+all,filed > decided > revived > hearing > decided > final,final,0.016162666,4042
+all,filed > suspended > decided > final,final,0.0084458023,1706
+all,filed > suspended,open,0.0073761983,1524
+all,filed > decided > appeal > final,final,0.0045084405,935
+all,filed > suspended > hearing > decided > final,final,0.0040290063,825
+all,filed > decided > appeal > revived > hearing > decided > final,final,0.0039306265,992
+all,filed > appeal > decided > appeal > final,final,0.0032513936,682
+all,filed > revived > hearing > decided > final,final,0.0028720607,604
+all,filed > hearing > decided > revived > final,final,0.0025285134,498
+all,filed > decided > revived > decided > final,final,0.0024868233,612
+all,filed > hearing > decided,open,0.0020760346,413
+all,filed > decided,closed,0.0019824636,384
+all,filed > hearing > decided > appeal > decided > appeal > final,final,0.0018312299,480
+all,filed > hearing > suspended > decided > final,final,0.0018114268,394
+all,filed > hearing > decided > appeal,open,0.0017836357,357
+all,filed > decided > appeal > revived > decided > final,final,0.0017198311,416
+all,filed > appeal > decided > final,final,0.0016669186,344
+all,filed > appeal > hearing > decided > final,final,0.0016413373,355
+all,filed > hearing > decided > revived > decided > final,final,0.0013623491,286
+all,filed > hearing,open,0.0013201225,306
+all,filed > hearing > appeal > hearing > decided > final,final,0.0011973053,279
+all,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.0011853636,282
+all,filed > appeal > hearing > decided > appeal > final,final,0.0010219427,185
+all,filed > hearing > suspended,open,0.00098201609,185
+all,filed,open,0.00093453958,167
+all,filed > hearing > suspended > hearing > decided > final,final,0.00093397697,208
+all,filed > hearing > appeal > hearing > decided > appeal > final,final,0.00083431949,167
+OSJICCB,filed > hearing > decided > final,final,0.76692149,1839
+OSJICCB,filed > decided > final,final,0.12205807,294
+OSJICCB,filed > revived > hearing > decided > final,final,0.020727042,51
+OSJICCB,filed > hearing > decided > appeal > final,final,0.015256073,36
+OSJICCB,filed > decided > appeal > final,final,0.0068947774,17
+OSJICCB,filed > appeal > revived > hearing > decided > final,final,0.0056114704,14
+OSJICCB,filed > appeal > revived > decided > final,final,0.0045845164,11
+OSJICCB,filed > decided,closed,0.0033961335,8
+OSJICCB,filed > appeal > decided > final,final,0.003274711,8
+OSJICCB,filed > suspended > decided > final,final,0.0032681033,8
+OSJICCK,filed > hearing > decided > final,final,0.80851935,1938
+OSJICCK,filed > decided > final,final,0.09540982,230
+OSJICCK,filed > decided > revived > hearing > decided > final,final,0.021709405,52
+OSJICCK,filed > hearing > decided > appeal > final,final,0.010804795,26
+OSJICCK,filed > suspended,open,0.0062376922,15
+OSJICCK,filed > suspended > decided > final,final,0.0057851421,14
+OSJICCK,filed > decided > appeal > revived > appeal > hearing > decided > final,final,0.004155842,10
+OSJICCK,filed > decided > revived > decided > final,final,0.0041544923,10
+OSJICCK,filed > decided > appeal > final,final,0.0025490892,6
+OSJICCK,filed > hearing > decided > appeal > decided > appeal > final,final,0.0025482981,6
+OSJICJH,filed > decided > final,final,0.4971705,1190
+OSJICJH,filed > hearing > decided > final,final,0.33848739,818
+OSJICJH,filed > decided > revived > hearing > decided > final,final,0.034726753,83
+OSJICJH,filed > decided > revived > decided > final,final,0.014921908,35
+OSJICJH,filed > decided > appeal > revived > hearing > decided > final,final,0.012264738,29
+OSJICJH,filed > hearing > decided > appeal > final,final,0.011517483,28
+OSJICJH,filed > appeal > decided > appeal > final,final,0.0062196429,15
+OSJICJH,filed > suspended,open,0.0055901292,14
+OSJICJH,filed > hearing > decided > revived > decided > final,final,0.005587363,13
+OSJICJH,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.0049773491,12
+OSJICPE,filed > hearing > decided > final,final,0.66112864,1575
+OSJICPE,filed > decided > final,final,0.19888962,480
+OSJICPE,filed > decided > revived > hearing > decided > final,final,0.024960288,61
+OSJICPE,filed > hearing > decided > appeal > final,final,0.015859443,38
+OSJICPE,filed > suspended > decided > final,final,0.0089024905,21
+OSJICPE,filed > decided > appeal > revived > hearing > decided > final,final,0.0086275273,21
+OSJICPE,filed > decided > appeal > final,final,0.0072874751,17
+OSJICPE,filed > decided > appeal > revived > decided > final,final,0.006592722,16
+OSJICPE,filed > suspended,open,0.0063463546,15
+OSJICPE,filed > appeal > decided > appeal > final,final,0.0050292816,12
+OSJICPI,filed > hearing > decided > final,final,0.69611497,1648
+OSJICPI,filed > decided > final,final,0.17387749,431
+OSJICPI,filed > decided > revived > hearing > decided > final,final,0.022047974,53
+OSJICPI,filed > hearing > decided > appeal > final,final,0.013588548,33
+OSJICPI,filed > suspended > decided > final,final,0.0058251141,15
+OSJICPI,filed > suspended,open,0.0048824717,11
+OSJICPI,filed > appeal > decided > appeal > final,final,0.004291187,11
+OSJICPI,filed > decided > revived > decided > final,final,0.004144411,11
+OSJICPI,filed > decided > appeal > final,final,0.0037837961,9
+OSJICPI,filed > decided > appeal > revived > hearing > decided > final,final,0.0036093096,10
+OSJICPT,filed > hearing > decided > final,final,0.76496739,1818
+OSJICPT,filed > decided > final,final,0.12866489,310
+OSJICPT,filed > decided > revived > hearing > decided > final,final,0.022001451,57
+OSJICPT,filed > hearing > decided > appeal > final,final,0.015889901,38
+OSJICPT,filed > decided > appeal > final,final,0.0094889084,24
+OSJICPT,filed > suspended,open,0.0070440315,17
+OSJICPT,filed > decided > appeal > revived > hearing > decided > final,final,0.0037813662,9
+OSJICPT,filed > suspended > decided > final,final,0.0034636141,8
+OSJICPT,filed > appeal > decided > appeal > final,final,0.0030161025,7
+OSJICPT,filed > hearing,open,0.0027446766,7
+OSJICST,filed > hearing > decided > final,final,0.69528023,1659
+OSJICST,filed > decided > final,final,0.18777893,456
+OSJICST,filed > decided > revived > hearing > decided > final,final,0.02010184,48
+OSJICST,filed > hearing > decided > appeal > final,final,0.016987349,40
+OSJICST,filed > decided > appeal > revived > hearing > decided > final,final,0.010187828,26
+OSJICST,filed > appeal > decided > appeal > final,final,0.0057849178,14
+OSJICST,filed > decided > appeal > final,final,0.0053657786,13
+OSJICST,filed > suspended > decided > final,final,0.0047920545,12
+OSJICST,filed > decided,closed,0.004455862,11
+OSJICST,filed > decided > revived > decided > final,final,0.0037921966,9
+OSJICTA,filed > hearing > decided > final,final,0.70039623,1682
+OSJICTA,filed > decided > final,final,0.16805349,404
+OSJICTA,filed > revived > hearing > decided > final,final,0.026452286,63
+OSJICTA,filed > decided > revived > hearing > decided > final,final,0.021034479,50
+OSJICTA,filed > hearing > decided > appeal > final,final,0.01327485,32
+OSJICTA,filed > decided > appeal > revived > hearing > decided > final,final,0.0051554527,12
+OSJICTA,filed > suspended,open,0.0050061549,12
+OSJICTA,filed > suspended > decided > final,final,0.0049257772,12
+OSJICTA,filed > suspended > hearing > decided > final,final,0.0038360245,9
 OSJICTA,filed > decided > appeal > final,final,0.00377821,9
-OSJIMBK,filed > hearing > decided > final,final,0.703858,1693
+OSJIMBK,filed > hearing > decided > final,final,0.70385783,1693
 OSJIMBK,filed > decided > final,final,0.157089,380
-OSJIMBK,filed > decided > revived > hearing > decided > final,final,0.0254512,61
-OSJIMBK,filed > hearing > decided > appeal > final,final,0.0121242,29
-OSJIMBK,filed > suspended > decided > final,final,0.0113452,27
-OSJIMBK,filed > decided > appeal > revived > hearing > decided > final,final,0.00786121,19
-OSJIMBK,filed > decided > appeal > final,final,0.00667708,16
-OSJIMBK,filed > hearing > suspended > decided > final,final,0.00667256,16
-OSJIMBK,filed > decided > revived > decided > final,final,0.00610772,15
-OSJIMBK,filed > suspended,open,0.00586319,14
-OSJIMBM,filed > hearing > decided > final,final,0.679423,1666
-OSJIMBM,filed > decided > final,final,0.15245,559
-OSJIMBM,filed > decided > revived > hearing > decided > final,final,0.0239934,154
-OSJIMBM,filed > suspended,open,0.0201181,51
-OSJIMBM,filed > hearing > decided > appeal > final,final,0.0170717,44
-OSJIMBM,filed > suspended > decided > final,final,0.0139792,37
-OSJIMBM,filed > decided > appeal > revived > hearing > decided > final,final,0.00690774,45
-OSJIMBM,filed > suspended > hearing > decided > final,final,0.00629935,18
-OSJIMBM,filed,open,0.00615689,16
-OSJIMBM,filed > decided > appeal > final,final,0.00459458,15
-OSJIMBO,filed > hearing > decided > final,final,0.689023,1653
-OSJIMBO,filed > decided > final,final,0.167421,396
-OSJIMBO,filed > hearing > decided > appeal > final,final,0.0190065,47
-OSJIMBO,filed > suspended > decided > final,final,0.0104078,26
-OSJIMBO,filed > decided > revived > hearing > decided > final,final,0.0100212,25
-OSJIMBO,filed > decided > appeal > revived > hearing > decided > final,final,0.00918747,23
-OSJIMBO,filed > suspended,open,0.00819823,20
-OSJIMBO,filed > hearing > decided > revived > final,final,0.00676574,16
-OSJIMBO,filed > suspended > hearing > decided > final,final,0.00441071,11
-OSJIMBO,filed > decided > appeal > final,final,0.00421493,11
-OSJIMBV,filed > hearing > decided > final,final,0.672387,1617
-OSJIMBV,filed > decided > final,final,0.171369,411
-OSJIMBV,filed > suspended > decided > final,final,0.0205991,51
-OSJIMBV,filed > decided > revived > hearing > decided > final,final,0.0177625,44
-OSJIMBV,filed > hearing > decided > appeal > final,final,0.0173933,42
-OSJIMBV,filed > suspended,open,0.0147668,34
-OSJIMBV,filed > suspended > hearing > decided > final,final,0.0127665,31
-OSJIMBV,filed > decided > appeal > final,final,0.00752173,18
-OSJIMBV,filed,open,0.00567751,12
-OSJIMBV,filed > hearing > decided,open,0.00507785,11
-OSJIMHO,filed > hearing > decided > final,final,0.711247,1706
-OSJIMHO,filed > decided > final,final,0.150391,361
-OSJIMHO,filed > suspended > decided > final,final,0.0157057,38
-OSJIMHO,filed > hearing > decided > appeal > final,final,0.0156454,38
-OSJIMHO,filed > decided > revived > hearing > decided > final,final,0.0127171,31
-OSJIMHO,filed > suspended,open,0.00802275,19
-OSJIMHO,filed > decided > appeal > final,final,0.00490707,12
-OSJIMHO,filed > suspended > hearing > decided > final,final,0.00485634,12
-OSJIMHO,filed > decided > appeal > revived > hearing > decided > final,final,0.00420909,10
-OSJIMHO,filed > hearing > decided > revived > decided > final,final,0.00420164,10
-OSJIMJI,filed > hearing > decided > final,final,0.7642,1831
-OSJIMJI,filed > decided > final,final,0.149028,364
-OSJIMJI,filed > decided > revived > hearing > decided > final,final,0.0170975,45
-OSJIMJI,filed > suspended,open,0.00905688,22
-OSJIMJI,filed > hearing > decided > appeal > final,final,0.00674883,17
-OSJIMJI,filed > suspended > decided > final,final,0.00567869,14
-OSJIMJI,filed > decided > appeal > final,final,0.00428045,11
-OSJIMJI,filed > decided > appeal > revived > hearing > decided > final,final,0.00405725,10
-OSJIMJI,filed > suspended > hearing > decided > final,final,0.00318735,8
-OSJIMJI,filed > decided,closed,0.00260767,6
-OSJIMKM,filed > hearing > decided > final,final,0.738833,1771
-OSJIMKM,filed > decided > final,final,0.1491,356
-OSJIMKM,filed > decided > revived > hearing > decided > final,final,0.0168683,40
-OSJIMKM,filed > hearing > decided > appeal > final,final,0.0138294,33
-OSJIMKM,filed > suspended > decided > final,final,0.00789522,19
-OSJIMKM,filed > decided > appeal > revived > hearing > decided > final,final,0.00707578,17
-OSJIMKM,filed > suspended,open,0.00632698,15
-OSJIMKM,filed > hearing > decided > appeal,open,0.00435938,10
-OSJIMKM,filed > suspended > hearing > decided > final,final,0.00287914,7
-OSJIMKM,filed > appeal > hearing > decided > final,final,0.00283589,7
-OSJIMPV,filed > hearing > decided > final,final,0.724446,1737
-OSJIMPV,filed > decided > final,final,0.136918,329
-OSJIMPV,filed > decided > revived > hearing > decided > final,final,0.0317554,76
-OSJIMPV,filed > hearing > decided > appeal > final,final,0.0135224,32
-OSJIMPV,filed > suspended,open,0.00971018,24
-OSJIMPV,filed > decided > appeal > revived > hearing > decided > final,final,0.00696072,17
-OSJIMPV,filed > hearing > decided > revived > final,final,0.00674264,16
-OSJIMPV,filed,closed,0.00519014,13
-OSJIMPV,filed > suspended > decided > final,final,0.00416269,10
-OSJIMPV,filed > hearing > decided > appeal,open,0.00394201,10
-OSJIMTR,filed > hearing > decided > final,final,0.783609,1880
-OSJIMTR,filed > decided > final,final,0.105136,254
-OSJIMTR,filed > hearing > decided > appeal > final,final,0.0132954,32
-OSJIMTR,filed > suspended > hearing > decided > final,final,0.00945997,23
-OSJIMTR,filed > suspended,open,0.00894515,21
-OSJIMTR,filed > decided > appeal > revived > hearing > decided > final,final,0.00796803,19
-OSJIMTR,filed > decided > revived > hearing > decided > final,final,0.00697879,17
-OSJIMTR,filed > suspended > decided > final,final,0.00484915,12
-OSJIMTR,filed > decided,closed,0.00383056,9
-OSJIMTR,filed > decided > appeal > revived > decided > final,final,0.00325777,8
-OSJIMUH,filed > hearing > decided > final,final,0.755045,1815
-OSJIMUH,filed > decided > final,final,0.133041,319
-OSJIMUH,filed > suspended > hearing > decided > final,final,0.00956624,23
-OSJIMUH,filed > suspended > decided > final,final,0.00929606,22
-OSJIMUH,filed > hearing > decided > appeal > decided > appeal > final,final,0.00841062,20
-OSJIMUH,filed > decided > appeal > revived > hearing > decided > final,final,0.0080863,19
-OSJIMUH,filed > hearing > decided > appeal > final,final,0.00623084,15
-OSJIMUH,filed > suspended,open,0.00608162,15
-OSJIMUH,filed > decided > revived > hearing > decided > final,final,0.00514861,12
-OSJIMUH,filed > hearing > suspended > decided > final,final,0.00412928,10
-OSJIMVY,filed > hearing > decided > final,final,0.704407,1688
-OSJIMVY,filed > decided > final,final,0.165438,398
-OSJIMVY,filed > suspended,open,0.0179772,43
-OSJIMVY,filed > hearing > decided > appeal > final,final,0.0112588,27
-OSJIMVY,filed > suspended > decided > final,final,0.00993483,24
-OSJIMVY,filed > decided > revived > hearing > decided > final,final,0.00822949,20
+OSJIMBK,filed > decided > revived > hearing > decided > final,final,0.025451232,61
+OSJIMBK,filed > hearing > decided > appeal > final,final,0.012124179,29
+OSJIMBK,filed > suspended > decided > final,final,0.011345233,27
+OSJIMBK,filed > decided > appeal > revived > hearing > decided > final,final,0.0078612131,19
+OSJIMBK,filed > decided > appeal > final,final,0.0066770764,16
+OSJIMBK,filed > hearing > suspended > decided > final,final,0.0066725554,16
+OSJIMBK,filed > decided > revived > decided > final,final,0.0061077195,15
+OSJIMBK,filed > suspended,open,0.0058631879,14
+OSJIMBM,filed > hearing > decided > final,final,0.67942283,1666
+OSJIMBM,filed > decided > final,final,0.15245044,559
+OSJIMBM,filed > decided > revived > hearing > decided > final,final,0.023993428,154
+OSJIMBM,filed > suspended,open,0.020118085,51
+OSJIMBM,filed > hearing > decided > appeal > final,final,0.017071685,44
+OSJIMBM,filed > suspended > decided > final,final,0.013979176,37
+OSJIMBM,filed > decided > appeal > revived > hearing > decided > final,final,0.0069077375,45
+OSJIMBM,filed > suspended > hearing > decided > final,final,0.0062993503,18
+OSJIMBM,filed,open,0.006156887,16
+OSJIMBM,filed > decided > appeal > final,final,0.0045945787,15
+OSJIMBO,filed > hearing > decided > final,final,0.68902281,1653
+OSJIMBO,filed > decided > final,final,0.16742144,396
+OSJIMBO,filed > hearing > decided > appeal > final,final,0.019006473,47
+OSJIMBO,filed > suspended > decided > final,final,0.010407792,26
+OSJIMBO,filed > decided > revived > hearing > decided > final,final,0.010021154,25
+OSJIMBO,filed > decided > appeal > revived > hearing > decided > final,final,0.0091874743,23
+OSJIMBO,filed > suspended,open,0.0081982323,20
+OSJIMBO,filed > hearing > decided > revived > final,final,0.0067657406,16
+OSJIMBO,filed > suspended > hearing > decided > final,final,0.0044107081,11
+OSJIMBO,filed > decided > appeal > final,final,0.0042149333,11
+OSJIMBV,filed > hearing > decided > final,final,0.67238715,1617
+OSJIMBV,filed > decided > final,final,0.1713688,411
+OSJIMBV,filed > suspended > decided > final,final,0.020599105,51
+OSJIMBV,filed > decided > revived > hearing > decided > final,final,0.017762504,44
+OSJIMBV,filed > hearing > decided > appeal > final,final,0.017393259,42
+OSJIMBV,filed > suspended,open,0.01476681,34
+OSJIMBV,filed > suspended > hearing > decided > final,final,0.01276647,31
+OSJIMBV,filed > decided > appeal > final,final,0.0075217315,18
+OSJIMBV,filed,open,0.0056775074,12
+OSJIMBV,filed > hearing > decided,open,0.005077853,11
+OSJIMHO,filed > hearing > decided > final,final,0.71124698,1706
+OSJIMHO,filed > decided > final,final,0.1503909,361
+OSJIMHO,filed > suspended > decided > final,final,0.015705717,38
+OSJIMHO,filed > hearing > decided > appeal > final,final,0.015645356,38
+OSJIMHO,filed > decided > revived > hearing > decided > final,final,0.012717116,31
+OSJIMHO,filed > suspended,open,0.0080227476,19
+OSJIMHO,filed > decided > appeal > final,final,0.0049070693,12
+OSJIMHO,filed > suspended > hearing > decided > final,final,0.004856336,12
+OSJIMHO,filed > decided > appeal > revived > hearing > decided > final,final,0.0042090862,10
+OSJIMHO,filed > hearing > decided > revived > decided > final,final,0.0042016379,10
+OSJIMJI,filed > hearing > decided > final,final,0.76419985,1831
+OSJIMJI,filed > decided > final,final,0.14902843,364
+OSJIMJI,filed > decided > revived > hearing > decided > final,final,0.017097481,45
+OSJIMJI,filed > suspended,open,0.0090568807,22
+OSJIMJI,filed > hearing > decided > appeal > final,final,0.0067488259,17
+OSJIMJI,filed > suspended > decided > final,final,0.0056786862,14
+OSJIMJI,filed > decided > appeal > final,final,0.0042804454,11
+OSJIMJI,filed > decided > appeal > revived > hearing > decided > final,final,0.0040572496,10
+OSJIMJI,filed > suspended > hearing > decided > final,final,0.0031873499,8
+OSJIMJI,filed > decided,closed,0.002607672,6
+OSJIMKM,filed > hearing > decided > final,final,0.73883303,1771
+OSJIMKM,filed > decided > final,final,0.14910017,356
+OSJIMKM,filed > decided > revived > hearing > decided > final,final,0.016868293,40
+OSJIMKM,filed > hearing > decided > appeal > final,final,0.013829394,33
+OSJIMKM,filed > suspended > decided > final,final,0.0078952164,19
+OSJIMKM,filed > decided > appeal > revived > hearing > decided > final,final,0.007075776,17
+OSJIMKM,filed > suspended,open,0.0063269755,15
+OSJIMKM,filed > hearing > decided > appeal,open,0.0043593775,10
+OSJIMKM,filed > suspended > hearing > decided > final,final,0.0028791446,7
+OSJIMKM,filed > appeal > hearing > decided > final,final,0.0028358882,7
+OSJIMPV,filed > hearing > decided > final,final,0.72444643,1737
+OSJIMPV,filed > decided > final,final,0.13691846,329
+OSJIMPV,filed > decided > revived > hearing > decided > final,final,0.031755397,76
+OSJIMPV,filed > hearing > decided > appeal > final,final,0.013522402,32
+OSJIMPV,filed > suspended,open,0.0097101767,24
+OSJIMPV,filed > decided > appeal > revived > hearing > decided > final,final,0.0069607215,17
+OSJIMPV,filed > hearing > decided > revived > final,final,0.0067426363,16
+OSJIMPV,filed,closed,0.0051901422,13
+OSJIMPV,filed > suspended > decided > final,final,0.004162691,10
+OSJIMPV,filed > hearing > decided > appeal,open,0.003942008,10
+OSJIMTR,filed > hearing > decided > final,final,0.78360939,1880
+OSJIMTR,filed > decided > final,final,0.10513614,254
+OSJIMTR,filed > hearing > decided > appeal > final,final,0.013295415,32
+OSJIMTR,filed > suspended > hearing > decided > final,final,0.0094599659,23
+OSJIMTR,filed > suspended,open,0.0089451489,21
+OSJIMTR,filed > decided > appeal > revived > hearing > decided > final,final,0.0079680282,19
+OSJIMTR,filed > decided > revived > hearing > decided > final,final,0.0069787937,17
+OSJIMTR,filed > suspended > decided > final,final,0.0048491479,12
+OSJIMTR,filed > decided,closed,0.0038305591,9
+OSJIMTR,filed > decided > appeal > revived > decided > final,final,0.0032577699,8
+OSJIMUH,filed > hearing > decided > final,final,0.75504538,1815
+OSJIMUH,filed > decided > final,final,0.1330408,319
+OSJIMUH,filed > suspended > hearing > decided > final,final,0.0095662376,23
+OSJIMUH,filed > suspended > decided > final,final,0.0092960559,22
+OSJIMUH,filed > hearing > decided > appeal > decided > appeal > final,final,0.0084106246,20
+OSJIMUH,filed > decided > appeal > revived > hearing > decided > final,final,0.0080862989,19
+OSJIMUH,filed > hearing > decided > appeal > final,final,0.0062308438,15
+OSJIMUH,filed > suspended,open,0.0060816249,15
+OSJIMUH,filed > decided > revived > hearing > decided > final,final,0.0051486128,12
+OSJIMUH,filed > hearing > suspended > decided > final,final,0.0041292766,10
+OSJIMVY,filed > hearing > decided > final,final,0.70440723,1688
+OSJIMVY,filed > decided > final,final,0.16543764,398
+OSJIMVY,filed > suspended,open,0.017977227,43
+OSJIMVY,filed > hearing > decided > appeal > final,final,0.011258785,27
+OSJIMVY,filed > suspended > decided > final,final,0.009934833,24
+OSJIMVY,filed > decided > revived > hearing > decided > final,final,0.0082294896,20
 OSJIMVY,filed > decided > appeal > final,final,0.00620673,15
-OSJIMVY,filed > hearing > decided > revived > final,final,0.00542588,13
-OSJIMVY,filed > hearing > decided > appeal,open,0.00483653,12
-OSJIMVY,filed > decided > appeal > revived > hearing > decided > final,final,0.0042477,10
-OSJIMZL,filed > hearing > decided > final,final,0.732456,1755
-OSJIMZL,filed > decided > final,final,0.150422,359
-OSJIMZL,filed > hearing > decided > appeal > decided > appeal > final,final,0.0149196,36
-OSJIMZL,filed > suspended > decided > final,final,0.00994211,24
-OSJIMZL,filed > decided > revived > hearing > decided > final,final,0.00899159,22
-OSJIMZL,filed > suspended,open,0.00591047,14
-OSJIMZL,filed > hearing > decided > revived > final,final,0.00543485,13
-OSJIMZL,filed > revived > hearing > decided > final,final,0.00406722,10
-OSJIMZL,filed > decided > appeal > revived > decided > final,final,0.00381749,9
-OSJIMZL,filed > decided > appeal > decided > appeal > final,final,0.0037873,9
-OSJIMZN,filed > hearing > decided > final,final,0.750466,1798
-OSJIMZN,filed > decided > final,final,0.116288,281
-OSJIMZN,filed > suspended > decided > final,final,0.019877,48
-OSJIMZN,filed > decided > revived > hearing > decided > final,final,0.0190026,46
-OSJIMZN,filed > hearing > decided > appeal > final,final,0.00975256,23
-OSJIMZN,filed > suspended,open,0.00725545,17
-OSJIMZN,filed > suspended > hearing > decided > final,final,0.00611858,15
-OSJIMZN,filed > decided > appeal > final,final,0.00582588,14
-OSJIMZN,filed > decided,closed,0.00423223,10
-OSJIMZN,filed > decided > appeal > revived > decided > final,final,0.00335487,8
-OSJIMZR,filed > hearing > decided > final,final,0.728421,1743
-OSJIMZR,filed > decided > final,final,0.129659,313
-OSJIMZR,filed > decided > revived > hearing > decided > final,final,0.0182017,44
-OSJIMZR,filed > suspended > decided > final,final,0.015115,36
-OSJIMZR,filed > suspended,open,0.0139485,34
-OSJIMZR,filed > suspended > hearing > decided > final,final,0.0127913,30
-OSJIMZR,filed > hearing > decided > appeal > final,final,0.0125172,30
-OSJIMZR,filed > hearing,open,0.0060209,15
-OSJIMZR,filed > decided > appeal > final,final,0.00372778,9
-OSJIMZR,filed > decided > appeal > revived > hearing > decided > final,final,0.00369519,9
-OSPHA01,filed > hearing > decided > final,final,0.445699,1136
-OSPHA01,filed > decided > final,final,0.341402,723
-OSPHA01,filed > hearing > decided > appeal > final,final,0.0333894,99
-OSPHA01,filed > suspended > decided > final,final,0.0222874,47
-OSPHA01,filed > suspended,open,0.0123258,31
-OSPHA01,filed > decided,closed,0.00679171,13
-OSPHA01,filed > appeal > decided > appeal > final,final,0.00616948,18
-OSPHA01,filed > appeal > revived > hearing > decided > final,final,0.00579336,16
-OSPHA01,filed > decided > appeal > final,final,0.00575731,17
-OSPHA01,filed > revived > hearing > decided > final,final,0.00575335,16
-OSPHA02,filed > hearing > decided > final,final,0.460003,1115
-OSPHA02,filed > decided > final,final,0.228853,555
-OSPHA02,filed > hearing > decided > appeal > final,final,0.104152,246
-OSPHA02,filed > decided > appeal > final,final,0.0418326,103
-OSPHA02,filed > appeal > decided > appeal > final,final,0.0181621,44
-OSPHA02,filed > appeal > decided > final,final,0.0109372,25
-OSPHA02,filed > suspended > decided > final,final,0.0107697,25
-OSPHA02,filed > hearing > decided > appeal > decided > appeal > final,final,0.00842488,22
-OSPHA02,filed > decided > revived > hearing > decided > final,final,0.00833473,19
-OSPHA02,filed > appeal > hearing > decided > appeal > final,final,0.00726869,19
-OSPHA03,filed > hearing > decided > final,final,0.721689,1735
-OSPHA03,filed > decided > final,final,0.176865,431
-OSPHA03,filed > hearing > decided > appeal > final,final,0.0224902,55
-OSPHA03,filed > suspended > hearing > decided > final,final,0.0069006,16
-OSPHA03,filed > suspended > decided > final,final,0.00683423,17
-OSPHA03,filed > decided > revived > hearing > decided > final,final,0.00655885,16
-OSPHA03,filed > appeal > decided > appeal > final,final,0.00509339,13
-OSPHA03,filed > decided > appeal > final,final,0.00498538,12
-OSPHA03,filed > decided > appeal > revived > hearing > decided > final,final,0.00474447,11
-OSPHA03,filed > hearing > suspended > decided > final,final,0.00293365,8
-OSPHA04,filed > hearing > decided > final,final,0.698075,1677
-OSPHA04,filed > decided > final,final,0.157382,388
+OSJIMVY,filed > hearing > decided > revived > final,final,0.0054258798,13
+OSJIMVY,filed > hearing > decided > appeal,open,0.0048365338,12
+OSJIMVY,filed > decided > appeal > revived > hearing > decided > final,final,0.0042476982,10
+OSJIMZL,filed > hearing > decided > final,final,0.73245596,1755
+OSJIMZL,filed > decided > final,final,0.15042242,359
+OSJIMZL,filed > hearing > decided > appeal > decided > appeal > final,final,0.014919635,36
+OSJIMZL,filed > suspended > decided > final,final,0.009942105,24
+OSJIMZL,filed > decided > revived > hearing > decided > final,final,0.0089915908,22
+OSJIMZL,filed > suspended,open,0.0059104678,14
+OSJIMZL,filed > hearing > decided > revived > final,final,0.0054348486,13
+OSJIMZL,filed > revived > hearing > decided > final,final,0.0040672247,10
+OSJIMZL,filed > decided > appeal > revived > decided > final,final,0.0038174906,9
+OSJIMZL,filed > decided > appeal > decided > appeal > final,final,0.0037872968,9
+OSJIMZN,filed > hearing > decided > final,final,0.75046638,1798
+OSJIMZN,filed > decided > final,final,0.11628775,281
+OSJIMZN,filed > suspended > decided > final,final,0.01987704,48
+OSJIMZN,filed > decided > revived > hearing > decided > final,final,0.019002579,46
+OSJIMZN,filed > hearing > decided > appeal > final,final,0.0097525608,23
+OSJIMZN,filed > suspended,open,0.0072554527,17
+OSJIMZN,filed > suspended > hearing > decided > final,final,0.0061185846,15
+OSJIMZN,filed > decided > appeal > final,final,0.005825878,14
+OSJIMZN,filed > decided,closed,0.0042322305,10
+OSJIMZN,filed > decided > appeal > revived > decided > final,final,0.0033548732,8
+OSJIMZR,filed > hearing > decided > final,final,0.72842123,1743
+OSJIMZR,filed > decided > final,final,0.12965926,313
+OSJIMZR,filed > decided > revived > hearing > decided > final,final,0.018201686,44
+OSJIMZR,filed > suspended > decided > final,final,0.015115037,36
+OSJIMZR,filed > suspended,open,0.01394848,34
+OSJIMZR,filed > suspended > hearing > decided > final,final,0.012791333,30
+OSJIMZR,filed > hearing > decided > appeal > final,final,0.012517231,30
+OSJIMZR,filed > hearing,open,0.006020898,15
+OSJIMZR,filed > decided > appeal > final,final,0.0037277784,9
+OSJIMZR,filed > decided > appeal > revived > hearing > decided > final,final,0.0036951945,9
+OSPHA01,filed > hearing > decided > final,final,0.44569942,1136
+OSPHA01,filed > decided > final,final,0.34140155,723
+OSPHA01,filed > hearing > decided > appeal > final,final,0.03338938,99
+OSPHA01,filed > suspended > decided > final,final,0.022287373,47
+OSPHA01,filed > suspended,open,0.012325807,31
+OSPHA01,filed > decided,closed,0.0067917111,13
+OSPHA01,filed > appeal > decided > appeal > final,final,0.0061694791,18
+OSPHA01,filed > appeal > revived > hearing > decided > final,final,0.0057933594,16
+OSPHA01,filed > decided > appeal > final,final,0.0057573105,17
+OSPHA01,filed > revived > hearing > decided > final,final,0.0057533467,16
+OSPHA02,filed > hearing > decided > final,final,0.46000257,1115
+OSPHA02,filed > decided > final,final,0.22885338,555
+OSPHA02,filed > hearing > decided > appeal > final,final,0.10415221,246
+OSPHA02,filed > decided > appeal > final,final,0.041832626,103
+OSPHA02,filed > appeal > decided > appeal > final,final,0.018162074,44
+OSPHA02,filed > appeal > decided > final,final,0.010937208,25
+OSPHA02,filed > suspended > decided > final,final,0.010769658,25
+OSPHA02,filed > hearing > decided > appeal > decided > appeal > final,final,0.0084248818,22
+OSPHA02,filed > decided > revived > hearing > decided > final,final,0.0083347326,19
+OSPHA02,filed > appeal > hearing > decided > appeal > final,final,0.0072686949,19
+OSPHA03,filed > hearing > decided > final,final,0.72168929,1735
+OSPHA03,filed > decided > final,final,0.1768646,431
+OSPHA03,filed > hearing > decided > appeal > final,final,0.022490199,55
+OSPHA03,filed > suspended > hearing > decided > final,final,0.0069006022,16
+OSPHA03,filed > suspended > decided > final,final,0.0068342308,17
+OSPHA03,filed > decided > revived > hearing > decided > final,final,0.0065588523,16
+OSPHA03,filed > appeal > decided > appeal > final,final,0.0050933886,13
+OSPHA03,filed > decided > appeal > final,final,0.0049853834,12
+OSPHA03,filed > decided > appeal > revived > hearing > decided > final,final,0.0047444662,11
+OSPHA03,filed > hearing > suspended > decided > final,final,0.002933647,8
+OSPHA04,filed > hearing > decided > final,final,0.69807538,1677
+OSPHA04,filed > decided > final,final,0.1573822,388
 OSPHA04,filed > hearing > decided > appeal > final,final,0.0215663,52
-OSPHA04,filed > decided > revived > hearing > decided > final,final,0.00978921,24
-OSPHA04,filed > appeal > decided > appeal > final,final,0.00785589,19
-OSPHA04,filed > suspended > decided > final,final,0.00769819,18
-OSPHA04,filed > suspended > hearing > decided > final,final,0.00748466,17
-OSPHA04,filed > revived > hearing > decided > final,final,0.00725739,17
-OSPHA04,filed > decided > appeal > final,final,0.00437977,11
-OSPHA04,filed > suspended,open,0.00374029,9
-OSPHA05,filed > hearing > decided > final,final,0.753362,1808
-OSPHA05,filed > decided > final,final,0.136519,328
-OSPHA05,filed > hearing > decided > appeal > final,final,0.0235518,58
-OSPHA05,filed > suspended > decided > final,final,0.0114973,27
-OSPHA05,filed > appeal > decided > appeal > final,final,0.00783826,19
-OSPHA05,filed > decided > appeal > final,final,0.00505565,13
-OSPHA05,filed > appeal > hearing > decided > appeal > final,final,0.00430636,10
-OSPHA05,filed > suspended,open,0.00270195,7
-OSPHA05,filed > hearing,open,0.00261289,7
-OSPHA05,filed > suspended > hearing > decided > final,final,0.0025477,6
-OSPHA06,filed > hearing > decided > final,final,0.657303,1575
-OSPHA06,filed > decided > final,final,0.198579,482
-OSPHA06,filed > hearing > decided > appeal > final,final,0.0255569,61
-OSPHA06,filed > suspended > decided > final,final,0.0129393,30
-OSPHA06,filed > decided > appeal > final,final,0.00803134,19
-OSPHA06,filed > suspended > hearing > decided > final,final,0.00522236,13
-OSPHA06,filed > hearing > decided > appeal,open,0.00469678,12
-OSPHA06,filed > appeal > decided > final,final,0.00427252,11
-OSPHA06,filed > appeal > decided > appeal > final,final,0.00427029,11
-OSPHA06,filed > suspended,open,0.00406103,10
-OSPHA07,filed > hearing > decided > final,final,0.647337,1561
-OSPHA07,filed > decided > final,final,0.18104,418
-OSPHA07,filed > hearing > decided > appeal > final,final,0.0318375,75
-OSPHA07,filed > decided > revived > hearing > decided > final,final,0.0178587,40
-OSPHA07,filed > decided > appeal > final,final,0.0119411,28
-OSPHA07,filed > decided > appeal > revived > hearing > decided > final,final,0.00847892,21
-OSPHA07,filed > suspended,open,0.00758405,21
-OSPHA07,filed > appeal > decided > appeal > final,final,0.00756748,19
-OSPHA07,filed > suspended > decided > final,final,0.00692967,16
-OSPHA07,filed > appeal > hearing > decided > final,final,0.00421395,10
-OSPHA08,filed > hearing > decided > final,final,0.693144,1655
-OSPHA08,filed > decided > final,final,0.141588,349
-OSPHA08,filed > hearing > decided > appeal > final,final,0.0336438,82
-OSPHA08,filed > decided > appeal > final,final,0.00937967,23
-OSPHA08,filed > suspended > decided > final,final,0.00909211,22
-OSPHA08,filed > appeal > decided > appeal > final,final,0.00552848,15
-OSPHA08,filed > decided > revived > hearing > decided > final,final,0.00510968,12
-OSPHA08,filed > hearing > suspended > decided > final,final,0.00497241,12
-OSPHA08,filed > hearing > decided > appeal,open,0.00478654,12
-OSPHA08,filed > suspended,open,0.00472437,12
-OSPHA09,filed > hearing > decided > final,final,0.747061,1785
-OSPHA09,filed > decided > final,final,0.12802,312
-OSPHA09,filed > hearing > decided > appeal > final,final,0.0208356,50
-OSPHA09,filed > decided > revived > hearing > decided > final,final,0.00900953,22
-OSPHA09,filed > suspended > decided > final,final,0.00738382,18
-OSPHA09,filed > appeal > decided > appeal > final,final,0.00686538,17
-OSPHA09,filed > suspended > hearing > decided > final,final,0.00578442,14
-OSPHA09,filed > decided > appeal > final,final,0.00519722,12
-OSPHA09,filed > decided,closed,0.0045097,11
-OSPHA09,filed > suspended,open,0.00443182,11
-OSPHA10,filed > hearing > decided > final,final,0.683716,1642
-OSPHA10,filed > decided > final,final,0.18528,449
-OSPHA10,filed > hearing > decided > appeal > final,final,0.0192438,47
-OSPHA10,filed > revived > hearing > decided > final,final,0.0127524,30
-OSPHA10,filed > suspended > decided > final,final,0.00954881,22
-OSPHA10,filed > decided > revived > hearing > decided > final,final,0.00745705,18
-OSPHA10,filed > decided > appeal > final,final,0.00502205,12
-OSPHA10,filed > suspended,open,0.00487388,12
-OSPHA10,filed > revived > decided > final,final,0.00396861,9
-OSPHA10,filed > suspended > hearing > decided > final,final,0.00379814,9
-OSSCECL,filed > hearing > decided > final,final,0.782166,1874
-OSSCECL,filed > decided > final,final,0.11481,275
-OSSCECL,filed > revived > hearing > decided > final,final,0.0284388,69
-OSSCECL,filed > suspended > decided > final,final,0.00823426,20
-OSSCECL,filed > hearing > decided > appeal > final,final,0.00753022,18
-OSSCECL,filed > suspended,open,0.00579743,14
-OSSCECL,filed > decided > appeal > final,final,0.00333393,8
-OSSCECL,filed > revived > decided > final,final,0.00326249,8
-OSSCECL,filed > hearing > final,final,0.00324876,8
-OSSCECL,filed > decided > revived > hearing > decided > final,final,0.00314817,7
-OSSCECV,filed > hearing > decided > final,final,0.825162,1978
-OSSCECV,filed > decided > final,final,0.0581822,142
-OSSCECV,filed > decided > revived > hearing > decided > final,final,0.0146263,36
-OSSCECV,filed > hearing > decided > appeal > final,final,0.0132411,32
-OSSCECV,filed > suspended > hearing > decided > final,final,0.0128809,32
-OSSCECV,filed > suspended,open,0.0108855,26
-OSSCECV,filed > hearing > decided > revived > hearing > decided > final,final,0.0101976,25
-OSSCECV,filed > hearing > decided > hearing > revived > decided > final,final,0.00640329,15
-OSSCECV,filed > hearing > decided > revived > decided > final,final,0.0055304,12
-OSSCECV,filed > hearing > decided,open,0.00477518,11
-OSSCEDC,filed > hearing > decided > final,final,0.814609,1947
-OSSCEDC,filed > decided > final,final,0.0845981,216
-OSSCEDC,filed > decided > revived > hearing > decided > final,final,0.0203865,56
-OSSCEDC,filed > suspended,open,0.0160887,38
-OSSCEDC,filed > suspended > decided > final,final,0.00700104,17
-OSSCEDC,filed > hearing > decided,open,0.00544754,13
-OSSCEDC,filed > hearing > decided > appeal > final,final,0.00517104,13
-OSSCEDC,filed > hearing > decided > revived > final,final,0.00475321,11
-OSSCEDC,filed > decided > appeal > revived > hearing > decided > final,final,0.00354464,9
-OSSCEDC,filed > suspended > hearing > decided > final,final,0.00309597,7
-OSSCEJN,filed > hearing > decided > final,final,0.78474,1883
-OSSCEJN,filed > decided > final,final,0.0998085,242
-OSSCEJN,filed > decided > revived > hearing > decided > final,final,0.0232637,56
-OSSCEJN,filed > hearing > decided > appeal > final,final,0.00949609,23
-OSSCEJN,filed > suspended,open,0.0057293,14
-OSSCEJN,filed > hearing > decided > revived > decided > final,final,0.00492458,11
-OSSCEJN,filed > decided,closed,0.00488388,12
-OSSCEJN,filed > suspended > decided > final,final,0.00453077,11
-OSSCEJN,filed > hearing > decided > revived > final,final,0.00438087,10
-OSSCEJN,filed > decided > appeal > revived > hearing > decided > final,final,0.00424041,10
-OSSCELB,filed > hearing > decided > final,final,0.77621,1894
-OSSCELB,filed > decided > final,final,0.114031,288
-OSSCELB,filed > decided > revived > hearing > decided > final,final,0.0132039,32
-OSSCELB,filed > suspended > decided > final,final,0.00979641,23
-OSSCELB,filed > hearing > decided > appeal > final,final,0.00872593,23
-OSSCELB,filed > suspended,open,0.00833098,20
-OSSCELB,filed > decided > appeal > revived > hearing > decided > final,final,0.00655844,16
-OSSCELB,filed > decided > appeal > final,final,0.00475973,13
-OSSCELB,filed > decided,closed,0.00370396,10
-OSSCELB,filed > suspended > hearing > decided > final,final,0.00347981,8
-OSSCELN,filed > hearing > decided > final,final,0.776139,1858
-OSSCELN,filed > decided > final,final,0.119622,291
-OSSCELN,filed > decided > revived > hearing > decided > final,final,0.017213,43
-OSSCELN,filed > suspended,open,0.0137682,32
-OSSCELN,filed > suspended > decided > final,final,0.0108944,27
-OSSCELN,filed > hearing > decided > appeal > final,final,0.00813836,20
-OSSCELN,filed > decided > appeal > revived > hearing > decided > final,final,0.00604743,15
-OSSCELN,filed > hearing > decided,open,0.00441089,10
-OSSCELN,filed > suspended > hearing > decided > final,final,0.00368545,9
-OSSCELN,filed > hearing > suspended > decided > final,final,0.00208894,5
-OSSCELT,filed > hearing > decided > final,final,0.685088,1631
-OSSCELT,filed > decided > final,final,0.196594,482
-OSSCELT,filed > decided > revived > hearing > decided > final,final,0.0227806,55
-OSSCELT,filed > suspended > decided > final,final,0.0138687,35
-OSSCELT,filed > suspended,open,0.0123426,29
-OSSCELT,filed > hearing > decided > appeal > final,final,0.0110697,27
-OSSCELT,filed > decided > revived > decided > final,final,0.00499204,13
-OSSCELT,filed > decided > appeal > revived > hearing > decided > final,final,0.00479274,12
-OSSCELT,filed > suspended > hearing > decided > final,final,0.00420001,10
-OSSCELT,filed > hearing > decided > revived > decided > final,final,0.00379092,9
-OSSCEMO,filed > hearing > decided > final,final,0.821667,1973
-OSSCEMO,filed > decided > final,final,0.100947,241
-OSSCEMO,filed > decided > revived > hearing > decided > final,final,0.0267139,64
-OSSCEMO,filed > hearing > decided > appeal > final,final,0.0091735,22
-OSSCEMO,filed > suspended > decided > final,final,0.0067273,16
-OSSCEMO,filed > suspended,open,0.00412293,10
-OSSCEMO,filed > hearing > decided > revived > final,final,0.00337892,8
-OSSCEMO,filed > hearing > decided,open,0.00324095,8
-OSSCEMO,filed > suspended > hearing > decided > final,final,0.0025131,6
-OSSCEMO,filed > decided > appeal > final,final,0.00251306,6
-OSSCETP,filed > hearing > decided > final,final,0.769368,1844
-OSSCETP,filed > decided > final,final,0.128453,336
-OSSCETP,filed > decided > revived > hearing > decided > final,final,0.0204021,63
-OSSCETP,filed > suspended,open,0.0093979,23
-OSSCETP,filed > hearing > decided > appeal > final,final,0.00822035,20
-OSSCETP,filed > hearing > decided > revived > final,final,0.00511203,12
-OSSCETP,filed > hearing > decided,open,0.0037175,9
+OSPHA04,filed > decided > revived > hearing > decided > final,final,0.0097892086,24
+OSPHA04,filed > appeal > decided > appeal > final,final,0.0078558873,19
+OSPHA04,filed > suspended > decided > final,final,0.0076981901,18
+OSPHA04,filed > suspended > hearing > decided > final,final,0.0074846563,17
+OSPHA04,filed > revived > hearing > decided > final,final,0.0072573887,17
+OSPHA04,filed > decided > appeal > final,final,0.0043797653,11
+OSPHA04,filed > suspended,open,0.0037402936,9
+OSPHA05,filed > hearing > decided > final,final,0.75336241,1808
+OSPHA05,filed > decided > final,final,0.13651947,328
+OSPHA05,filed > hearing > decided > appeal > final,final,0.023551827,58
+OSPHA05,filed > suspended > decided > final,final,0.01149733,27
+OSPHA05,filed > appeal > decided > appeal > final,final,0.0078382612,19
+OSPHA05,filed > decided > appeal > final,final,0.0050556495,13
+OSPHA05,filed > appeal > hearing > decided > appeal > final,final,0.0043063567,10
+OSPHA05,filed > suspended,open,0.0027019457,7
+OSPHA05,filed > hearing,open,0.0026128903,7
+OSPHA05,filed > suspended > hearing > decided > final,final,0.0025476956,6
+OSPHA06,filed > hearing > decided > final,final,0.65730334,1575
+OSPHA06,filed > decided > final,final,0.19857925,482
+OSPHA06,filed > hearing > decided > appeal > final,final,0.025556857,61
+OSPHA06,filed > suspended > decided > final,final,0.012939275,30
+OSPHA06,filed > decided > appeal > final,final,0.0080313444,19
+OSPHA06,filed > suspended > hearing > decided > final,final,0.0052223611,13
+OSPHA06,filed > hearing > decided > appeal,open,0.0046967783,12
+OSPHA06,filed > appeal > decided > final,final,0.0042725196,11
+OSPHA06,filed > appeal > decided > appeal > final,final,0.0042702935,11
+OSPHA06,filed > suspended,open,0.0040610277,10
+OSPHA07,filed > hearing > decided > final,final,0.64733689,1561
+OSPHA07,filed > decided > final,final,0.18103981,418
+OSPHA07,filed > hearing > decided > appeal > final,final,0.031837522,75
+OSPHA07,filed > decided > revived > hearing > decided > final,final,0.017858717,40
+OSPHA07,filed > decided > appeal > final,final,0.01194114,28
+OSPHA07,filed > decided > appeal > revived > hearing > decided > final,final,0.008478918,21
+OSPHA07,filed > suspended,open,0.0075840472,21
+OSPHA07,filed > appeal > decided > appeal > final,final,0.0075674817,19
+OSPHA07,filed > suspended > decided > final,final,0.0069296732,16
+OSPHA07,filed > appeal > hearing > decided > final,final,0.0042139456,10
+OSPHA08,filed > hearing > decided > final,final,0.69314385,1655
+OSPHA08,filed > decided > final,final,0.14158786,349
+OSPHA08,filed > hearing > decided > appeal > final,final,0.033643815,82
+OSPHA08,filed > decided > appeal > final,final,0.0093796725,23
+OSPHA08,filed > suspended > decided > final,final,0.009092107,22
+OSPHA08,filed > appeal > decided > appeal > final,final,0.0055284769,15
+OSPHA08,filed > decided > revived > hearing > decided > final,final,0.005109676,12
+OSPHA08,filed > hearing > suspended > decided > final,final,0.0049724073,12
+OSPHA08,filed > hearing > decided > appeal,open,0.0047865372,12
+OSPHA08,filed > suspended,open,0.0047243677,12
+OSPHA09,filed > hearing > decided > final,final,0.74706147,1785
+OSPHA09,filed > decided > final,final,0.12802035,312
+OSPHA09,filed > hearing > decided > appeal > final,final,0.02083565,50
+OSPHA09,filed > decided > revived > hearing > decided > final,final,0.0090095256,22
+OSPHA09,filed > suspended > decided > final,final,0.0073838234,18
+OSPHA09,filed > appeal > decided > appeal > final,final,0.0068653831,17
+OSPHA09,filed > suspended > hearing > decided > final,final,0.0057844245,14
+OSPHA09,filed > decided > appeal > final,final,0.0051972177,12
+OSPHA09,filed > decided,closed,0.0045097024,11
+OSPHA09,filed > suspended,open,0.0044318198,11
+OSPHA10,filed > hearing > decided > final,final,0.68371572,1642
+OSPHA10,filed > decided > final,final,0.1852799,449
+OSPHA10,filed > hearing > decided > appeal > final,final,0.019243838,47
+OSPHA10,filed > revived > hearing > decided > final,final,0.012752444,30
+OSPHA10,filed > suspended > decided > final,final,0.0095488061,22
+OSPHA10,filed > decided > revived > hearing > decided > final,final,0.0074570522,18
+OSPHA10,filed > decided > appeal > final,final,0.0050220546,12
+OSPHA10,filed > suspended,open,0.0048738836,12
+OSPHA10,filed > revived > decided > final,final,0.0039686075,9
+OSPHA10,filed > suspended > hearing > decided > final,final,0.0037981363,9
+OSSCECL,filed > hearing > decided > final,final,0.78216569,1874
+OSSCECL,filed > decided > final,final,0.11480981,275
+OSSCECL,filed > revived > hearing > decided > final,final,0.02843879,69
+OSSCECL,filed > suspended > decided > final,final,0.0082342617,20
+OSSCECL,filed > hearing > decided > appeal > final,final,0.0075302213,18
+OSSCECL,filed > suspended,open,0.0057974322,14
+OSSCECL,filed > decided > appeal > final,final,0.0033339254,8
+OSSCECL,filed > revived > decided > final,final,0.0032624883,8
+OSSCECL,filed > hearing > final,final,0.0032487597,8
+OSSCECL,filed > decided > revived > hearing > decided > final,final,0.0031481744,7
+OSSCECV,filed > hearing > decided > final,final,0.82516153,1978
+OSSCECV,filed > decided > final,final,0.058182238,142
+OSSCECV,filed > decided > revived > hearing > decided > final,final,0.014626326,36
+OSSCECV,filed > hearing > decided > appeal > final,final,0.01324112,32
+OSSCECV,filed > suspended > hearing > decided > final,final,0.012880881,32
+OSSCECV,filed > suspended,open,0.010885505,26
+OSSCECV,filed > hearing > decided > revived > hearing > decided > final,final,0.010197579,25
+OSSCECV,filed > hearing > decided > hearing > revived > decided > final,final,0.0064032894,15
+OSSCECV,filed > hearing > decided > revived > decided > final,final,0.0055304037,12
+OSSCECV,filed > hearing > decided,open,0.004775179,11
+OSSCEDC,filed > hearing > decided > final,final,0.81460863,1947
+OSSCEDC,filed > decided > final,final,0.084598108,216
+OSSCEDC,filed > decided > revived > hearing > decided > final,final,0.020386458,56
+OSSCEDC,filed > suspended,open,0.016088666,38
+OSSCEDC,filed > suspended > decided > final,final,0.0070010392,17
+OSSCEDC,filed > hearing > decided,open,0.0054475375,13
+OSSCEDC,filed > hearing > decided > appeal > final,final,0.0051710351,13
+OSSCEDC,filed > hearing > decided > revived > final,final,0.0047532091,11
+OSSCEDC,filed > decided > appeal > revived > hearing > decided > final,final,0.0035446376,9
+OSSCEDC,filed > suspended > hearing > decided > final,final,0.0030959717,7
+OSSCEJN,filed > hearing > decided > final,final,0.78474005,1883
+OSSCEJN,filed > decided > final,final,0.099808537,242
+OSSCEJN,filed > decided > revived > hearing > decided > final,final,0.023263675,56
+OSSCEJN,filed > hearing > decided > appeal > final,final,0.0094960897,23
+OSSCEJN,filed > suspended,open,0.0057292976,14
+OSSCEJN,filed > hearing > decided > revived > decided > final,final,0.0049245793,11
+OSSCEJN,filed > decided,closed,0.004883883,12
+OSSCEJN,filed > suspended > decided > final,final,0.0045307695,11
+OSSCEJN,filed > hearing > decided > revived > final,final,0.0043808732,10
+OSSCEJN,filed > decided > appeal > revived > hearing > decided > final,final,0.004240413,10
+OSSCELB,filed > hearing > decided > final,final,0.77620998,1894
+OSSCELB,filed > decided > final,final,0.11403118,288
+OSSCELB,filed > decided > revived > hearing > decided > final,final,0.013203852,32
+OSSCELB,filed > suspended > decided > final,final,0.0097964069,23
+OSSCELB,filed > hearing > decided > appeal > final,final,0.008725933,23
+OSSCELB,filed > suspended,open,0.0083309796,20
+OSSCELB,filed > decided > appeal > revived > hearing > decided > final,final,0.0065584396,16
+OSSCELB,filed > decided > appeal > final,final,0.0047597258,13
+OSSCELB,filed > decided,closed,0.0037039592,10
+OSSCELB,filed > suspended > hearing > decided > final,final,0.0034798106,8
+OSSCELN,filed > hearing > decided > final,final,0.77613898,1858
+OSSCELN,filed > decided > final,final,0.11962193,291
+OSSCELN,filed > decided > revived > hearing > decided > final,final,0.017213049,43
+OSSCELN,filed > suspended,open,0.01376817,32
+OSSCELN,filed > suspended > decided > final,final,0.010894436,27
+OSSCELN,filed > hearing > decided > appeal > final,final,0.0081383554,20
+OSSCELN,filed > decided > appeal > revived > hearing > decided > final,final,0.0060474308,15
+OSSCELN,filed > hearing > decided,open,0.0044108856,10
+OSSCELN,filed > suspended > hearing > decided > final,final,0.0036854544,9
+OSSCELN,filed > hearing > suspended > decided > final,final,0.0020889448,5
+OSSCELT,filed > hearing > decided > final,final,0.68508814,1631
+OSSCELT,filed > decided > final,final,0.19659406,482
+OSSCELT,filed > decided > revived > hearing > decided > final,final,0.022780637,55
+OSSCELT,filed > suspended > decided > final,final,0.013868727,35
+OSSCELT,filed > suspended,open,0.012342566,29
+OSSCELT,filed > hearing > decided > appeal > final,final,0.011069744,27
+OSSCELT,filed > decided > revived > decided > final,final,0.0049920414,13
+OSSCELT,filed > decided > appeal > revived > hearing > decided > final,final,0.0047927367,12
+OSSCELT,filed > suspended > hearing > decided > final,final,0.0042000116,10
+OSSCELT,filed > hearing > decided > revived > decided > final,final,0.0037909201,9
+OSSCEMO,filed > hearing > decided > final,final,0.82166652,1973
+OSSCEMO,filed > decided > final,final,0.10094728,241
+OSSCEMO,filed > decided > revived > hearing > decided > final,final,0.026713902,64
+OSSCEMO,filed > hearing > decided > appeal > final,final,0.0091735005,22
+OSSCEMO,filed > suspended > decided > final,final,0.0067273017,16
+OSSCEMO,filed > suspended,open,0.0041229316,10
+OSSCEMO,filed > hearing > decided > revived > final,final,0.0033789204,8
+OSSCEMO,filed > hearing > decided,open,0.0032409534,8
+OSSCEMO,filed > suspended > hearing > decided > final,final,0.0025130995,6
+OSSCEMO,filed > decided > appeal > final,final,0.0025130618,6
+OSSCETP,filed > hearing > decided > final,final,0.76936756,1844
+OSSCETP,filed > decided > final,final,0.1284526,336
+OSSCETP,filed > decided > revived > hearing > decided > final,final,0.020402115,63
+OSSCETP,filed > suspended,open,0.0093978952,23
+OSSCETP,filed > hearing > decided > appeal > final,final,0.008220348,20
+OSSCETP,filed > hearing > decided > revived > final,final,0.0051120304,12
+OSSCETP,filed > hearing > decided,open,0.0037174969,9
 OSSCETP,filed > suspended > decided > final,final,0.00278038,7
-OSSCETP,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.00240049,7
-OSSCETP,filed > revived > hearing > decided > final,final,0.00204262,5
-OSSCEUL,filed > hearing > decided > final,final,0.876584,2140
-OSSCEUL,filed > decided > final,final,0.0685744,176
-OSSCEUL,filed > hearing > decided > appeal > final,final,0.00765122,20
-OSSCEUL,filed > suspended > decided > final,final,0.00591966,14
-OSSCEUL,filed > decided > revived > hearing > decided > final,final,0.00488338,12
-OSSCEUL,filed > suspended > hearing > decided > final,final,0.00340511,8
-OSSCEUL,filed > hearing > decided > revived > final,final,0.00295006,7
-OSSCEUL,filed > suspended,open,0.00263089,6
-OSSCEUL,filed > decided > appeal > final,final,0.0017475,4
-OSSCEUL,filed > hearing > decided > revived > hearing > decided > final,final,0.00158973,4
-OSSEMBR,filed > hearing > decided > final,final,0.756397,1809
-OSSEMBR,filed > decided > final,final,0.125631,309
-OSSEMBR,filed > suspended > hearing > decided > final,final,0.024219,59
-OSSEMBR,filed > decided > revived > hearing > decided > final,final,0.0202504,50
-OSSEMBR,filed > hearing > decided > appeal > final,final,0.0139449,34
-OSSEMBR,filed > suspended,open,0.0116561,28
-OSSEMBR,filed > suspended > decided > final,final,0.00891511,22
-OSSEMBR,filed > hearing > decided > revived > final,final,0.00429028,10
-OSSEMBR,filed > hearing > decided > revived > decided > final,final,0.00287903,7
-OSSEMBR,filed > decided > appeal > revived > hearing > decided > final,final,0.00277044,7
-OSSEMFM,filed > hearing > decided > final,final,0.731804,1762
-OSSEMFM,filed > decided > final,final,0.137241,353
-OSSEMFM,filed > decided > revived > hearing > decided > final,final,0.0176694,46
-OSSEMFM,filed > hearing > decided > appeal > final,final,0.0145013,35
-OSSEMFM,filed > suspended > decided > final,final,0.0120235,29
-OSSEMFM,filed > suspended,open,0.0116877,28
-OSSEMFM,filed > decided > appeal > revived > hearing > decided > final,final,0.00527504,17
-OSSEMFM,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.00396606,11
-OSSEMFM,filed > hearing > decided > revived > final,final,0.00392762,9
-OSSEMFM,filed > appeal > hearing > decided > final,final,0.00335019,8
-OSSEMJE,filed > hearing > decided > final,final,0.736186,1769
-OSSEMJE,filed > decided > final,final,0.147443,352
-OSSEMJE,filed > revived > hearing > decided > final,final,0.0143459,35
-OSSEMJE,filed > suspended > decided > final,final,0.0112395,27
-OSSEMJE,filed > hearing > decided > appeal > final,final,0.011046,27
-OSSEMJE,filed > hearing > decided > appeal > decided > appeal > final,final,0.00798714,19
-OSSEMJE,filed > appeal > revived > hearing > decided > final,final,0.00628321,15
-OSSEMJE,filed > suspended,open,0.00540724,13
-OSSEMJE,filed > appeal > decided > appeal > final,final,0.00338129,8
-OSSEMJE,filed > appeal > revived > hearing > decided > appeal > final,final,0.00336073,8
-OSSEMKA,filed > hearing > decided > final,final,0.795032,1908
-OSSEMKA,filed > decided > final,final,0.120633,291
-OSSEMKA,filed > hearing > decided > appeal > final,final,0.015141,37
-OSSEMKA,filed > decided > revived > hearing > decided > final,final,0.0123942,30
-OSSEMKA,filed > suspended > decided > final,final,0.008342,20
-OSSEMKA,filed > suspended,open,0.00616231,15
-OSSEMKA,filed > decided,closed,0.00501296,12
-OSSEMKA,filed > decided > appeal > revived > decided > final,final,0.00249552,6
-OSSEMKA,filed > decided > appeal > revived > hearing > decided > final,final,0.00246616,6
-OSSEMKA,filed > decided > appeal > final,final,0.00243859,6
-OSSEMNJ,filed > hearing > decided > final,final,0.736502,1768
-OSSEMNJ,filed > decided > final,final,0.14809,356
+OSSCETP,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.0024004914,7
+OSSCETP,filed > revived > hearing > decided > final,final,0.002042624,5
+OSSCEUL,filed > hearing > decided > final,final,0.87658352,2140
+OSSCEUL,filed > decided > final,final,0.068574444,176
+OSSCEUL,filed > hearing > decided > appeal > final,final,0.0076512234,20
+OSSCEUL,filed > suspended > decided > final,final,0.0059196557,14
+OSSCEUL,filed > decided > revived > hearing > decided > final,final,0.0048833784,12
+OSSCEUL,filed > suspended > hearing > decided > final,final,0.0034051134,8
+OSSCEUL,filed > hearing > decided > revived > final,final,0.0029500576,7
+OSSCEUL,filed > suspended,open,0.0026308887,6
+OSSCEUL,filed > decided > appeal > final,final,0.0017474952,4
+OSSCEUL,filed > hearing > decided > revived > hearing > decided > final,final,0.0015897264,4
+OSSEMBR,filed > hearing > decided > final,final,0.75639685,1809
+OSSEMBR,filed > decided > final,final,0.12563129,309
+OSSEMBR,filed > suspended > hearing > decided > final,final,0.024219014,59
+OSSEMBR,filed > decided > revived > hearing > decided > final,final,0.020250422,50
+OSSEMBR,filed > hearing > decided > appeal > final,final,0.013944878,34
+OSSEMBR,filed > suspended,open,0.011656122,28
+OSSEMBR,filed > suspended > decided > final,final,0.008915106,22
+OSSEMBR,filed > hearing > decided > revived > final,final,0.0042902769,10
+OSSEMBR,filed > hearing > decided > revived > decided > final,final,0.002879026,7
+OSSEMBR,filed > decided > appeal > revived > hearing > decided > final,final,0.0027704437,7
+OSSEMFM,filed > hearing > decided > final,final,0.73180415,1762
+OSSEMFM,filed > decided > final,final,0.13724105,353
+OSSEMFM,filed > decided > revived > hearing > decided > final,final,0.017669395,46
+OSSEMFM,filed > hearing > decided > appeal > final,final,0.014501283,35
+OSSEMFM,filed > suspended > decided > final,final,0.012023541,29
+OSSEMFM,filed > suspended,open,0.01168766,28
+OSSEMFM,filed > decided > appeal > revived > hearing > decided > final,final,0.0052750415,17
+OSSEMFM,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.0039660606,11
+OSSEMFM,filed > hearing > decided > revived > final,final,0.0039276187,9
+OSSEMFM,filed > appeal > hearing > decided > final,final,0.003350189,8
+OSSEMJE,filed > hearing > decided > final,final,0.73618613,1769
+OSSEMJE,filed > decided > final,final,0.14744296,352
+OSSEMJE,filed > revived > hearing > decided > final,final,0.01434593,35
+OSSEMJE,filed > suspended > decided > final,final,0.011239503,27
+OSSEMJE,filed > hearing > decided > appeal > final,final,0.011045971,27
+OSSEMJE,filed > hearing > decided > appeal > decided > appeal > final,final,0.0079871411,19
+OSSEMJE,filed > appeal > revived > hearing > decided > final,final,0.0062832103,15
+OSSEMJE,filed > suspended,open,0.0054072423,13
+OSSEMJE,filed > appeal > decided > appeal > final,final,0.0033812891,8
+OSSEMJE,filed > appeal > revived > hearing > decided > appeal > final,final,0.0033607311,8
+OSSEMKA,filed > hearing > decided > final,final,0.79503197,1908
+OSSEMKA,filed > decided > final,final,0.12063258,291
+OSSEMKA,filed > hearing > decided > appeal > final,final,0.015141042,37
+OSSEMKA,filed > decided > revived > hearing > decided > final,final,0.012394158,30
+OSSEMKA,filed > suspended > decided > final,final,0.0083419959,20
+OSSEMKA,filed > suspended,open,0.0061623145,15
+OSSEMKA,filed > decided,closed,0.005012956,12
+OSSEMKA,filed > decided > appeal > revived > decided > final,final,0.0024955214,6
+OSSEMKA,filed > decided > appeal > revived > hearing > decided > final,final,0.0024661569,6
+OSSEMKA,filed > decided > appeal > final,final,0.0024385867,6
+OSSEMNJ,filed > hearing > decided > final,final,0.73650217,1768
+OSSEMNJ,filed > decided > final,final,0.14808988,356
 OSSEMNJ,filed > decided > revived > hearing > decided > final,final,0.0264804,63
-OSSEMNJ,filed > hearing > decided > appeal > final,final,0.0112284,27
-OSSEMNJ,filed > suspended,open,0.0105659,25
-OSSEMNJ,filed > suspended > decided > final,final,0.0054244,13
-OSSEMNJ,filed > decided > appeal > revived > hearing > decided > final,final,0.00502177,12
-OSSEMNJ,filed > decided > appeal > final,final,0.0037412,9
-OSSEMNJ,filed > hearing > decided,open,0.00333601,8
-OSSEMNJ,filed > hearing > decided > revived > final,final,0.00328184,8
-OSSEMOC,filed > hearing > decided > final,final,0.704882,1694
-OSSEMOC,filed > decided > final,final,0.160956,388
-OSSEMOC,filed > decided > revived > hearing > decided > final,final,0.0206654,50
-OSSEMOC,filed > hearing > decided > appeal > final,final,0.0154887,37
-OSSEMOC,filed > decided > appeal > revived > hearing > decided > final,final,0.00838041,20
-OSSEMOC,filed > decided > appeal > revived > decided > final,final,0.00619279,15
-OSSEMOC,filed > appeal > suspended > decided > final,final,0.00589671,14
-OSSEMOC,filed > decided > appeal > final,final,0.00454677,12
-OSSEMOC,filed > appeal > decided > final,final,0.00454494,11
-OSSEMOC,filed > suspended > decided > final,final,0.00415211,10
-OSSEMOP,filed > hearing > decided > final,final,0.660543,1596
-OSSEMOP,filed > decided > final,final,0.176868,431
-OSSEMOP,filed > decided > revived > hearing > decided > final,final,0.0473452,116
-OSSEMOP,filed > hearing > decided > appeal > final,final,0.0131473,31
-OSSEMOP,filed > decided > appeal > revived > hearing > decided > final,final,0.0129097,32
-OSSEMOP,filed > suspended,open,0.0112595,28
-OSSEMOP,filed > suspended > decided > final,final,0.00868533,21
-OSSEMOP,filed > decided > appeal > final,final,0.00733131,17
-OSSEMOP,filed > decided,closed,0.00510582,13
-OSSEMOP,filed > decided > appeal > revived > decided > final,final,0.00364739,9
-OSSEMOS,filed > hearing > decided > final,final,0.811928,1990
-OSSEMOS,filed > decided > final,final,0.116987,436
-OSSEMOS,filed > hearing > decided > appeal > final,final,0.0100771,29
-OSSEMOS,filed > decided > revived > hearing > decided > final,final,0.00921475,93
-OSSEMOS,filed > suspended,open,0.00726703,22
-OSSEMOS,filed > suspended > decided > final,final,0.0052119,15
-OSSEMOS,filed > decided > appeal > revived > hearing > decided > final,final,0.00358506,30
-OSSEMOS,filed > hearing > decided,open,0.00280106,7
-OSSEMOS,filed > suspended > hearing > decided > final,final,0.00250364,8
-OSSEMOS,filed > hearing > decided > appeal,open,0.00241638,7
-OSSEMPR,filed > hearing > decided > final,final,0.701848,1681
-OSSEMPR,filed > decided > final,final,0.151537,366
-OSSEMPR,filed > decided > revived > hearing > decided > final,final,0.0403133,98
+OSSEMNJ,filed > hearing > decided > appeal > final,final,0.011228432,27
+OSSEMNJ,filed > suspended,open,0.01056586,25
+OSSEMNJ,filed > suspended > decided > final,final,0.0054244032,13
+OSSEMNJ,filed > decided > appeal > revived > hearing > decided > final,final,0.0050217665,12
+OSSEMNJ,filed > decided > appeal > final,final,0.0037411992,9
+OSSEMNJ,filed > hearing > decided,open,0.0033360059,8
+OSSEMNJ,filed > hearing > decided > revived > final,final,0.0032818409,8
+OSSEMOC,filed > hearing > decided > final,final,0.70488189,1694
+OSSEMOC,filed > decided > final,final,0.16095623,388
+OSSEMOC,filed > decided > revived > hearing > decided > final,final,0.020665384,50
+OSSEMOC,filed > hearing > decided > appeal > final,final,0.015488741,37
+OSSEMOC,filed > decided > appeal > revived > hearing > decided > final,final,0.0083804058,20
+OSSEMOC,filed > decided > appeal > revived > decided > final,final,0.0061927865,15
+OSSEMOC,filed > appeal > suspended > decided > final,final,0.0058967082,14
+OSSEMOC,filed > decided > appeal > final,final,0.0045467672,12
+OSSEMOC,filed > appeal > decided > final,final,0.0045449428,11
+OSSEMOC,filed > suspended > decided > final,final,0.0041521145,10
+OSSEMOP,filed > hearing > decided > final,final,0.66054256,1596
+OSSEMOP,filed > decided > final,final,0.17686814,431
+OSSEMOP,filed > decided > revived > hearing > decided > final,final,0.047345173,116
+OSSEMOP,filed > hearing > decided > appeal > final,final,0.013147301,31
+OSSEMOP,filed > decided > appeal > revived > hearing > decided > final,final,0.01290972,32
+OSSEMOP,filed > suspended,open,0.011259536,28
+OSSEMOP,filed > suspended > decided > final,final,0.0086853278,21
+OSSEMOP,filed > decided > appeal > final,final,0.0073313104,17
+OSSEMOP,filed > decided,closed,0.0051058169,13
+OSSEMOP,filed > decided > appeal > revived > decided > final,final,0.0036473934,9
+OSSEMOS,filed > hearing > decided > final,final,0.81192764,1990
+OSSEMOS,filed > decided > final,final,0.11698731,436
+OSSEMOS,filed > hearing > decided > appeal > final,final,0.010077057,29
+OSSEMOS,filed > decided > revived > hearing > decided > final,final,0.0092147483,93
+OSSEMOS,filed > suspended,open,0.0072670296,22
+OSSEMOS,filed > suspended > decided > final,final,0.0052118979,15
+OSSEMOS,filed > decided > appeal > revived > hearing > decided > final,final,0.003585064,30
+OSSEMOS,filed > hearing > decided,open,0.0028010562,7
+OSSEMOS,filed > suspended > hearing > decided > final,final,0.0025036379,8
+OSSEMOS,filed > hearing > decided > appeal,open,0.0024163833,7
+OSSEMPR,filed > hearing > decided > final,final,0.70184799,1681
+OSSEMPR,filed > decided > final,final,0.15153652,366
+OSSEMPR,filed > decided > revived > hearing > decided > final,final,0.040313342,98
 OSSEMPR,filed > hearing > decided > appeal > final,final,0.0192406,46
-OSSEMPR,filed > suspended,open,0.00639872,15
-OSSEMPR,filed > decided > appeal > revived > hearing > decided > final,final,0.00614737,15
-OSSEMPR,filed > suspended > decided > final,final,0.00493733,12
-OSSEMPR,filed > hearing > decided > revived > final,final,0.00484501,12
-OSSEMPR,filed > suspended > hearing > decided > final,final,0.00440909,11
-OSSEMPR,filed > decided > appeal > revived > decided > final,final,0.0038332,9
-OSSEMSU,filed > hearing > decided > final,final,0.718472,1719
-OSSEMSU,filed > decided > final,final,0.155112,378
-OSSEMSU,filed > decided > revived > hearing > decided > final,final,0.0237327,59
-OSSEMSU,filed > suspended > decided > final,final,0.0145812,36
-OSSEMSU,filed > suspended,open,0.0109924,26
-OSSEMSU,filed > hearing > decided > appeal > decided > appeal > final,final,0.0104517,26
-OSSEMSU,filed > decided > appeal > revived > hearing > decided > final,final,0.00654152,16
-OSSEMSU,filed > hearing > decided > appeal > final,final,0.00499732,12
-OSSEMSU,filed > hearing > suspended > decided > final,final,0.00308818,7
-OSSEMSU,filed > decided > appeal > final,final,0.00292958,7
-OSSEMVS,filed > hearing > decided > final,final,0.651183,1568
-OSSEMVS,filed > decided > final,final,0.204644,506
-OSSEMVS,filed > hearing > decided > appeal > final,final,0.0192368,46
-OSSEMVS,filed > decided > revived > hearing > decided > final,final,0.0158823,42
-OSSEMVS,filed > suspended > decided > final,final,0.0125566,30
-OSSEMVS,filed > decided > appeal > revived > hearing > decided > final,final,0.00878083,23
-OSSEMVS,filed > suspended,open,0.0081693,20
-OSSEMVS,filed > decided > appeal > final,final,0.00672532,16
-OSSEMVS,filed > decided > appeal > revived > decided > final,final,0.00425038,12
-OSSEMVS,filed > suspended > hearing > decided > final,final,0.00410491,10
-OSSTCBE,filed > hearing > decided > final,final,0.76906,1844
-OSSTCBE,filed > decided > final,final,0.118888,291
-OSSTCBE,filed > hearing > decided > appeal > final,final,0.0200413,48
-OSSTCBE,filed > decided > revived > hearing > decided > final,final,0.0126015,34
-OSSTCBE,filed > suspended,open,0.0107823,26
-OSSTCBE,filed > suspended > decided > final,final,0.00879734,21
+OSSEMPR,filed > suspended,open,0.0063987216,15
+OSSEMPR,filed > decided > appeal > revived > hearing > decided > final,final,0.0061473744,15
+OSSEMPR,filed > suspended > decided > final,final,0.0049373273,12
+OSSEMPR,filed > hearing > decided > revived > final,final,0.0048450134,12
+OSSEMPR,filed > suspended > hearing > decided > final,final,0.0044090886,11
+OSSEMPR,filed > decided > appeal > revived > decided > final,final,0.003833201,9
+OSSEMSU,filed > hearing > decided > final,final,0.71847171,1719
+OSSEMSU,filed > decided > final,final,0.15511228,378
+OSSEMSU,filed > decided > revived > hearing > decided > final,final,0.023732668,59
+OSSEMSU,filed > suspended > decided > final,final,0.014581188,36
+OSSEMSU,filed > suspended,open,0.010992372,26
+OSSEMSU,filed > hearing > decided > appeal > decided > appeal > final,final,0.010451745,26
+OSSEMSU,filed > decided > appeal > revived > hearing > decided > final,final,0.0065415163,16
+OSSEMSU,filed > hearing > decided > appeal > final,final,0.0049973187,12
+OSSEMSU,filed > hearing > suspended > decided > final,final,0.003088176,7
+OSSEMSU,filed > decided > appeal > final,final,0.002929577,7
+OSSEMVS,filed > hearing > decided > final,final,0.65118284,1568
+OSSEMVS,filed > decided > final,final,0.2046438,506
+OSSEMVS,filed > hearing > decided > appeal > final,final,0.019236791,46
+OSSEMVS,filed > decided > revived > hearing > decided > final,final,0.015882294,42
+OSSEMVS,filed > suspended > decided > final,final,0.012556649,30
+OSSEMVS,filed > decided > appeal > revived > hearing > decided > final,final,0.0087808299,23
+OSSEMVS,filed > suspended,open,0.008169302,20
+OSSEMVS,filed > decided > appeal > final,final,0.0067253191,16
+OSSEMVS,filed > decided > appeal > revived > decided > final,final,0.0042503818,12
+OSSEMVS,filed > suspended > hearing > decided > final,final,0.0041049052,10
+OSSTCBE,filed > hearing > decided > final,final,0.76905974,1844
+OSSTCBE,filed > decided > final,final,0.11888848,291
+OSSTCBE,filed > hearing > decided > appeal > final,final,0.020041263,48
+OSSTCBE,filed > decided > revived > hearing > decided > final,final,0.012601531,34
+OSSTCBE,filed > suspended,open,0.010782328,26
+OSSTCBE,filed > suspended > decided > final,final,0.008797338,21
 OSSTCBE,filed > decided > appeal > revived > hearing > decided > final,final,0.00465314,12
-OSSTCBE,filed > hearing > decided > revived > final,final,0.00381478,9
-OSSTCBE,filed > hearing > decided > revived > decided > final,final,0.00377807,9
-OSSTCBE,filed > suspended > hearing > decided > final,final,0.00338549,8
-OSSTCBN,filed > hearing > decided > final,final,0.735637,1761
-OSSTCBN,filed > decided > final,final,0.12225,294
-OSSTCBN,filed > decided > revived > hearing > decided > final,final,0.0304924,74
-OSSTCBN,filed > hearing > decided > appeal > decided > appeal > final,final,0.0135928,33
-OSSTCBN,filed > decided > appeal > revived > hearing > decided > final,final,0.00833632,20
-OSSTCBN,filed > hearing > decided > appeal > final,final,0.00588297,14
-OSSTCBN,filed > suspended,open,0.00547975,13
-OSSTCBN,filed > appeal > decided > appeal > final,final,0.00458042,11
-OSSTCBN,filed > suspended > decided > final,final,0.00453179,11
-OSSTCBN,filed > hearing > decided > revived > final,final,0.00378419,9
-OSSTCKH,filed > hearing > decided > final,final,0.793798,1907
-OSSTCKH,filed > decided > final,final,0.112785,271
-OSSTCKH,filed > hearing > decided > appeal > final,final,0.0154099,37
-OSSTCKH,filed > suspended,open,0.00792332,19
-OSSTCKH,filed > decided > revived > hearing > decided > final,final,0.00712898,17
-OSSTCKH,filed > appeal > decided > appeal > final,final,0.00642644,15
-OSSTCKH,filed > suspended > decided > final,final,0.00586023,14
-OSSTCKH,filed > hearing > decided > revived > decided > final,final,0.00545877,13
-OSSTCKH,filed > hearing > suspended > decided > final,final,0.00411934,10
-OSSTCKH,filed > suspended > hearing > decided > final,final,0.0029545,7
-OSSTCKL,filed > hearing > decided > final,final,0.764354,1866
+OSSTCBE,filed > hearing > decided > revived > final,final,0.0038147821,9
+OSSTCBE,filed > hearing > decided > revived > decided > final,final,0.0037780651,9
+OSSTCBE,filed > suspended > hearing > decided > final,final,0.0033854891,8
+OSSTCBN,filed > hearing > decided > final,final,0.73563745,1761
+OSSTCBN,filed > decided > final,final,0.12225005,294
+OSSTCBN,filed > decided > revived > hearing > decided > final,final,0.030492433,74
+OSSTCBN,filed > hearing > decided > appeal > decided > appeal > final,final,0.013592812,33
+OSSTCBN,filed > decided > appeal > revived > hearing > decided > final,final,0.0083363168,20
+OSSTCBN,filed > hearing > decided > appeal > final,final,0.0058829695,14
+OSSTCBN,filed > suspended,open,0.0054797488,13
+OSSTCBN,filed > appeal > decided > appeal > final,final,0.0045804193,11
+OSSTCBN,filed > suspended > decided > final,final,0.0045317882,11
+OSSTCBN,filed > hearing > decided > revived > final,final,0.0037841902,9
+OSSTCKH,filed > hearing > decided > final,final,0.79379809,1907
+OSSTCKH,filed > decided > final,final,0.11278475,271
+OSSTCKH,filed > hearing > decided > appeal > final,final,0.015409887,37
+OSSTCKH,filed > suspended,open,0.007923325,19
+OSSTCKH,filed > decided > revived > hearing > decided > final,final,0.007128977,17
+OSSTCKH,filed > appeal > decided > appeal > final,final,0.0064264424,15
+OSSTCKH,filed > suspended > decided > final,final,0.0058602344,14
+OSSTCKH,filed > hearing > decided > revived > decided > final,final,0.0054587673,13
+OSSTCKH,filed > hearing > suspended > decided > final,final,0.0041193366,10
+OSSTCKH,filed > suspended > hearing > decided > final,final,0.0029545027,7
+OSSTCKL,filed > hearing > decided > final,final,0.76435401,1866
 OSSTCKL,filed > decided > final,final,0.110851,315
-OSSTCKL,filed > hearing > decided > appeal > final,final,0.0181382,46
-OSSTCKL,filed > hearing > decided > revived > final,final,0.0122999,29
-OSSTCKL,filed > decided > revived > hearing > decided > final,final,0.0114548,45
-OSSTCKL,filed > suspended > decided > final,final,0.00620174,15
-OSSTCKL,filed > suspended,open,0.00586084,16
-OSSTCKL,filed > appeal > decided > appeal > final,final,0.00535286,14
-OSSTCKL,filed > suspended > hearing > decided > final,final,0.00528486,14
-OSSTCKL,filed > hearing > decided,open,0.0040915,10
-OSSTCKO,filed > hearing > decided > final,final,0.787642,1888
-OSSTCKO,filed > decided > final,final,0.111985,268
-OSSTCKO,filed > hearing > decided > appeal > final,final,0.0202522,49
-OSSTCKO,filed > decided > revived > hearing > decided > final,final,0.0116559,28
-OSSTCKO,filed > hearing > decided > revived > final,final,0.0057959,14
-OSSTCKO,filed > suspended > decided > final,final,0.00576456,14
-OSSTCKO,filed > suspended,open,0.00458778,11
-OSSTCKO,filed > decided > appeal > final,final,0.00449003,11
-OSSTCKO,filed > decided,open,0.00322016,8
-OSSTCKO,filed > hearing > decided > revived > decided > final,final,0.00291177,7
-OSSTCMB,filed > hearing > decided > final,final,0.755198,1813
-OSSTCMB,filed > decided > final,final,0.136764,328
-OSSTCMB,filed > hearing > decided > appeal > final,final,0.0193831,47
-OSSTCMB,filed > suspended > decided > final,final,0.0104656,25
-OSSTCMB,filed > revived > hearing > decided > final,final,0.0103666,25
-OSSTCMB,filed > appeal > revived > hearing > decided > final,final,0.00582989,14
-OSSTCMB,filed > revived > decided > final,final,0.00532793,13
-OSSTCMB,filed > suspended,open,0.00459988,11
-OSSTCMB,filed > hearing > decided > revived > final,final,0.00368246,9
-OSSTCMB,filed > suspended > hearing > decided > final,final,0.00327953,8
-OSSTCME,filed > hearing > decided > final,final,0.748417,1793
-OSSTCME,filed > decided > final,final,0.158725,383
-OSSTCME,filed > decided > revived > hearing > decided > final,final,0.0148299,37
-OSSTCME,filed > hearing > decided > appeal > final,final,0.0114868,28
-OSSTCME,filed > suspended,open,0.00685962,16
-OSSTCME,filed > suspended > decided > final,final,0.00531217,13
-OSSTCME,filed > decided > appeal > revived > hearing > decided > final,final,0.00458715,11
-OSSTCME,filed > decided > appeal > final,final,0.00449563,11
-OSSTCME,filed > appeal > decided > appeal > final,final,0.00332829,8
-OSSTCME,filed > decided,closed,0.00295635,7
-OSSTCNB,filed > hearing > decided > final,final,0.636233,1530
-OSSTCNB,filed > decided > final,final,0.229276,550
-OSSTCNB,filed > decided > revived > hearing > decided > final,final,0.0253764,61
-OSSTCNB,filed > hearing > decided > appeal > final,final,0.0204267,49
-OSSTCNB,filed > suspended > decided > final,final,0.0109063,26
-OSSTCNB,filed > decided > appeal > final,final,0.00704972,17
-OSSTCNB,filed > suspended,open,0.00559945,13
-OSSTCNB,filed > decided > revived > decided > final,final,0.00511107,12
-OSSTCNB,filed > decided > appeal > revived > hearing > decided > final,final,0.00500533,12
-OSSTCNB,filed > appeal > decided > appeal > final,final,0.00455123,11
-OSSTCPB,filed > hearing > decided > final,final,0.730919,1754
-OSSTCPB,filed > decided > final,final,0.118202,287
-OSSTCPB,filed > hearing > decided > appeal > final,final,0.0226449,54
-OSSTCPB,filed > revived > hearing > decided > final,final,0.0206541,48
-OSSTCPB,filed > appeal > decided > appeal > final,final,0.00876642,20
+OSSTCKL,filed > hearing > decided > appeal > final,final,0.01813823,46
+OSSTCKL,filed > hearing > decided > revived > final,final,0.012299896,29
+OSSTCKL,filed > decided > revived > hearing > decided > final,final,0.01145483,45
+OSSTCKL,filed > suspended > decided > final,final,0.0062017414,15
+OSSTCKL,filed > suspended,open,0.0058608408,16
+OSSTCKL,filed > appeal > decided > appeal > final,final,0.0053528558,14
+OSSTCKL,filed > suspended > hearing > decided > final,final,0.005284855,14
+OSSTCKL,filed > hearing > decided,open,0.0040915038,10
+OSSTCKO,filed > hearing > decided > final,final,0.78764159,1888
+OSSTCKO,filed > decided > final,final,0.11198539,268
+OSSTCKO,filed > hearing > decided > appeal > final,final,0.020252166,49
+OSSTCKO,filed > decided > revived > hearing > decided > final,final,0.011655863,28
+OSSTCKO,filed > hearing > decided > revived > final,final,0.0057959029,14
+OSSTCKO,filed > suspended > decided > final,final,0.0057645587,14
+OSSTCKO,filed > suspended,open,0.004587778,11
+OSSTCKO,filed > decided > appeal > final,final,0.0044900267,11
+OSSTCKO,filed > decided,open,0.0032201636,8
+OSSTCKO,filed > hearing > decided > revived > decided > final,final,0.0029117664,7
+OSSTCMB,filed > hearing > decided > final,final,0.75519807,1813
+OSSTCMB,filed > decided > final,final,0.13676369,328
+OSSTCMB,filed > hearing > decided > appeal > final,final,0.019383058,47
+OSSTCMB,filed > suspended > decided > final,final,0.010465606,25
+OSSTCMB,filed > revived > hearing > decided > final,final,0.010366638,25
+OSSTCMB,filed > appeal > revived > hearing > decided > final,final,0.0058298892,14
+OSSTCMB,filed > revived > decided > final,final,0.0053279319,13
+OSSTCMB,filed > suspended,open,0.004599877,11
+OSSTCMB,filed > hearing > decided > revived > final,final,0.0036824622,9
+OSSTCMB,filed > suspended > hearing > decided > final,final,0.0032795337,8
+OSSTCME,filed > hearing > decided > final,final,0.74841701,1793
+OSSTCME,filed > decided > final,final,0.15872453,383
+OSSTCME,filed > decided > revived > hearing > decided > final,final,0.014829865,37
+OSSTCME,filed > hearing > decided > appeal > final,final,0.011486841,28
+OSSTCME,filed > suspended,open,0.0068596172,16
+OSSTCME,filed > suspended > decided > final,final,0.0053121717,13
+OSSTCME,filed > decided > appeal > revived > hearing > decided > final,final,0.0045871533,11
+OSSTCME,filed > decided > appeal > final,final,0.0044956265,11
+OSSTCME,filed > appeal > decided > appeal > final,final,0.0033282851,8
+OSSTCME,filed > decided,closed,0.0029563458,7
+OSSTCNB,filed > hearing > decided > final,final,0.6362326,1530
+OSSTCNB,filed > decided > final,final,0.22927635,550
+OSSTCNB,filed > decided > revived > hearing > decided > final,final,0.025376353,61
+OSSTCNB,filed > hearing > decided > appeal > final,final,0.020426703,49
+OSSTCNB,filed > suspended > decided > final,final,0.010906339,26
+OSSTCNB,filed > decided > appeal > final,final,0.0070497208,17
+OSSTCNB,filed > suspended,open,0.0055994456,13
+OSSTCNB,filed > decided > revived > decided > final,final,0.0051110655,12
+OSSTCNB,filed > decided > appeal > revived > hearing > decided > final,final,0.0050053285,12
+OSSTCNB,filed > appeal > decided > appeal > final,final,0.0045512271,11
+OSSTCPB,filed > hearing > decided > final,final,0.7309187,1754
+OSSTCPB,filed > decided > final,final,0.11820222,287
+OSSTCPB,filed > hearing > decided > appeal > final,final,0.022644891,54
+OSSTCPB,filed > revived > hearing > decided > final,final,0.020654079,48
+OSSTCPB,filed > appeal > decided > appeal > final,final,0.0087664186,20
 OSSTCPB,filed > appeal > revived > hearing > decided > final,final,0.007391,18
-OSSTCPB,filed > hearing > decided > revived > final,final,0.00686093,16
-OSSTCPB,filed > decided > appeal > final,final,0.0051038,12
-OSSTCPB,filed > hearing > decided > appeal > decided > appeal > final,final,0.00450995,11
-OSSTCPB,filed > decided > appeal > revived > hearing > decided > final,final,0.00448994,11
-OSSTCPY,filed > hearing > decided > final,final,0.661095,1585
-OSSTCPY,filed > decided > final,final,0.152783,368
-OSSTCPY,filed > decided > revived > hearing > decided > final,final,0.0229726,55
-OSSTCPY,filed > hearing > decided > appeal > final,final,0.0218296,52
-OSSTCPY,filed > decided > revived > decided > final,final,0.011649,28
-OSSTCPY,filed > decided > revived > final,final,0.00920874,22
-OSSTCPY,filed > suspended > decided > final,final,0.00839152,20
-OSSTCPY,filed > decided > appeal > final,final,0.00754525,18
-OSSTCPY,filed > appeal > decided > appeal > final,final,0.00747914,18
-OSSTCPY,filed > suspended,open,0.00612852,15
-OSSTCPZ,filed > hearing > decided > final,final,0.651605,1565
-OSSTCPZ,filed > decided > final,final,0.16329,396
-OSSTCPZ,filed > decided > revived > hearing > decided > final,final,0.0296518,70
-OSSTCPZ,filed > hearing > decided > appeal > final,final,0.0282576,70
-OSSTCPZ,filed > suspended > decided > final,final,0.0096239,23
-OSSTCPZ,filed > hearing > suspended > decided > final,final,0.0052665,13
-OSSTCPZ,filed > decided > appeal > revived > hearing > decided > final,final,0.00502766,12
-OSSTCPZ,filed > hearing > decided > revived > final,final,0.00495785,12
-OSSTCPZ,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.00453014,11
-OSSTCPZ,filed > suspended,open,0.00448653,11
-OSSTCRA,filed > hearing > decided > final,final,0.631863,1519
-OSSTCRA,filed > decided > final,final,0.213369,510
-OSSTCRA,filed > decided > revived > hearing > decided > final,final,0.0475155,113
-OSSTCRA,filed > hearing > decided > appeal > final,final,0.0233696,56
-OSSTCRA,filed > decided > appeal > revived > hearing > decided > appeal > decided > final,final,0.00785892,19
-OSSTCRA,filed > appeal > decided > appeal > final,final,0.00568916,14
-OSSTCRA,filed > suspended > decided > final,final,0.00549391,13
-OSSTCRA,filed > suspended,open,0.00530394,13
-OSSTCRA,filed > decided > revived > decided > final,final,0.00456732,11
-OSSTCRA,filed > decided > appeal > final,final,0.00374424,9
-OSVYCCR,filed > hearing > decided > final,final,0.74248,1780
-OSVYCCR,filed > decided > final,final,0.127592,311
-OSVYCCR,filed > hearing > decided > appeal > final,final,0.016842,43
-OSVYCCR,filed > decided > revived > hearing > decided > final,final,0.016188,38
-OSVYCCR,filed > suspended,open,0.0118624,28
-OSVYCCR,filed > decided > appeal > final,final,0.00830659,19
-OSVYCCR,filed > suspended > decided > final,final,0.00751243,19
-OSVYCCR,filed > decided > appeal > revived > hearing > decided > final,final,0.00685925,17
-OSVYCCR,filed > appeal > decided > appeal > final,final,0.00518918,12
-OSVYCCR,filed > hearing > decided > revived > decided > final,final,0.00401811,9
-OSVYCHB,filed > hearing > decided > final,final,0.714424,1715
-OSVYCHB,filed > decided > final,final,0.166943,405
-OSVYCHB,filed > revived > hearing > decided > final,final,0.0189975,48
-OSVYCHB,filed > suspended,open,0.0101103,25
-OSVYCHB,filed > hearing > decided > appeal > final,final,0.00796551,19
-OSVYCHB,filed > suspended > decided > final,final,0.00749526,18
-OSVYCHB,filed > appeal > revived > hearing > decided > final,final,0.00612091,15
-OSVYCHB,filed > hearing > decided > appeal > decided > appeal > final,final,0.00584932,14
-OSVYCHB,filed > suspended > hearing > decided > final,final,0.00493303,12
-OSVYCHB,filed > decided > appeal > final,final,0.00404157,10
-OSVYCHK,filed > decided > final,final,0.693624,1658
-OSVYCHK,filed > hearing > decided > final,final,0.183154,446
-OSVYCHK,filed > decided > revived > decided > final,final,0.0263828,63
-OSVYCHK,filed > suspended > decided > final,final,0.0140331,33
-OSVYCHK,filed > decided > appeal > final,final,0.01051,25
-OSVYCHK,filed > suspended,open,0.00691342,17
-OSVYCHK,filed > hearing > decided > appeal > final,final,0.00676993,16
-OSVYCHK,filed > decided > appeal > revived > hearing > decided > final,final,0.00488283,12
-OSVYCHK,filed > decided > revived > final,final,0.00420403,10
-OSVYCHK,filed > decided > appeal > revived > decided > final,final,0.00411082,10
-OSVYCJC,filed > hearing > decided > final,final,0.701937,1682
-OSVYCJC,filed > decided > final,final,0.167053,412
-OSVYCJC,filed > hearing > decided > appeal > final,final,0.0153126,39
-OSVYCJC,filed > decided > revived > hearing > decided > final,final,0.0134197,37
-OSVYCJC,filed > suspended > decided > final,final,0.0128915,33
-OSVYCJC,filed > suspended,open,0.00954016,22
-OSVYCJC,filed > decided > appeal > revived > hearing > decided > final,final,0.0048966,13
-OSVYCJC,filed > appeal > decided > appeal > final,final,0.00473129,11
-OSVYCJC,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.00451798,12
-OSVYCJC,filed > hearing,open,0.00432083,9
-OSVYCNA,filed > hearing > decided > final,final,0.80708,1941
-OSVYCNA,filed > decided > final,final,0.0985631,242
-OSVYCNA,filed > decided > revived > hearing > decided > final,final,0.0164901,43
-OSVYCNA,filed > decided > appeal > revived > hearing > decided > final,final,0.00929033,24
-OSVYCNA,filed > hearing > decided > appeal > final,final,0.00742101,18
+OSSTCPB,filed > hearing > decided > revived > final,final,0.0068609322,16
+OSSTCPB,filed > decided > appeal > final,final,0.0051037953,12
+OSSTCPB,filed > hearing > decided > appeal > decided > appeal > final,final,0.004509946,11
+OSSTCPB,filed > decided > appeal > revived > hearing > decided > final,final,0.0044899442,11
+OSSTCPY,filed > hearing > decided > final,final,0.66109469,1585
+OSSTCPY,filed > decided > final,final,0.15278324,368
+OSSTCPY,filed > decided > revived > hearing > decided > final,final,0.022972581,55
+OSSTCPY,filed > hearing > decided > appeal > final,final,0.021829632,52
+OSSTCPY,filed > decided > revived > decided > final,final,0.011649043,28
+OSSTCPY,filed > decided > revived > final,final,0.0092087423,22
+OSSTCPY,filed > suspended > decided > final,final,0.0083915154,20
+OSSTCPY,filed > decided > appeal > final,final,0.0075452495,18
+OSSTCPY,filed > appeal > decided > appeal > final,final,0.0074791364,18
+OSSTCPY,filed > suspended,open,0.0061285216,15
+OSSTCPZ,filed > hearing > decided > final,final,0.65160489,1565
+OSSTCPZ,filed > decided > final,final,0.16329017,396
+OSSTCPZ,filed > decided > revived > hearing > decided > final,final,0.029651787,70
+OSSTCPZ,filed > hearing > decided > appeal > final,final,0.028257599,70
+OSSTCPZ,filed > suspended > decided > final,final,0.0096238961,23
+OSSTCPZ,filed > hearing > suspended > decided > final,final,0.0052665026,13
+OSSTCPZ,filed > decided > appeal > revived > hearing > decided > final,final,0.0050276568,12
+OSSTCPZ,filed > hearing > decided > revived > final,final,0.0049578459,12
+OSSTCPZ,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.0045301384,11
+OSSTCPZ,filed > suspended,open,0.0044865341,11
+OSSTCRA,filed > hearing > decided > final,final,0.63186349,1519
+OSSTCRA,filed > decided > final,final,0.21336858,510
+OSSTCRA,filed > decided > revived > hearing > decided > final,final,0.047515484,113
+OSSTCRA,filed > hearing > decided > appeal > final,final,0.023369565,56
+OSSTCRA,filed > decided > appeal > revived > hearing > decided > appeal > decided > final,final,0.0078589217,19
+OSSTCRA,filed > appeal > decided > appeal > final,final,0.0056891574,14
+OSSTCRA,filed > suspended > decided > final,final,0.0054939095,13
+OSSTCRA,filed > suspended,open,0.0053039354,13
+OSSTCRA,filed > decided > revived > decided > final,final,0.0045673187,11
+OSSTCRA,filed > decided > appeal > final,final,0.0037442444,9
+OSVYCCR,filed > hearing > decided > final,final,0.7424801,1780
+OSVYCCR,filed > decided > final,final,0.12759179,311
+OSVYCCR,filed > hearing > decided > appeal > final,final,0.016842016,43
+OSVYCCR,filed > decided > revived > hearing > decided > final,final,0.016188017,38
+OSVYCCR,filed > suspended,open,0.011862383,28
+OSVYCCR,filed > decided > appeal > final,final,0.0083065895,19
+OSVYCCR,filed > suspended > decided > final,final,0.0075124321,19
+OSVYCCR,filed > decided > appeal > revived > hearing > decided > final,final,0.0068592493,17
+OSVYCCR,filed > appeal > decided > appeal > final,final,0.0051891811,12
+OSVYCCR,filed > hearing > decided > revived > decided > final,final,0.0040181114,9
+OSVYCHB,filed > hearing > decided > final,final,0.71442417,1715
+OSVYCHB,filed > decided > final,final,0.16694299,405
+OSVYCHB,filed > revived > hearing > decided > final,final,0.018997519,48
+OSVYCHB,filed > suspended,open,0.01011034,25
+OSVYCHB,filed > hearing > decided > appeal > final,final,0.0079655077,19
+OSVYCHB,filed > suspended > decided > final,final,0.0074952609,18
+OSVYCHB,filed > appeal > revived > hearing > decided > final,final,0.0061209081,15
+OSVYCHB,filed > hearing > decided > appeal > decided > appeal > final,final,0.0058493223,14
+OSVYCHB,filed > suspended > hearing > decided > final,final,0.0049330343,12
+OSVYCHB,filed > decided > appeal > final,final,0.0040415744,10
+OSVYCHK,filed > decided > final,final,0.69362419,1658
+OSVYCHK,filed > hearing > decided > final,final,0.18315414,446
+OSVYCHK,filed > decided > revived > decided > final,final,0.026382837,63
+OSVYCHK,filed > suspended > decided > final,final,0.014033107,33
+OSVYCHK,filed > decided > appeal > final,final,0.010509954,25
+OSVYCHK,filed > suspended,open,0.0069134183,17
+OSVYCHK,filed > hearing > decided > appeal > final,final,0.0067699294,16
+OSVYCHK,filed > decided > appeal > revived > hearing > decided > final,final,0.0048828285,12
+OSVYCHK,filed > decided > revived > final,final,0.0042040289,10
+OSVYCHK,filed > decided > appeal > revived > decided > final,final,0.0041108222,10
+OSVYCJC,filed > hearing > decided > final,final,0.70193691,1682
+OSVYCJC,filed > decided > final,final,0.16705316,412
+OSVYCJC,filed > hearing > decided > appeal > final,final,0.015312649,39
+OSVYCJC,filed > decided > revived > hearing > decided > final,final,0.013419722,37
+OSVYCJC,filed > suspended > decided > final,final,0.012891491,33
+OSVYCJC,filed > suspended,open,0.0095401606,22
+OSVYCJC,filed > decided > appeal > revived > hearing > decided > final,final,0.0048965974,13
+OSVYCJC,filed > appeal > decided > appeal > final,final,0.0047312863,11
+OSVYCJC,filed > decided > appeal > revived > hearing > decided > appeal > final,final,0.0045179807,12
+OSVYCJC,filed > hearing,open,0.0043208303,9
+OSVYCNA,filed > hearing > decided > final,final,0.80707958,1941
+OSVYCNA,filed > decided > final,final,0.09856314,242
+OSVYCNA,filed > decided > revived > hearing > decided > final,final,0.016490104,43
+OSVYCNA,filed > decided > appeal > revived > hearing > decided > final,final,0.0092903283,24
+OSVYCNA,filed > hearing > decided > appeal > final,final,0.0074210145,18
 OSVYCNA,filed > decided > hearing > revived > decided > final,final,0.00553094,13
-OSVYCNA,filed > appeal > decided > appeal > final,final,0.00410053,10
-OSVYCNA,filed > suspended > decided > final,final,0.00290729,7
-OSVYCNA,filed > hearing > decided,open,0.00264579,6
-OSVYCNA,filed > decided > appeal > final,final,0.00212603,5
-OSVYCPA,filed > hearing > decided > final,final,0.699148,1677
-OSVYCPA,filed > decided > final,final,0.158596,400
-OSVYCPA,filed > hearing > decided > appeal > final,final,0.0166466,40
-OSVYCPA,filed > decided > revived > hearing > decided > final,final,0.0143713,40
-OSVYCPA,filed > suspended,open,0.00990466,24
-OSVYCPA,filed > decided > appeal > final,final,0.00812075,20
-OSVYCPA,filed > suspended > decided > final,final,0.00693702,17
-OSVYCPA,filed > hearing > decided,open,0.00469248,11
-OSVYCPA,filed > decided > revived > decided > final,final,0.00464759,14
-OSVYCPA,filed > decided > appeal > revived > hearing > decided > final,final,0.00455003,15
-OSVYCRK,filed > hearing > decided > final,final,0.740017,1776
-OSVYCRK,filed > decided > final,final,0.137762,331
-OSVYCRK,filed > revived > hearing > decided > final,final,0.0247869,60
-OSVYCRK,filed > hearing > decided > appeal > decided > appeal > final,final,0.00984715,24
-OSVYCRK,filed > appeal > revived > hearing > decided > final,final,0.00859027,20
-OSVYCRK,filed > hearing > decided > appeal > final,final,0.00649947,16
-OSVYCRK,filed > suspended,open,0.00537104,13
-OSVYCRK,filed > suspended > decided > final,final,0.00494915,12
-OSVYCRK,filed > revived > decided > final,final,0.00459297,11
-OSVYCRK,filed > hearing > suspended > decided > final,final,0.00368628,9
-OSVYCSM,filed > hearing > decided > final,final,0.58967,1413
-OSVYCSM,filed > decided > final,final,0.239229,577
-OSVYCSM,filed > hearing > decided > appeal > decided > appeal > final,final,0.0139669,34
-OSVYCSM,filed > decided > appeal > revived > hearing > decided > final,final,0.0124803,30
-OSVYCSM,filed > suspended > decided > final,final,0.0106673,25
-OSVYCSM,filed > decided > revived > hearing > decided > final,final,0.0105521,25
-OSVYCSM,filed > suspended,open,0.0102227,25
-OSVYCSM,filed > hearing > decided > appeal > final,final,0.00887565,21
-OSVYCSM,filed > appeal > hearing > decided > final,final,0.005025,12
-OSVYCSM,filed > suspended > hearing > decided > final,final,0.00418774,10
-OSVYCSY,filed > hearing > decided > final,final,0.786084,1886
-OSVYCSY,filed > decided > final,final,0.0947455,228
-OSVYCSY,filed > decided > revived > hearing > decided > final,final,0.0259691,63
-OSVYCSY,filed > hearing > decided > appeal > final,final,0.0239356,57
-OSVYCSY,filed > suspended,open,0.0108184,26
-OSVYCSY,filed > suspended > hearing > decided > final,final,0.00827464,20
-OSVYCSY,filed > suspended > decided > final,final,0.00795258,19
-OSVYCSY,filed > hearing > decided,open,0.00621773,15
-OSVYCSY,filed > appeal > hearing > decided > final,final,0.00334361,8
-OSVYCSY,filed > decided > appeal > revived > hearing > decided > final,final,0.00250815,6
-OSVYCTU,filed > hearing > decided > final,final,0.751721,1805
-OSVYCTU,filed > decided > final,final,0.124032,304
-OSVYCTU,filed > decided > revived > hearing > decided > final,final,0.0331548,83
-OSVYCTU,filed > suspended,open,0.00980791,23
-OSVYCTU,filed > hearing > decided > appeal > decided > appeal > final,final,0.00711328,17
-OSVYCTU,filed > decided > appeal > revived > hearing > decided > final,final,0.00599776,15
-OSVYCTU,filed > hearing > decided > appeal > final,final,0.00519603,12
-OSVYCTU,filed > suspended > decided > final,final,0.00484779,12
-OSVYCTU,filed > hearing > decided,open,0.00460372,11
-OSVYCTU,filed > appeal > decided > appeal > final,final,0.00409959,10
-OSVYCUO,filed > decided > final,final,0.442177,1170
-OSVYCUO,filed > hearing > decided > final,final,0.21838,526
-OSVYCUO,filed > decided > revived > hearing > decided > final,final,0.19063,484
-OSVYCUO,filed > decided > revived > decided > final,final,0.0351098,90
-OSVYCUO,filed > decided > revived > final,final,0.0109715,28
-OSVYCUO,filed > suspended > decided > final,final,0.00943019,23
-OSVYCUO,filed > decided,open,0.00782357,20
-OSVYCUO,filed > suspended,open,0.00715806,17
-OSVYCUO,filed > decided > appeal > revived > hearing > decided > appeal > decided > final,final,0.00710494,22
-OSVYCUO,filed > hearing > decided > appeal > decided > appeal > final,final,0.00400557,10
-OSZPCCH,filed > hearing > decided > final,final,0.778205,1869
-OSZPCCH,filed > decided > final,final,0.130769,320
-OSZPCCH,filed > decided > revived > hearing > decided > final,final,0.0153035,36
-OSZPCCH,filed > hearing > decided > appeal > final,final,0.0083239,21
-OSZPCCH,filed > hearing > decided > appeal > decided > appeal > final,final,0.00790036,19
-OSZPCCH,filed > suspended > decided > final,final,0.00721334,17
-OSZPCCH,filed > suspended,open,0.0058555,14
-OSZPCCH,filed > decided > revived > decided > final,final,0.00339027,8
-OSZPCCH,filed > decided > appeal > final,final,0.00294308,7
-OSZPCCH,filed > appeal > decided > final,final,0.0021021,5
-OSZPCDO,filed > hearing > decided > final,final,0.778628,1868
-OSZPCDO,filed > decided > final,final,0.12877,309
-OSZPCDO,filed > decided > revived > hearing > decided > final,final,0.0224982,54
-OSZPCDO,filed > hearing > decided > appeal > final,final,0.0186882,46
-OSZPCDO,filed > suspended,open,0.00498685,12
-OSZPCDO,filed > decided > appeal > revived > hearing > decided > final,final,0.00414673,10
-OSZPCDO,filed > decided > appeal > revived > decided > final,final,0.00213266,5
-OSZPCDO,filed > suspended > decided > final,final,0.00203671,5
-OSZPCDO,filed > hearing > decided,open,0.00203625,5
-OSZPCDO,filed > decided > appeal > final,final,0.00170903,4
-OSZPCKT,filed > hearing > decided > final,final,0.750496,1800
-OSZPCKT,filed > decided > final,final,0.13358,322
-OSZPCKT,filed > decided > revived > hearing > decided > final,final,0.028382,68
-OSZPCKT,filed > hearing > decided > appeal > final,final,0.0215254,52
-OSZPCKT,filed > suspended > decided > final,final,0.00618356,15
-OSZPCKT,filed > hearing > decided > revived > final,final,0.00544681,13
-OSZPCKT,filed > decided > appeal > final,final,0.00426466,10
-OSZPCKT,filed > suspended,open,0.00416978,10
-OSZPCKT,filed > decided > appeal > revived > hearing > decided > final,final,0.00380319,9
-OSZPCKT,filed > suspended > hearing > decided > final,final,0.00372337,9
-OSZPCKV,filed > hearing > decided > final,final,0.810397,1944
-OSZPCKV,filed > decided > final,final,0.0915603,220
-OSZPCKV,filed > decided > revived > hearing > decided > final,final,0.0225271,54
-OSZPCKV,filed > hearing > decided > appeal > final,final,0.0103753,25
-OSZPCKV,filed > suspended,open,0.00534618,13
-OSZPCKV,filed > decided > appeal > revived > hearing > decided > final,final,0.00534052,13
-OSZPCKV,filed > suspended > decided > final,final,0.0045668,11
-OSZPCKV,filed > suspended > hearing > decided > final,final,0.00387172,9
-OSZPCKV,filed > decided > appeal > final,final,0.0033037,8
-OSZPCKV,filed > decided > revived > decided > final,final,0.00301986,7
-OSZPCPJ,filed > hearing > decided > final,final,0.729759,1745
-OSZPCPJ,filed > decided > final,final,0.127733,310
-OSZPCPJ,filed > hearing > decided > appeal > final,final,0.0242357,59
-OSZPCPJ,filed > revived > hearing > decided > final,final,0.0201353,49
-OSZPCPJ,filed > decided > revived > hearing > decided > final,final,0.0113293,28
-OSZPCPJ,filed > suspended > decided > final,final,0.00948038,23
-OSZPCPJ,filed > appeal > decided > appeal > final,final,0.00703592,17
-OSZPCPJ,filed > suspended,open,0.00675491,16
-OSZPCPJ,filed > suspended > hearing > decided > final,final,0.00454683,11
-OSZPCPJ,filed > hearing > revived > decided > final,final,0.00286577,7
-OSZPCPM,filed > hearing > decided > final,final,0.716,1720
-OSZPCPM,filed > decided > final,final,0.183051,439
+OSVYCNA,filed > appeal > decided > appeal > final,final,0.0041005293,10
+OSVYCNA,filed > suspended > decided > final,final,0.0029072895,7
+OSVYCNA,filed > hearing > decided,open,0.0026457938,6
+OSVYCNA,filed > decided > appeal > final,final,0.0021260314,5
+OSVYCPA,filed > hearing > decided > final,final,0.69914752,1677
+OSVYCPA,filed > decided > final,final,0.15859569,400
+OSVYCPA,filed > hearing > decided > appeal > final,final,0.016646625,40
+OSVYCPA,filed > decided > revived > hearing > decided > final,final,0.014371315,40
+OSVYCPA,filed > suspended,open,0.0099046561,24
+OSVYCPA,filed > decided > appeal > final,final,0.0081207523,20
+OSVYCPA,filed > suspended > decided > final,final,0.0069370232,17
+OSVYCPA,filed > hearing > decided,open,0.0046924807,11
+OSVYCPA,filed > decided > revived > decided > final,final,0.0046475943,14
+OSVYCPA,filed > decided > appeal > revived > hearing > decided > final,final,0.0045500331,15
+OSVYCRK,filed > hearing > decided > final,final,0.74001699,1776
+OSVYCRK,filed > decided > final,final,0.13776199,331
+OSVYCRK,filed > revived > hearing > decided > final,final,0.024786879,60
+OSVYCRK,filed > hearing > decided > appeal > decided > appeal > final,final,0.0098471538,24
+OSVYCRK,filed > appeal > revived > hearing > decided > final,final,0.0085902697,20
+OSVYCRK,filed > hearing > decided > appeal > final,final,0.0064994703,16
+OSVYCRK,filed > suspended,open,0.0053710389,13
+OSVYCRK,filed > suspended > decided > final,final,0.0049491502,12
+OSVYCRK,filed > revived > decided > final,final,0.0045929683,11
+OSVYCRK,filed > hearing > suspended > decided > final,final,0.0036862829,9
+OSVYCSM,filed > hearing > decided > final,final,0.58967008,1413
+OSVYCSM,filed > decided > final,final,0.23922854,577
+OSVYCSM,filed > hearing > decided > appeal > decided > appeal > final,final,0.01396687,34
+OSVYCSM,filed > decided > appeal > revived > hearing > decided > final,final,0.012480295,30
+OSVYCSM,filed > suspended > decided > final,final,0.010667311,25
+OSVYCSM,filed > decided > revived > hearing > decided > final,final,0.010552051,25
+OSVYCSM,filed > suspended,open,0.010222712,25
+OSVYCSM,filed > hearing > decided > appeal > final,final,0.008875646,21
+OSVYCSM,filed > appeal > hearing > decided > final,final,0.005025005,12
+OSVYCSM,filed > suspended > hearing > decided > final,final,0.0041877439,10
+OSVYCSY,filed > hearing > decided > final,final,0.78608388,1886
+OSVYCSY,filed > decided > final,final,0.094745492,228
+OSVYCSY,filed > decided > revived > hearing > decided > final,final,0.025969132,63
+OSVYCSY,filed > hearing > decided > appeal > final,final,0.023935636,57
+OSVYCSY,filed > suspended,open,0.010818363,26
+OSVYCSY,filed > suspended > hearing > decided > final,final,0.0082746353,20
+OSVYCSY,filed > suspended > decided > final,final,0.0079525802,19
+OSVYCSY,filed > hearing > decided,open,0.0062177348,15
+OSVYCSY,filed > appeal > hearing > decided > final,final,0.0033436148,8
+OSVYCSY,filed > decided > appeal > revived > hearing > decided > final,final,0.0025081484,6
+OSVYCTU,filed > hearing > decided > final,final,0.75172084,1805
+OSVYCTU,filed > decided > final,final,0.1240319,304
+OSVYCTU,filed > decided > revived > hearing > decided > final,final,0.033154834,83
+OSVYCTU,filed > suspended,open,0.0098079116,23
+OSVYCTU,filed > hearing > decided > appeal > decided > appeal > final,final,0.007113284,17
+OSVYCTU,filed > decided > appeal > revived > hearing > decided > final,final,0.0059977567,15
+OSVYCTU,filed > hearing > decided > appeal > final,final,0.0051960287,12
+OSVYCTU,filed > suspended > decided > final,final,0.0048477857,12
+OSVYCTU,filed > hearing > decided,open,0.0046037156,11
+OSVYCTU,filed > appeal > decided > appeal > final,final,0.0040995923,10
+OSVYCUO,filed > decided > final,final,0.44217715,1170
+OSVYCUO,filed > hearing > decided > final,final,0.21837998,526
+OSVYCUO,filed > decided > revived > hearing > decided > final,final,0.1906304,484
+OSVYCUO,filed > decided > revived > decided > final,final,0.035109758,90
+OSVYCUO,filed > decided > revived > final,final,0.010971472,28
+OSVYCUO,filed > suspended > decided > final,final,0.0094301894,23
+OSVYCUO,filed > decided,open,0.0078235749,20
+OSVYCUO,filed > suspended,open,0.0071580584,17
+OSVYCUO,filed > decided > appeal > revived > hearing > decided > appeal > decided > final,final,0.0071049388,22
+OSVYCUO,filed > hearing > decided > appeal > decided > appeal > final,final,0.0040055707,10
+OSZPCCH,filed > hearing > decided > final,final,0.77820514,1869
+OSZPCCH,filed > decided > final,final,0.13076945,320
+OSZPCCH,filed > decided > revived > hearing > decided > final,final,0.015303502,36
+OSZPCCH,filed > hearing > decided > appeal > final,final,0.0083239003,21
+OSZPCCH,filed > hearing > decided > appeal > decided > appeal > final,final,0.0079003561,19
+OSZPCCH,filed > suspended > decided > final,final,0.0072133402,17
+OSZPCCH,filed > suspended,open,0.005855498,14
+OSZPCCH,filed > decided > revived > decided > final,final,0.0033902679,8
+OSZPCCH,filed > decided > appeal > final,final,0.002943081,7
+OSZPCCH,filed > appeal > decided > final,final,0.0021021021,5
+OSZPCDO,filed > hearing > decided > final,final,0.77862798,1868
+OSZPCDO,filed > decided > final,final,0.12877004,309
+OSZPCDO,filed > decided > revived > hearing > decided > final,final,0.022498237,54
+OSZPCDO,filed > hearing > decided > appeal > final,final,0.018688236,46
+OSZPCDO,filed > suspended,open,0.0049868521,12
+OSZPCDO,filed > decided > appeal > revived > hearing > decided > final,final,0.0041467322,10
+OSZPCDO,filed > decided > appeal > revived > decided > final,final,0.002132663,5
+OSZPCDO,filed > suspended > decided > final,final,0.0020367084,5
+OSZPCDO,filed > hearing > decided,open,0.0020362534,5
+OSZPCDO,filed > decided > appeal > final,final,0.0017090263,4
+OSZPCKT,filed > hearing > decided > final,final,0.75049565,1800
+OSZPCKT,filed > decided > final,final,0.13358009,322
+OSZPCKT,filed > decided > revived > hearing > decided > final,final,0.028382018,68
+OSZPCKT,filed > hearing > decided > appeal > final,final,0.021525411,52
+OSZPCKT,filed > suspended > decided > final,final,0.0061835595,15
+OSZPCKT,filed > hearing > decided > revived > final,final,0.0054468136,13
+OSZPCKT,filed > decided > appeal > final,final,0.0042646562,10
+OSZPCKT,filed > suspended,open,0.0041697814,10
+OSZPCKT,filed > decided > appeal > revived > hearing > decided > final,final,0.0038031925,9
+OSZPCKT,filed > suspended > hearing > decided > final,final,0.0037233687,9
+OSZPCKV,filed > hearing > decided > final,final,0.81039735,1944
+OSZPCKV,filed > decided > final,final,0.091560337,220
+OSZPCKV,filed > decided > revived > hearing > decided > final,final,0.022527127,54
+OSZPCKV,filed > hearing > decided > appeal > final,final,0.010375282,25
+OSZPCKV,filed > suspended,open,0.0053461764,13
+OSZPCKV,filed > decided > appeal > revived > hearing > decided > final,final,0.0053405241,13
+OSZPCKV,filed > suspended > decided > final,final,0.0045667958,11
+OSZPCKV,filed > suspended > hearing > decided > final,final,0.0038717238,9
+OSZPCKV,filed > decided > appeal > final,final,0.0033036979,8
+OSZPCKV,filed > decided > revived > decided > final,final,0.003019861,7
+OSZPCPJ,filed > hearing > decided > final,final,0.7297587,1745
+OSZPCPJ,filed > decided > final,final,0.12773308,310
+OSZPCPJ,filed > hearing > decided > appeal > final,final,0.024235664,59
+OSZPCPJ,filed > revived > hearing > decided > final,final,0.020135328,49
+OSZPCPJ,filed > decided > revived > hearing > decided > final,final,0.011329322,28
+OSZPCPJ,filed > suspended > decided > final,final,0.0094803836,23
+OSZPCPJ,filed > appeal > decided > appeal > final,final,0.0070359177,17
+OSZPCPJ,filed > suspended,open,0.0067549149,16
+OSZPCPJ,filed > suspended > hearing > decided > final,final,0.0045468255,11
+OSZPCPJ,filed > hearing > revived > decided > final,final,0.0028657691,7
+OSZPCPM,filed > hearing > decided > final,final,0.71599965,1720
+OSZPCPM,filed > decided > final,final,0.18305069,439
 OSZPCPM,filed > hearing > decided > appeal > final,final,0.0134268,32
-OSZPCPM,filed > revived > hearing > decided > final,final,0.0100293,24
-OSZPCPM,filed > suspended > decided > final,final,0.00884804,21
-OSZPCPM,filed > suspended > hearing > decided > final,final,0.00708623,17
-OSZPCPM,filed > suspended,open,0.00407112,10
-OSZPCPM,filed > appeal > revived > decided > final,final,0.00376625,9
-OSZPCPM,filed > appeal > decided > final,final,0.00343067,8
-OSZPCPM,filed > hearing > decided > revived > final,final,0.00339736,8
-OSZPCPS,filed > hearing > decided > final,final,0.746966,1793
-OSZPCPS,filed > decided > final,final,0.163346,389
-OSZPCPS,filed > decided > revived > hearing > decided > final,final,0.0195877,47
-OSZPCPS,filed > hearing > decided > appeal > final,final,0.00871734,21
-OSZPCPS,filed > suspended,open,0.00779795,19
-OSZPCPS,filed > suspended > decided > final,final,0.00455761,11
-OSZPCPS,filed > hearing > decided > revived > final,final,0.00420288,10
-OSZPCPS,filed > decided > appeal > final,final,0.00379108,9
-OSZPCPS,filed > decided,closed,0.00369487,9
-OSZPCPS,filed > decided > revived > decided > final,final,0.00341478,8
-OSZPCRO,filed > hearing > decided > final,final,0.730985,1754
-OSZPCRO,filed > decided > final,final,0.165869,396
-OSZPCRO,filed > decided > revived > hearing > decided > final,final,0.0209613,51
-OSZPCRO,filed > hearing > decided > appeal > final,final,0.0118929,29
-OSZPCRO,filed > suspended > decided > final,final,0.008172,20
-OSZPCRO,filed > suspended,open,0.00573363,14
-OSZPCRO,filed > decided > appeal > revived > hearing > decided > final,final,0.00543997,13
-OSZPCRO,filed > decided > appeal > final,final,0.00500197,12
-OSZPCRO,filed > suspended > hearing > decided > final,final,0.00407327,10
-OSZPCRO,filed > decided > revived > decided > final,final,0.00387472,9
-OSZPCSO,filed > hearing > decided > final,final,0.856079,2055
-OSZPCSO,filed > decided > final,final,0.0802917,192
-OSZPCSO,filed > hearing > decided > appeal > final,final,0.0133313,32
-OSZPCSO,filed > suspended > decided > final,final,0.00702752,17
-OSZPCSO,filed > suspended,open,0.0066463,16
-OSZPCSO,filed > decided > revived > hearing > decided > final,final,0.0058036,14
-OSZPCSO,filed > suspended > hearing > decided > final,final,0.00259199,6
-OSZPCSO,filed > decided,closed,0.00248053,6
-OSZPCSO,filed > decided > appeal > revived > hearing > decided > final,final,0.00210451,5
-OSZPCSO,filed > decided > appeal > final,final,0.00208361,5
-OSZPCTC,filed > hearing > decided > final,final,0.766518,1831
-OSZPCTC,filed > decided > final,final,0.153413,376
-OSZPCTC,filed > decided > revived > hearing > decided > final,final,0.0147457,35
-OSZPCTC,filed > hearing > decided > appeal > final,final,0.0133688,33
-OSZPCTC,filed > suspended,open,0.00507264,12
-OSZPCTC,filed > hearing > decided > appeal > decided > appeal > final,final,0.00476935,11
-OSZPCTC,filed > decided > appeal > revived > appeal > hearing > decided > appeal > final,final,0.00384111,9
-OSZPCTC,filed > suspended > decided > final,final,0.00337959,8
-OSZPCTC,filed > suspended > hearing > decided > final,final,0.00256829,6
-OSZPCTC,filed > hearing > appeal > hearing > decided > final,final,0.00215645,5
+OSZPCPM,filed > revived > hearing > decided > final,final,0.010029341,24
+OSZPCPM,filed > suspended > decided > final,final,0.0088480435,21
+OSZPCPM,filed > suspended > hearing > decided > final,final,0.0070862261,17
+OSZPCPM,filed > suspended,open,0.0040711213,10
+OSZPCPM,filed > appeal > revived > decided > final,final,0.0037662539,9
+OSZPCPM,filed > appeal > decided > final,final,0.0034306693,8
+OSZPCPM,filed > hearing > decided > revived > final,final,0.0033973649,8
+OSZPCPS,filed > hearing > decided > final,final,0.74696616,1793
+OSZPCPS,filed > decided > final,final,0.16334571,389
+OSZPCPS,filed > decided > revived > hearing > decided > final,final,0.019587709,47
+OSZPCPS,filed > hearing > decided > appeal > final,final,0.0087173447,21
+OSZPCPS,filed > suspended,open,0.0077979461,19
+OSZPCPS,filed > suspended > decided > final,final,0.0045576135,11
+OSZPCPS,filed > hearing > decided > revived > final,final,0.0042028813,10
+OSZPCPS,filed > decided > appeal > final,final,0.0037910758,9
+OSZPCPS,filed > decided,closed,0.0036948666,9
+OSZPCPS,filed > decided > revived > decided > final,final,0.0034147763,8
+OSZPCRO,filed > hearing > decided > final,final,0.73098473,1754
+OSZPCRO,filed > decided > final,final,0.16586863,396
+OSZPCRO,filed > decided > revived > hearing > decided > final,final,0.020961286,51
+OSZPCRO,filed > hearing > decided > appeal > final,final,0.011892877,29
+OSZPCRO,filed > suspended > decided > final,final,0.0081719973,20
+OSZPCRO,filed > suspended,open,0.005733628,14
+OSZPCRO,filed > decided > appeal > revived > hearing > decided > final,final,0.005439973,13
+OSZPCRO,filed > decided > appeal > final,final,0.0050019715,12
+OSZPCRO,filed > suspended > hearing > decided > final,final,0.0040732699,10
+OSZPCRO,filed > decided > revived > decided > final,final,0.0038747159,9
+OSZPCSO,filed > hearing > decided > final,final,0.85607926,2055
+OSZPCSO,filed > decided > final,final,0.080291698,192
+OSZPCSO,filed > hearing > decided > appeal > final,final,0.013331332,32
+OSZPCSO,filed > suspended > decided > final,final,0.0070275248,17
+OSZPCSO,filed > suspended,open,0.0066462987,16
+OSZPCSO,filed > decided > revived > hearing > decided > final,final,0.0058036029,14
+OSZPCSO,filed > suspended > hearing > decided > final,final,0.0025919922,6
+OSZPCSO,filed > decided,closed,0.0024805333,6
+OSZPCSO,filed > decided > appeal > revived > hearing > decided > final,final,0.0021045075,5
+OSZPCSO,filed > decided > appeal > final,final,0.002083609,5
+OSZPCTC,filed > hearing > decided > final,final,0.76651799,1831
+OSZPCTC,filed > decided > final,final,0.15341295,376
+OSZPCTC,filed > decided > revived > hearing > decided > final,final,0.01474571,35
+OSZPCTC,filed > hearing > decided > appeal > final,final,0.013368841,33
+OSZPCTC,filed > suspended,open,0.0050726383,12
+OSZPCTC,filed > hearing > decided > appeal > decided > appeal > final,final,0.0047693492,11
+OSZPCTC,filed > decided > appeal > revived > appeal > hearing > decided > appeal > final,final,0.0038411085,9
+OSZPCTC,filed > suspended > decided > final,final,0.0033795909,8
+OSZPCTC,filed > suspended > hearing > decided > final,final,0.0025682945,6
+OSZPCTC,filed > hearing > appeal > hearing > decided > final,final,0.0021564487,5
