@@ -23,6 +23,9 @@ DERIVED = [
     ("intake", paths.DERIVED / "intake.csv"),
     ("sample", paths.DERIVED / "cases.parquet"),
     ("sample", paths.DERIVED / "events.parquet"),
+    ("official", paths.DERIVED / "official.csv"),
+    ("analyse", paths.DERIVED / "journey_summary.csv"),
+    ("model", paths.DERIVED / "model_scores.csv"),
 ]
 DAY_INDEX = re.compile(re.escape(rozhodnuti.API) + r"/(\d{4})/(\d{1,2})$")
 DAY_PAGE = re.compile(re.escape(rozhodnuti.API) + r"/(\d{4})/(\d{1,2})/(\d{1,2})\?page=(\d+)$")
