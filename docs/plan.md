@@ -755,13 +755,15 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - **So the GRU still doesn't clearly beat the trees.** The ensemble ranks cases better and forecasts the next 1 to 3 months better, ties at 6 months, and is slightly worse at 12 and 24. It ranks better than the trees in 66 of the 86 courts, and has the lower Brier score at 6 months in 36 and at 12 months in 29.
   - **By how far into a case,** concordance at filing and 1, 3, 6 and 12 months in: the ensemble 0.610, 0.635, 0.684, 0.742, 0.757; the trees 0.608, 0.629, 0.676, 0.745, 0.752.
   - **Calibration at 6 months:** where the ensemble forecast under 60%, more cases finished than it said, by 3 to 8 points. Above that it's within 1.2 points.
-- [ ] A model card for the demo: facts drafted in `docs/` for Mark to write it from.
+- [x] A model card for the demo: facts drafted in `docs/` for Mark to write it from.
+  - `docs/model-card.md`, under the headings of Mitchell et al. (2019), "Model Cards for Model Reporting": the model, intended use (left for Mark, with the facts that bear on it), factors, metrics, training and evaluation data, results, ethical considerations and caveats. Facts only, as `docs/writeup.md`. Mark writes the demo's card (step 8).
 
 ### 8. Forecast and process map: release status `in-progress`
 - [ ] Move the demo to the latest demo-kit (see "Look") and bump `version`.
 - [ ] Export `demo/public/data/soudai.json` (aim for under 500 KB; the bundle must stay under 2 MB).
 - [ ] The frame, the tabs, the court selector, the status line and "How this works".
 - [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
+- [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
 - [ ] The Process map tab and its time curves.
 - [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.
 - [ ] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
