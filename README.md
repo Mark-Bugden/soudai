@@ -14,7 +14,7 @@ The project makes no claims about why courts differ, and isn't legal advice.
 | [`src/soudai/`](src/soudai/) | Python: the scrapers, the parse steps and the analysis. |
 | [`reference/`](reference/) | The hand-checked tables of district courts and event codes, and a record of the sources. Its README explains how they're made and checked. |
 | [`tests/`](tests/) | Python tests. They never touch the network: they run on real responses saved in `tests/fixtures/`. |
-| [`docs/`](docs/) | The plan, and notes for the write-up. |
+| [`docs/`](docs/) | The plan, and notes for the write-up and the model card. |
 
 The plan's "Repo layout" section lists what each part will hold as the rebuild goes on, including `data/derived/` (the parsed tables).
 
