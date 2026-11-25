@@ -27,7 +27,7 @@ uv sync
 uv run pytest
 ```
 
-Each stage runs as `uv run soudai <stage>`, in this order. `model` fits and scores the forecasting models, and needs the optional dependencies (LightGBM and a CPU-only PyTorch): `uv sync --group model`. `export` isn't built yet. The plan gives each stage's inputs, outputs and rough cost.
+Each stage runs as `uv run soudai <stage>`, in this order. `model` fits and scores the forecasting models, and needs the optional dependencies (LightGBM and a CPU-only PyTorch): `uv sync --group model`. `export` writes the demo's data from the committed tables, so it runs without the cache. The plan gives each stage's inputs, outputs and rough cost.
 
 | Stage | What it does | Milestone |
 | --- | --- | --- |

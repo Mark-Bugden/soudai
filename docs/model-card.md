@@ -72,7 +72,7 @@ Higher concordance is better, and lower Brier score and calibration error. The o
 ## Ethical considerations
 
 - **Privacy:** infosoud's records hold no names. The judge's name, which the published decisions data includes, is dropped when it's read, and nothing in the model or the demo holds it.
-- **Real cases:** the demo shows 3,010 real past cases by their case numbers, which are public on infosoud. Their records hold dates and event types only.
+- **Real cases:** the demo shows 1,720 real past cases by their case numbers, which are public on infosoud. Their records hold dates and event types only.
 - **Courts' records differ:** some courts record far fewer hearings than others (Okresní soud Hradec Králové records a hearing in 22% of cases, against 80% nationally). So a forecast for a court reflects its record-keeping as well as its pace. Which it is isn't known, and the project makes no claims about it.
 
 ## Caveats

@@ -26,6 +26,7 @@ DERIVED = [
     ("official", paths.DERIVED / "official.csv"),
     ("analyse", paths.DERIVED / "journey_summary.csv"),
     ("model", paths.DERIVED / "model_scores.csv"),
+    ("export", paths.EXPORT),
 ]
 DAY_INDEX = re.compile(re.escape(rozhodnuti.API) + r"/(\d{4})/(\d{1,2})$")
 DAY_PAGE = re.compile(re.escape(rozhodnuti.API) + r"/(\d{4})/(\d{1,2})/(\d{1,2})\?page=(\d+)$")
@@ -160,6 +161,8 @@ def _derived(derived):
             lines.append(f"  {path.name}: not yet ({stage})")
         elif path.suffix == ".parquet":
             lines.append(f"  {path.name}: {pyarrow.parquet.read_metadata(path).num_rows:,} rows")
+        elif path.suffix == ".json":
+            lines.append(f"  {path.name}: {path.stat().st_size / 1000:.0f} KB")
         else:
             lines.append(f"  {path.name}: {_csv_rows(path):,} rows")
     return lines

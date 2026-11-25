@@ -103,6 +103,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Official statistics | InfoData's S_AS_40 report, intake | `data/derived/official.csv` | 13 requests (step 6) |
 | Journey | cases, events | `data/derived/journey_*.csv` | No requests: about 45 s (step 6) |
 | Model | cases, events | `data/derived/model_scores.csv`, `model_calibration.csv`, `network.json`, `demo_cases.csv` | No requests: about 11 minutes for all seven models, with the ensemble's five networks trained at once (step 7) |
+| Export | the model's and the journey's tables, cases, events, intake | `demo/public/data/soudai.json` | No requests: about 4 s (step 8) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -206,7 +207,7 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   - **Backpropagation through time.** The chain of steps is unrolled, and each shared weight's gradient is the sum of its contributions from all the steps. The GRU and the output layers are trained together.
   - **As built:** Adam with a learning rate of 0.0005, batches of 256 cases (of similar lengths, to save padding), gradients clipped to a norm of 1. Training stops when the held-out cases' loss hasn't improved for 8 passes over the data, and keeps the best pass. (It was 0.001 and 5 passes until the ensemble: see step 7.) The loss is reported per month a case is known to be open, as LightGBM's is, so the two compare directly. A pass takes about 3 s on one thread of this machine's CPU, and a network 2–6 minutes.
   - **The ensemble** (Mark, 2026-11-25): 5 networks trained the same way from different random starts, whose forecasts are averaged. The demo runs all five.
-  - **For the demo:** `uv run soudai model` writes the ensemble's weights to `data/derived/network.json`: 469 KB, at 9 significant digits. The export will need them smaller (fewer digits, or binary). `forward.py` runs the networks in plain numpy, one case at a time, and averages them. It's the reference for the JavaScript port, and each run checks it against PyTorch on 500 test forecasts.
+  - **For the demo:** `uv run soudai model` writes the ensemble's weights to `data/derived/network.json`: 469 KB, at 9 significant digits. The export stores them as 16-bit integers, in 96 KB (step 8). `forward.py` runs the networks in plain numpy, one case at a time, and averages them. It's the reference for the JavaScript port, and each run checks it against PyTorch on 500 test forecasts.
 - **Comparison models,** each knowing more about the case than the one before:
   1. **The court average:** a Kaplan–Meier curve per court.
      - As built (`baselines.py`): the court's curve from filing to the end, over its training cases, read from the day of the cut: S(day + t) / S(day). Where fewer than 20 of the court's sampled cases were still open on that day, it's read from the last day that had 20.
@@ -238,7 +239,7 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   - modelling the different endings (judgment, withdrawal) as competing risks;
   - a transformer as a further comparison.
 - **In the demo** (settled with Mark on 2026-11-25). The model is the opening Forecast tab, and it's built before the backlog.
-  - **Real past cases:** a few thousand from the test years, carried in the demo with their histories and what happened next. A visitor picks one at random or by court and case number.
+  - **Real past cases:** 1,720 from the test years, 20 per court (Mark, 2026-11-26), carried in the demo with their histories and what happened next. A visitor picks one at random or by court and case number.
   - **Made-up cases:** the visitor gives the court and the events so far, and the demo runs the network itself, so its forward pass is ported to JS and checked against the Python.
   - **How well it does:** the scores of the model and the simpler methods side by side, and its calibration.
 
@@ -707,7 +708,7 @@ Reordered with Mark on 2026-11-25: the model comes before the demo, and the Cour
   - `forward.py` is the reference, in plain numpy. `tests/fixtures/network/forward.json` holds an ensemble of two networks with random weights (since the ensemble PR) and PyTorch's forecasts at all 27 cuts of three made-up cases (filed, heard, decided, appealed, revived, suspended and censored). CI checks `forward.py` against it without PyTorch, and with PyTorch installed a test checks the fixture is still what PyTorch gives. The demo's JavaScript will be checked against the same file in step 8.
   - The trained networks are in `data/derived/network.json`, with their event codes and courts in the order of their rows.
 - [x] Choose the real past cases the demo carries: a few thousand from the test years, with their histories and what happened next.
-  - **Fourth PR (2026-11-25).** `examples.demo_cases` draws 35 test cases from each court, 3,010 in all, with chances in proportion to their weights, so each court's draw stands for all its registered cases rather than the sample. `uv run soudai model` writes them to `data/derived/demo_cases.csv`: the case, its filing date, the days to its end or censoring, and whether it finished. 1 new test.
+  - **Fourth PR (2026-11-25).** `examples.demo_cases` draws 35 test cases from each court, 3,010 in all (20 and 1,720 since step 8), with chances in proportion to their weights, so each court's draw stands for all its registered cases rather than the sample. `uv run soudai model` writes them to `data/derived/demo_cases.csv`: the case, its filing date, the days to its end or censoring, and whether it finished. 1 new test.
   - **What the export adds in step 8:** each case's events (`examples.build` on the test cases gives them, as the network reads them) and how it ended. The demo runs the network on them itself, so no forecasts are stored, and the forecast at any point in a case's life is the one the demo would give for a made-up case with the same history.
 
 Added with Mark on 2026-11-25, after the first four PRs: weighting recent training years more, an ensemble of networks, and a model card for the demo.
@@ -761,7 +762,26 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
 ### 8. Forecast and process map: release status `in-progress`
 - [x] Move the demo to the latest demo-kit (see "Look") and bump `version`.
   - **demo-kit 0.5.0,** still the latest on 2026-11-25, as demo v0.2.0. Since kit 0.2.0 a demo is dark unless the page sets `data-theme="light"`, so `index.html`'s `color-scheme` is `dark`, as in the kit's template. The stub's CSS has no colours of its own, so nothing else changed. It builds, validates, and loads in Edge with no console errors in either theme.
-- [ ] Export `demo/public/data/soudai.json` (aim for under 500 KB; the bundle must stay under 2 MB).
+- [x] Export `demo/public/data/soudai.json` (aim for under 500 KB; the bundle must stay under 2 MB).
+  - **In code:** `export.py` and `uv run soudai export` write it in about 4 s from the committed tables (the journey's and the model's, `network.json`, `demo_cases.csv`, cases, events and intake), so it runs without the cache. `status` reports its size. 12 new tests, which run without the `model` group, as CI does.
+  - **What it holds:** the snapshot (2026-11-25, with records from 2026-11-20), the split, the 86 courts and 28 event codes in the order of the network's rows (with each code's English gloss and stage), the network, the real past cases, each model's scores and calibration, and the journey numbers for the whole country and each court. A court's count of cases registered is intake's exact count.
+  - **483 KB, 165 KB gzipped,** under the aim, with 20 real cases per court (see below). The network is 100 KB, the 1,720 real cases 104 KB, the scores 62 KB, the calibration 9 KB and the journeys 186 KB. The test's budget is 500 KB. The whole bundle should come to about 1 MB of its 2 MB, if its images and code weigh what doctor-who-ratings' do (about 420 KB and 60 KB).
+  - **20 real cases per court** (Mark, 2026-11-26). With 35, the file was 567 KB. The real cases are only the ones a visitor can pick; the scores come from all the test cases, so the number carried changes neither the model nor its scores. 30 per court would have made 539 KB, 25 510 KB and 22 493 KB. `examples.DEMO_PER_COURT` is 20, and the cases were drawn again with the same function and seed as `soudai model`, without retraining, since the draw doesn't depend on it.
+  - **The network's weights** are 16-bit integers, one scale per matrix (a weight is its integer × the scale), in base64: 96 KB, against 469 KB at 9 digits. Over all 13,827 forecasts on the real cases (on each day with events before the end, and each month to 12), the largest change in a forecast is 0.00008. 16-bit floats, in the same space, moved forecasts by up to 0.0004, and 4 significant digits as text would take 287 KB.
+  - **Fewer bits, tried and not used** (Mark kept 16, 2026-11-26). The ensemble was scored again on all 234,784 test forecasts with its weights at each precision. Its scores hardly move even at 8 bits (concordance and Brier scores by 0.0001 or less), but single forecasts do, and the demo shows single forecasts. The share of the chances within 1, 3, 6 and 12 months that would change at whole percent:
+
+    | Weights | Size | Largest change | Whole percent changed |
+    | --- | --- | --- | --- |
+    | 16 bits | 97 KB | 0.00007 | none |
+    | 12 bits | 73 KB | 0.0009 | 0.4%, by 1 point |
+    | 10 bits | 61 KB | 0.0035 | 2.6%, by 1 point |
+    | 8 bits, a scale per row | 67 KB | 0.025 | 4.3%, by up to 3 |
+    | 8 bits, a scale per matrix | 49 KB | 0.052 | 11.9%, by up to 6 |
+
+  - **The real cases** carry their events as the network reads them, plus those on the day the case ended or its record ran out, which the network never reads. 1,651 of the 1,720 finished, and 69 were still open at the snapshot. A case's filing date is in days after the split, and "ended" is 1 or 0, which saves space. The earliest was filed on 2019-02-11 and registered in 2024 (17 C 289/2024 at Prague 9).
+  - **Rounding.** Shares and scores keep 4 significant digits, so a move made by a handful of cases keeps its size. The time curves keep 3 decimal places, since they're only drawn.
+  - **Left out:** the ensemble's first network alone, since the demo runs the ensemble.
+  - **The tests** check that a rebuild gives the same file, that the exported network forecasts as the full one does, the real cases' histories, the journeys, the scores, and that the file holds no free text: every string is a court's name or area, an event's code or gloss, a name the export gives, a date, or the weights. So no judge's or party's name can be in it.
 - [ ] The frame, the tabs, the court selector, the status line and "How this works".
 - [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
 - [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
