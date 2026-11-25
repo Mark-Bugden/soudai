@@ -100,7 +100,7 @@ The feasibility check used throwaway scripts outside the repo. Everything it est
 | Published decisions | rozhodnuti listing | `data/derived/decisions.parquet` | 7,517 requests, 6 h 20 min (step 3) |
 | Senates | decisions, probes of number 1 | `data/derived/senates.csv` | 36,403 requests, 10 h 8 min (step 4) |
 | Intake | senates, binary search | `data/derived/intake.csv` | 7,670 senate-years: 92,195 requests, 25 h 42 min (step 4) |
-| Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208k cases, ~186k requests, ~18 h at 3 a second (estimate, step 5) |
+| Timelines | intake, stratified sample | `data/derived/cases.parquet`, `events.parquet` | 400 per court-year: 208,227 cases, 184,243 requests, 17 h 9 min at 3 a second (step 5) |
 
 The estimates for the senate and intake stages come from step 3's table (see step 4). Replace them with real numbers as the stages run.
 
@@ -435,7 +435,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
 - **A first look at the German tank estimate.** From the published decisions alone, it gives national register C totals of 294,192 (2020), 292,409, 294,591, 287,539, 286,718 and 274,013 (2025). The official nápad is 286,801 for 2020, 295,311 for 2022 and 272,434 for 2025. These are senate-years with published decisions only, before any exact count. Step 6 does this properly.
 
 ### 5. Timeline sample (run, then PR)
-- [ ] Draw 60 cases per court-year, uniformly over the court-year's docket (all its senates' numbers together), with a recorded seed. Each case's weight is the court-year's intake / 60.
+- [x] Draw 60 cases per court-year, uniformly over the court-year's docket (all its senates' numbers together), with a recorded seed. Each case's weight is the court-year's intake / 60.
   - **Changed with Mark on 2026-11-24, before the run:**
     - **400 cases per court-year** instead of 60, for the remaining-time model: 208,227 in all.
     - **Drawn by senate-year** (one senate's cases in one year) rather than over the whole court-year. Each court-year's 400 are split between its senates in proportion to their counts, by largest remainders, with at least 1 each.
@@ -447,6 +447,9 @@ Built before the run (2026-11-22), with tests on fake dockets:
   - **Run 28 stopped** on 2026-11-25 at 09:20, after 127,624 requests with no failures, on an unexpected answer. Asked for 5 C 294/2020 at Nymburk, infosoud gave that case's 7 events plus a stray "hearing scheduled" of 2018-10-26 stamped "5 C 294/20", whose year (20) became the record's, with no status.
     - `infosoud.find_case` now raises `WrongCase` for a record of another case. The sample skips it like a hidden number, and any other unexpected answer still stops a run.
     - The run was resumed from the cache as run 29.
+  - **Runs 28 and 29.** Run 28 made 127,624 requests in 11 h 53 min before the stop, and run 29 made 56,619 in 5 h 16 min. That's 184,243 requests in all, at 2.97 a second, with no failures, no retries and no 429s. infosoud answered in 0.065 s on average.
+  - **208,227 cases,** 22,207 of them from step 4's probes, about 34,700 per year. The weights add up exactly to intake's counts in every year (288,307 for 2020, and so on).
+  - **Skipped:** 788 hidden numbers (0.38% of the numbers tried) and the 1 record for another case. No senate-year fell short of its target.
   - **Found before the run.** The probes' 22,000 timelines show nearly all cases registered 2020–2025 are already disposed:
 
     | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
@@ -454,7 +457,7 @@ Built before the run (2026-11-22), with tests on fake dockets:
     | 100% | 99% | 99% | 98% | 98% | 97% |
 
     The share legally final is 99% for 2020 and 92% for 2025. The 2025 cases took a median of 126 days from filing to disposal, and 90% took 258 days or less. So unfinished cases are a small tail, not most of the recent years.
-- [ ] Parse to `data/derived/cases.parquet` (case, court, filing date, status, status date, `platneK`, weight) and `data/derived/events.parquet` (case, code, date, `poradi`, cancelled).
+- [x] Parse to `data/derived/cases.parquet` (case, court, filing date, status, status date, `platneK`, weight) and `data/derived/events.parquet` (case, code, date, `poradi`, cancelled).
   - **A case's history includes its linked cases' events.** Of 173,486 cached records, 9,115 (5.3%) hold events stamped (`znackaId`) with another case's number:
     - 10,552 appeals (`ODVOLANI`), at the regional court's `Co` register;
     - about 1,100 other higher-court proceedings (`NAD_RIZENI`, registers `Nc`, `Ncp` and `Ncd`);
@@ -462,7 +465,38 @@ Built before the run (2026-11-22), with tests on fake dockets:
     - and the one stray above.
 
     So `events.parquet` gains `linked_court` and `linked_case`: null for the case's own events, and the other case's court code and number for these. The appeal loop on the map comes from them.
-- [ ] Check that every case has a filing event in its case year and that events order sensibly, and record the share still open by filing year.
+  - **The tables.** `cases.parquet` is 0.98 MB and `events.parquet` 4.2 MB, with 1,391,808 events (a median of 6 per case, at most 89). `soudai sample --parse-only` rebuilds them from the cache in about 20 s. They hold codes, dates, numbers and infosoud's status labels, and no names.
+  - **Linked-case events** are in 9,783 of the sampled cases (4.7%).
+  - **Statuses (`stav`):**
+
+    | Status | Meaning | Cases |
+    | --- | --- | --- |
+    | Odškrtnutá – evidenčně ukončená věc | closed in the register | 202,543 |
+    | Přerušeno na dobu neurčitou | suspended indefinitely | 1,926 |
+    | Vyřízená věc | disposed | 1,548 |
+    | Nevyřízená věc | not yet disposed | 978 |
+    | Pravomocná věc | legally final | 826 |
+    | Obživlá věc | revived after its decision was quashed | 328 |
+    | none | | 78 |
+
+  - **The records' dates.** Each record is complete to its `platneK`, which is between 2026-11-20 and 2026-11-25. The snapshot spans the run.
+- [x] Check that every case has a filing event in its case year and that events order sensibly, and record the share still open by filing year.
+  - **Filing events.** 76 cases (0.04%) have none.
+    - None was filed after its case year.
+    - **20.0% were filed in an earlier year,** weighted. By court, that runs from 7.5% (Jeseník) to 35.4% (Ostrava), with a median of 18.9%. Those cases were filed a median of 61 days before 1 January, and 90% within 165 days. That fits the EPR transfers (see "Filing date and case year").
+  - **Order.** The case's own first event is the filing in 208,024 of the 208,151 cases that have one. 127 have own events dated before the filing (73 of them hearings). 365 have "legally final" dated before "disposed".
+  - **Odd dates.**
+    - 542 hearings are dated after the snapshot, up to 2028-02-08. They're hearings scheduled ahead, so they're kept.
+    - 3 dates are typos (years 0023, 1021 and 1023).
+    - 13 events fall between 1990 and 2009.
+  - **Still open,** weighted:
+
+    | | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | No disposal event | 0.4% | 0.8% | 0.9% | 1.2% | 1.8% | 3.5% |
+    | No legal-force event | 0.9% | 1.5% | 1.6% | 2.1% | 3.0% | 6.7% |
+
+  - **Median days from filing to disposal,** weighted, among disposed cases: 159 (2020), 158, 148, 147, 146 and 131 (2025). The recent years are biased low by their open tail. Step 6's Kaplan–Meier corrects that.
 
 ### 6. Analysis (PR)
 - [ ] Settle the stage model (see "The journey") and write it here.

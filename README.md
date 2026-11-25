@@ -27,7 +27,7 @@ uv sync
 uv run pytest
 ```
 
-Each stage runs as `uv run soudai <stage>`, in this order. The stages from milestone 5 on aren't built yet. The plan gives each stage's inputs, outputs and rough cost.
+Each stage runs as `uv run soudai <stage>`, in this order. The stages from milestone 6 on aren't built yet. The plan gives each stage's inputs, outputs and rough cost.
 
 | Stage | What it does | Milestone |
 | --- | --- | --- |
