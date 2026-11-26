@@ -12,7 +12,7 @@ import '@mark-bugden/demo-kit/tokens.scoped.css';
 import '@mark-bugden/demo-kit/frame.css';
 import './demo.css';
 import { MOST_EVENTS, add, findCases, madeUp, offered, ordered, pick, undo } from './cases.js';
-import { actions, search, segmented } from './controls.js';
+import { actions, iconButton, search, segmented } from './controls.js';
 import { matches, searchIndex } from './courts.js';
 import { prepare } from './data.js';
 import { h } from './dom.js';
@@ -32,6 +32,9 @@ const ICONS = {
   random: '<rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>'
     + '<g fill="currentColor"><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="12" cy="12" r="1.5"/>'
     + '<circle cx="8.5" cy="15.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/></g>',
+  // An arrow turning back, and a circle of arrow.
+  undo: '<path d="M9 14L4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+  reset: '<path d="M12 5a7 7 0 1 1-6.06 3.5M14.5 2.5L12 5l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 const TABS = {
   forecast: { label: 'Forecast' },
@@ -75,16 +78,22 @@ async function start(el) {
     empty: 'No court by that name',
     browse: true,
   });
+  // The switches' options name themselves, so their labels are for screen readers only, which keeps the
+  // rail short enough to fit the window beside the stage.
   const show = segmented({
     label: 'Show',
+    showLabel: false,
     options: [{ label: 'A case', value: 'case' }, { label: 'How well it does', value: 'scores' }],
     value: 'case',
   });
   const kind = segmented({
     label: 'Case',
-    options: [{ label: 'Real', value: 'real', title: 'A real past case' }, { label: 'Made up', value: 'made', title: 'A case you describe' }],
+    showLabel: false,
+    options: [{ label: 'Real case', value: 'real', title: 'A real past case' }, { label: 'Made-up case', value: 'made', title: 'A case you describe' }],
     value: 'real',
   });
+  // Picks a case at random, from beside the case search.
+  const random = iconButton({ label: 'Random case', icon: ICONS.random });
   const realCase = search({
     label: 'Case number',
     placeholder: 'Case number',
@@ -97,8 +106,8 @@ async function start(el) {
     format: (c) => c.label,
     empty: 'No case by that number',
     browse: true,
+    beside: random,
   });
-  const random = actions({ label: 'Pick a case', options: [{ label: 'Random case', value: 'random', icon: ICONS.random }] });
   const day = slider({
     label: 'Forecast on',
     min: 0,
@@ -116,8 +125,14 @@ async function start(el) {
     format: (d) => (d === 0 ? 'Filing' : `Day ${describe.count(d)}`),
   });
   const event = select({ label: 'Event', options: events.map((option) => ({ label: option.label, value: option })) });
-  const addEvent = actions({ label: 'Add the event', options: [{ label: 'Add', value: 'add' }] });
-  const edit = actions({ label: 'Change the case', options: [{ label: 'Undo', value: 'undo' }, { label: 'Start again', value: 'reset' }] });
+  const edit = actions({
+    label: 'Change the case',
+    options: [
+      { label: 'Add', value: 'add' },
+      { label: 'Undo', value: 'undo', icon: ICONS.undo, iconOnly: true },
+      { label: 'Start again', value: 'reset', icon: ICONS.reset, iconOnly: true },
+    ],
+  });
   const landmark = segmented({
     label: 'Forecasts made, months after filing',
     options: LANDMARKS.map((when) => ({ label: when === 'all' ? 'All' : when, value: when, title: when === 'all' ? 'All forecasts together' : describe.landmark(when) })),
@@ -128,12 +143,12 @@ async function start(el) {
     options: data.horizons.map((months) => ({ label: String(months), value: months, title: `Within ${describe.months(months)}` })),
     value: 6,
   });
-  const controls = { tab, court, show, kind, realCase, random, day, madeDay, event, addEvent, edit, landmark, horizon };
+  const controls = { tab, court, show, kind, realCase, day, madeDay, event, edit, landmark, horizon };
   // The controls each tab uses, besides the tab switch.
   const used = () => {
     if (tab.value === 'map') return [court];
     if (show.value === 'scores') return [court, show, landmark, horizon];
-    return [court, show, kind, ...(kind.value === 'real' ? [realCase, random, day] : [madeDay, event, addEvent, edit])];
+    return [court, show, kind, ...(kind.value === 'real' ? [realCase, day] : [madeDay, event, edit])];
   };
 
   /** Sets a slider's range, keeping its value within it. */
@@ -164,10 +179,14 @@ async function start(el) {
   });
   // Clearing the case box leaves the case as it was.
   realCase.onChange((c) => (c ? choose(c) : (realCase.value = item)));
-  random.onChange(() => choose(pick(casesOf(court.value), item)));
-  addEvent.onChange(() => change(add(made, event.value.codes, madeDay.value)));
+  // The button isn't one of the frame's controls, so it asks for the redraw itself.
+  random.addEventListener('click', () => {
+    choose(pick(casesOf(court.value), item));
+    app.redraw();
+  });
   edit.onChange((action) => {
-    change(action === 'undo' ? undo(made) : madeUp(data, null));
+    if (action === 'add') change(add(made, event.value.codes, madeDay.value));
+    else change(action === 'undo' ? undo(made) : madeUp(data, null));
     if (action === 'reset') madeDay.value = 0;
   });
 
@@ -225,8 +244,8 @@ async function start(el) {
 
   /** Labels the made-up case's buttons for the day, and turns off those that can't do anything. */
   function showEditing() {
-    addEvent.relabel('add', madeDay.value === 0 ? 'Add at filing' : `Add on day ${describe.count(madeDay.value)}`);
-    addEvent.enable('add', made.events.length + event.value.codes.length <= MOST_EVENTS);
+    edit.relabel('add', madeDay.value === 0 ? 'Add at filing' : `Add on day ${describe.count(madeDay.value)}`);
+    edit.enable('add', made.events.length + event.value.codes.length <= MOST_EVENTS);
     edit.enable('undo', made.added.length > 0);
     edit.enable('reset', made.added.length > 0);
   }

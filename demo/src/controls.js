@@ -58,14 +58,21 @@ export function segmented({ label, options, value = options[0].value, showLabel 
   };
 }
 
+/** A round button showing only an icon, with its label for screen readers and as a tooltip. */
+export function iconButton({ label, icon: markup }) {
+  return h('button', { type: 'button', class: 'dk-button sd-icon-button', 'aria-label': label, title: label }, icon(markup));
+}
+
 /**
- * A row of buttons that each do something when pressed, such as picking a case at random. `options` are
- * { label, value, icon? }. The value is the last pressed, and each press notifies, even of the same one.
- * `enable(value, state)` turns one button on or off, and `relabel(value, text)` changes its label.
+ * A row of buttons that each do something when pressed, such as adding an event. `options` are
+ * { label, value, icon?, iconOnly? }; with `iconOnly`, the button shows its icon alone. The value is
+ * the last pressed, and each press notifies, even of the same one. `enable(value, state)` turns one
+ * button on or off, and `relabel(value, text)` changes a labelled button's label.
  */
 export function actions({ label, options }) {
   const buttons = new Map(options.map((option) => {
-    const text = h('span', {}, option.label);
+    if (option.iconOnly) return [option.value, { el: iconButton(option), text: null }];
+    const text = h('span', { class: 'sd-button-label' }, option.label);
     return [option.value, { el: h('button', { type: 'button', class: 'dk-button' }, icon(option.icon), text), text }];
   }));
   const el = h('div', { class: 'dk-control sd-actions', role: 'group', 'aria-label': label }, ...[...buttons.values()].map((b) => b.el));
@@ -109,9 +116,10 @@ export function actions({ label, options }) {
  * empty box lists everything `suggest('')` gives. Picking a suggestion, by click, tap or Enter, makes
  * it the value, and clearing the box makes the value null; either notifies. A suggestion whose value
  * is null leaves the box empty, showing the placeholder. The arrow keys move
- * through the suggestions and Escape closes them.
+ * through the suggestions and Escape closes them. `beside` is an element, such as a button, to put to
+ * the right of the box; the suggestions then span both.
  */
-export function search({ label, placeholder = '', suggest, format, empty = 'No matches', browse = false }) {
+export function search({ label, placeholder = '', suggest, format, empty = 'No matches', browse = false, beside = null }) {
   const id = `sd-search-${++lastId}`;
   const input = h('input', {
     id,
@@ -130,7 +138,7 @@ export function search({ label, placeholder = '', suggest, format, empty = 'No m
   const list = h('ul', { id: `${id}-list`, class: 'sd-search-list', role: 'listbox', 'aria-label': label, hidden: true });
   const el = h('div', { class: 'dk-control sd-search' },
     h('label', { for: id, class: 'dk-control-label' }, label),
-    h('div', { class: 'sd-search-box' }, input, clear, list));
+    h('div', { class: 'sd-search-box' }, h('div', { class: 'sd-search-field' }, input, clear), beside, list));
 
   const listeners = new Set();
   let chosen = null;
