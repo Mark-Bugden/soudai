@@ -161,6 +161,13 @@ test('an arrow\'s share goes on one side and its wait on the other, clear of wha
   assert.equal(together.length, 1);
   assert.deepEqual(together[0].lines, ['4.4%', '97 days']);
   assert.deepEqual(place(['3.0%'], 4, flat, space).map((b) => b.lines), [['3.0%']]);
+  // On a diagonal arrow, steep at one end and flat at the other, they sit across it where it runs at
+  // about 45°, so the line between them is at about 45° too.
+  const bend = arrow([[100, 40], [100, 140], [150, 240], [250, 240]], 2);
+  const [one, two] = place(['2.3%', '151 days'], 2, bend, space);
+  const centre = (box) => [box.x, (box.bounds[1] + box.bounds[3]) / 2];
+  const [[x1, y1], [x2, y2]] = [centre(one), centre(two)];
+  assert.ok(Math.abs((Math.atan2(Math.abs(y2 - y1), Math.abs(x2 - x1)) * 180) / Math.PI - 45) < 15);
 });
 
 test('labels shown all the time are plainly their arrow\'s; the rest wait for a hover', () => {

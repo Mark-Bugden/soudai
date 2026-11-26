@@ -29,6 +29,7 @@ const TILT = 0.47; // the slope at which an arc below the row reaches its bottom
 const CLEAR = 40; // px: a label always shown is this much nearer its own arrow than any other, less 2 px
                   // for each px of the arrow's width, down to 12: a thick arrow claims its labels more plainly
 const SPACE = 8; // px: and at least this far from any other arrow's label
+const SLANT = 7; // degrees: on a diagonal arrow, labels go where it runs within this of 45°
 
 export function createMap(host, data) {
   const meta = h('p', { class: 'sd-case-meta' });
@@ -44,7 +45,7 @@ export function createMap(host, data) {
     h('div', { class: 'sd-map-flow' },
       h('div', { class: 'sd-case' }, h('p', { class: 'sd-case-title' }, 'Process map'), meta), mapBox, rest),
     h('div', { class: 'sd-curves' },
-      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title' }, '% of cases legally final over time'), legend, curveBox),
+      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title' }, 'How quickly cases become legally final'), legend, curveBox),
       h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title', id: 'sd-routes-title' }, 'Most common routes'), routeList)),
     table);
   host.append(el);
@@ -283,7 +284,7 @@ export function createMap(host, data) {
       curveSvg.replaceChildren();
       return null;
     }
-    const margin = { top: 8, right: 10, bottom: 36, left: 40 };
+    const margin = { top: 8, right: 10, bottom: 40, left: 40 };
     const x = (month) => margin.left + (month / MONTHS) * (width - margin.left - margin.right);
     const y = (p) => height - margin.bottom - p * (height - margin.top - margin.bottom);
     const path = (series) => series.slice(0, MONTHS + 1).map((v, m) => `${m ? 'L' : 'M'}${x(m).toFixed(1)},${y(v).toFixed(1)}`).join('');
@@ -294,9 +295,11 @@ export function createMap(host, data) {
       ticks.push({ tick, at: y(p) });
       nodes.push(s('line', { class: p === 0 ? 'sd-axis-line' : 'sd-grid', x1: x(0), x2: x(MONTHS), y1: y(p), y2: y(p) }), tick);
     }
+    // Ticks every 3 months, longer every 6, which are labelled (every 12 if they'd be cramped).
     const step = x(6) - x(0) >= 28 ? 6 : 12;
-    for (let m = 0; m <= MONTHS; m += step) {
-      nodes.push(s('text', { class: 'sd-tick', x: x(m), y: height - 20, 'text-anchor': 'middle' }, String(m)));
+    for (let m = 0; m <= MONTHS; m += 3) {
+      nodes.push(s('line', { class: 'sd-axis-tick', x1: x(m), x2: x(m), y1: y(0), y2: y(0) + (m % 6 ? 3 : 6) }));
+      if (m % step === 0) nodes.push(s('text', { class: 'sd-tick', x: x(m), y: height - 21, 'text-anchor': 'middle' }, String(m)));
     }
     nodes.push(s('text', { class: 'sd-tick', x: x(MONTHS), y: height - 4, 'text-anchor': 'end' }, 'Months after filing'));
     nodes.push(s('path', { class: values ? 'sd-curve-all' : 'sd-forecast-line', d: path(all) }));
@@ -453,13 +456,15 @@ export function nearer(bounds, marks, own, twin = null) {
 }
 
 /**
- * Where an arrow's labels go: its share on one side and its wait on the other, the share above (or on
- * the left of an upright arrow) where it can be, each at the first of a few places along it that clears
- * the map's edges, the boxes in `taken` and the arrows (`marks`, as [x, y, radius, arrow]), with text as
- * wide as `measure(text)` gives, and, if `sure`, is plainly the arrow `own`'s (see nearer). Failing that,
- * or `together`, both on one side, on two lines, the left of travel first. Failing that, nothing; or with
- * `fallback`, the share alone where it crosses fewest arrows, but never over other text or off the map.
- * Gives a list of { lines, x, bounds }.
+ * Where an arrow's labels go: its share on one side and its wait directly across from it, the share above
+ * (or on the left of an upright arrow) where it can be, at the first of a few places along it where both
+ * clear the map's edges, the boxes in `taken` and the arrows (`marks`, as [x, y, radius, arrow]), with
+ * text as wide as `measure(text)` gives, and, if `sure`, are plainly the arrow `own`'s (see nearer). The
+ * places are near the middle, or on a diagonal arrow where it runs within SLANT of 45°, so the two labels
+ * sit diagonally across it. Failing that, or `together`, both on one side, on two lines, the left of
+ * travel first, but not on a diagonal arrow alone. Failing that, nothing; or with `fallback`, the share
+ * alone where it crosses fewest arrows, but never over other text or off the map. Gives a list of
+ * { lines, x, bounds }.
  */
 export function place(texts, width, geometry, { width: w, height: h, taken, marks, measure, own = null, twin = null },
   { together = false, sure = true, fallback = false } = {}) {
@@ -485,7 +490,14 @@ export function place(texts, width, geometry, { width: w, height: h, taken, mark
     }
     return best;
   };
-  const along = [0.5, 0.4, 0.6, 0.3, 0.7, 0.2, 0.8];
+  const degrees = (x, y) => (Math.atan2(Math.abs(y), Math.abs(x)) * 180) / Math.PI;
+  const [a, b] = [geometry.at(0), geometry.at(1)];
+  const diagonal = Math.abs(degrees(b[0] - a[0], b[1] - a[1]) - 45) < 35;
+  const off = (t) => Math.abs(degrees(geometry.left(t)[1], geometry.left(t)[0]) - 45); // the arrow's slope there, from 45°
+  const slanted = Array.from({ length: 15 }, (_, i) => 0.15 + i * 0.05).sort((p, q) => off(p) - off(q));
+  const along = diagonal
+    ? slanted.filter((t, i) => off(t) <= SLANT || i < 2)
+    : [0.5, 0.4, 0.6, 0.3, 0.7, 0.2, 0.8];
   const on = (...sides) => sides.flatMap((side) => along.map((t) => [t, side]));
   let least = null;
   // The first of `places` where `lines` clear everything, and `also` too.
@@ -501,12 +513,14 @@ export function place(texts, width, geometry, { width: w, height: h, taken, mark
   const up = ny < -0.2 || (ny <= 0.2 && nx < 0) ? 1 : -1; // the side above, or on the left of an upright arrow
   if (!together && texts.length === 2) {
     for (const side of [up, -up]) {
-      const share = clear([texts[0]], on(side));
-      const wait = share && clear([texts[1]], on(-side), [share.bounds]);
-      if (wait) return [share, wait];
+      for (const t of along) {
+        const share = box([texts[0]], t, side, []);
+        const wait = !share.clashes && box([texts[1]], t, -side, [share.bounds]);
+        if (wait && !wait.clashes) return [share, wait];
+      }
     }
   }
-  if (texts.length === 2) {
+  if (texts.length === 2 && (together || !diagonal)) {
     const both = clear(texts, on(1, -1));
     if (both) return [both];
   }

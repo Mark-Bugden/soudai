@@ -372,6 +372,11 @@
   stroke-width: 1;
 }
 
+[data-demo] .sd-axis-tick {
+  stroke: var(--color-muted);
+  stroke-width: 1;
+}
+
 [data-demo] .sd-event {
   fill: var(--color-text);
   stroke: var(--color-surface);
