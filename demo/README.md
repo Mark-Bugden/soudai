@@ -30,4 +30,4 @@ The files to edit:
 | `src/forecast.js` | The network's forward pass, ported from `src/soudai/forward.py`. `npm test` checks it against PyTorch's forecasts in `tests/fixtures/network/forward.json`. |
 | `public/data/soudai.json` | The demo's data, written by `uv run soudai export` (don't edit it by hand). |
 | `test/` | Tests of the modules that don't touch the page, with `node --test`. |
-| `public/static.webp`, `thumb.webp`, `og.jpg` | Images. |
+| `public/static.webp`, `thumb.webp`, `og.jpg`, and `static-light.webp`, `thumb-light.webp` | Images, rendered by `scripts/stills.py`. |

@@ -864,7 +864,29 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - The placeholder view and its styles are gone.
   - **Tests:** 6 new node:test tests: every stage has a place, the moves and their waits for every court (decided → legally final is the commonest everywhere), the commonest route, the curves, the arrows' bow and ends, and the text.
   - **Checked in Edge,** in both themes at 1280 × 800, at 390 px and in a 1100 × 520 window: the map for all courts and for Hradec Králové, hovering an arrow and the curves, and back to the Forecast tab. The Forecast tab's checks still pass. No console errors.
-- [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.
+- [x] Render the stills, and fit the window (v0.10.0).
+  - **Fitting the window,** measured on a copy of the site's local build, with soudai's bundle on a project page, so the site's header, title and `demo-fit.js` sit above it as they will: the demo starts 251 px down.
+    - **Before:** the Forecast tab's controls were 590 px tall for a real case and 650 for a made-up one, against a stage of 391 px at 1536 × 730. So the frame ran 111 and 171 px past the window there, 51 and 111 px at 1440 × 790, and fitted only at 1920 × 960. The Process map's rail is short, and it fitted at all four sizes.
+    - **The controls are more compact** (Mark, 2026-11-26). The "Show" and "Case" switches have no visible headings, since their options name themselves (screen readers keep them), and the case options read "Real case" and "Made-up case". "Random case" is a round button with a die beside the case-number box, and the box's suggestions span both. Undo and Start again are round icon buttons beside "Add on day …".
+    - **After:** the controls are 469 px tall for a real case, 529 for a made-up one, 452 for the scores and 188 for the map. On the site:
+
+      | Window | Real case | Made-up case | How well it does | Process map |
+      | --- | --- | --- | --- | --- |
+      | 1920 × 960 | fits | fits | fits | fits |
+      | 1536 × 730 | fits | 50 px short | fits | fits |
+      | 1440 × 790 | fits | fits | fits | fits |
+      | 1366 × 650 | 70 px short | 130 px short | 53 px short | fits |
+
+      At 1366 × 650 the stage is at its 22rem minimum, and the controls are still taller.
+  - **The stills.** `scripts/stills.py`, adapted from doctor-who-ratings', renders them from the built demo in Edge, in both themes:
+    - `static.webp` and `static-light.webp`: the opening state, the Forecast tab on 18 C 33/2024 at Jihlava at filing, at 1200 × 675 (23.5 KB).
+    - `thumb.webp` and `thumb-light.webp`, for the project card: the Process map for all courts, shot at 576 × 360 so its arrows still read on the card, which shows it about 384 px wide (79 KB, under the 80 KB limit). The Forecast tab at that size was cramped.
+    - `og.jpg`, for link previews: the same map at 640 × 336, dark only (111 KB).
+    - Rerunning it gives the same files, but for a few bytes of `thumb.webp`.
+  - The bundle is 883 KB, of 2 MB. `index.html`'s still now has alt text for the new still. Its description is still the old tagline, to change with the manifest.
+  - **Checked in Edge,** in both themes at 1280 × 800 and at 390 px: the die picks a case from the court selected and shows it in the box, the suggestions open across the box and the die, "Add on day 1,096" fits its button, and Undo turns off when there's nothing left to undo. No console errors in any tab.
+- [ ] The manifest, in Mark's copy, with `status: "in-progress"`.
+  - Waiting for Mark's copy (2026-11-26): the tagline, summary and tags still describe the old project. `index.html`'s description follows the tagline.
 - [ ] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
 
 ### 9. Write-up: release status `live`
