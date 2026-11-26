@@ -131,10 +131,10 @@ export function createMap(host, data) {
     const stroke = (share) => 1 + (widest - 1) * share;
     const overWidth = stroke(drawn.find((move) => shape(move.from, move.to) === 'over')?.share ?? 0);
 
-    // The rows. The arc over the hearing rises about a fifth of its span, up to 1.3 times that, and the
-    // arcs below dip half of theirs, up to 1.8 times that, as far as the height allows, and the drawing
-    // is centred in it; on a narrow map, up to 2 and 3 times, to make room for the labels. The arc over
-    // the hearing always clears the hearing's label, and the arcs below leave room for theirs.
+    // The rows. The arcs below dip as far under the top row as the arc over the hearing rises above it:
+    // about a fifth of its span, up to 1.3 times that, as far as the height allows, and the drawing is
+    // centred in it; on a narrow map, up to twice that, to make room for the labels. The arc over the
+    // hearing always clears the hearing's label, and the arcs below leave room for theirs.
     const pad = {
       left: Math.max(measure('Filed', true), measure(shareText('filed') ?? '')) + NODE + 12,
       right: NODE + 4,
@@ -143,12 +143,10 @@ export function createMap(host, data) {
     };
     const inner = width - pad.left - pad.right;
     const room = height - pad.top - pad.bottom;
-    const least = { lift: NODE + 2 * LINE + 12 + overWidth / 2, depth: 2 * NODE + 2 * LINE + 4 };
-    const want = { lift: 0.22 * (PLACES.decided[0] - PLACES.filed[0]) * inner, depth: 0.5 * (PLACES.decided[0] - PLACES.hearing[0]) * inner };
-    const most = inner < 400 ? { lift: 2, depth: 3 } : { lift: 1.3, depth: 1.8 };
-    const lift = Math.max(least.lift, want.lift * Math.min(most.lift, room / (want.lift + want.depth)));
-    const depth = Math.max(least.depth, Math.min(want.depth * most.depth, room - lift));
-    const top = pad.top + Math.max(0, (room - lift - depth) / 2) + lift;
+    const least = Math.max(NODE + 2 * LINE + 12 + overWidth / 2, 2 * NODE + 2 * LINE + 4);
+    const want = 0.22 * (PLACES.decided[0] - PLACES.filed[0]) * inner;
+    const depth = Math.max(least, want * Math.min(inner < 400 ? 2 : 1.3, room / (2 * want)));
+    const top = pad.top + Math.max(0, room / 2 - depth) + depth;
     const at = (stage) => [pad.left + PLACES[stage][0] * inner, top + PLACES[stage][1] * depth];
 
     // What labels must keep clear of: the stages and their labels, the arrows, and the other labels.
@@ -189,7 +187,7 @@ export function createMap(host, data) {
     const arrows = drawn.map((move, id) => {
       const w = stroke(move.share);
       const twin = drawn.findIndex((other) => other.from === move.to && other.to === move.from);
-      const points = route(move.from, move.to, at, { lift });
+      const points = route(move.from, move.to, at);
       return { id, move, w, twin: twin < 0 ? null : twin, geometry: arrow(points, w, twin < 0 ? 0 : head(w) + 1.5) };
     });
     const marks = arrows.flatMap(({ id, w, geometry }) => geometry.samples.map(([x, y]) => [x, y, w / 2 + 2, id]));
@@ -366,16 +364,22 @@ const mix = ([ax, ay], [bx, by], t) => [ax + (bx - ax) * t, ay + (by - ay) * t];
 
 /**
  * The curve a move follows on the map, between its stages' centres (`at(stage)`), as a cubic Bézier's
- * four points: straight for a line; for the arc over the hearing, rising `lift` px at its middle; or
- * along the arc below the row whose bottom is a suspension, a revival or an appeal, leaving the row
- * steeply and reaching the bottom at a slope of TILT, so that a line along the bottom row stays clear.
+ * four points: straight for a line; for the arc over the hearing, its arrow's middle rising as far above
+ * the top row as the bottom row is below it; or along the arc below the row whose bottom is a
+ * suspension, a revival or an appeal, leaving the row steeply and reaching the bottom at a slope of TILT,
+ * so that a line along the bottom row stays clear.
  */
-export function route(from, to, at, { lift }) {
+export function route(from, to, at) {
   const [p, q] = [at(from), at(to)];
   const kind = shape(from, to);
   if (kind === 'line') return [p, mix(p, q, 1 / 3), mix(p, q, 2 / 3), q];
   if (kind === 'over') {
-    const rise = lift / 0.75; // a cubic's middle reaches 3/4 of the way to its control points
+    // A cubic's middle is 3/8 of each control point and 1/8 of each end, and the arrow's ends are cut
+    // back GAP and GAP + ARROW px along its slope (see arrow), which lifts its middle; so the control
+    // points rise that much less.
+    const depth = at('suspended')[1] - p[1];
+    let rise = depth / 0.75;
+    for (let i = 0; i < 5; i++) rise = (8 * depth - ((2 * GAP + ARROW) * rise) / Math.hypot((q[0] - p[0]) / 4, rise)) / 6;
     return [p, [p[0] + (q[0] - p[0]) / 4, p[1] - rise], [q[0] - (q[0] - p[0]) / 4, q[1] - rise], q];
   }
   // From the row down to the bottom of the arc, then the other way if the move goes up.

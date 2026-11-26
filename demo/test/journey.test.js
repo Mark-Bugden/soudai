@@ -106,7 +106,6 @@ test('the share legally final, month by month', () => {
 
 // Stages on a map 300 wide, with the top row at y = 100 and the bottom row 60 below it.
 const at = (stage) => [PLACES[stage][0] * 300, 100 + PLACES[stage][1] * 60];
-const sizes = { lift: 50, depth: 60 };
 const near = (a, b) => Math.abs(a[0] - b[0]) < 1e-9 && Math.abs(a[1] - b[1]) < 1e-9;
 
 test('the arcs below the row pass through suspensions, revivals and appeals', () => {
@@ -114,8 +113,8 @@ test('the arcs below the row pass through suspensions, revivals and appeals', ()
   assert.deepEqual(Object.keys(ARCS).sort(), ['appeal', 'revived', 'suspended']);
   for (const [bottom, [left, right]] of Object.entries(ARCS)) {
     assert.ok(Math.abs(at(bottom)[0] - (at(left)[0] + at(right)[0]) / 2) < 1e-9, bottom);
-    const down = curve(left, bottom, at, sizes);
-    const up = curve(bottom, right, at, sizes);
+    const down = curve(left, bottom, at);
+    const up = curve(bottom, right, at);
     assert.ok(near(down[0], at(left)) && near(down[3], at(bottom)), `${left} to ${bottom}`);
     assert.ok(near(up[0], at(bottom)) && near(up[3], at(right)), `${bottom} to ${right}`);
     // Mirror images, each reaching the bottom from above at the same slope, so a line along the bottom
@@ -123,15 +122,15 @@ test('the arcs below the row pass through suspensions, revivals and appeals', ()
     const slope = (a, b) => (b[1] - a[1]) / (b[0] - a[0]);
     assert.ok(slope(down[2], down[3]) > 0.3 && Math.abs(slope(down[2], down[3]) + slope(up[0], up[1])) < 1e-9);
     // A move back up the same half is the same curve the other way.
-    assert.deepEqual(curve(bottom, left, at, sizes), [...down].reverse());
+    assert.deepEqual(curve(bottom, left, at), [...down].reverse());
   }
-  // The arc over the hearing rises its lift at its middle.
-  const [p0, p1, p2, p3] = curve('filed', 'decided', at, sizes);
-  assert.ok(Math.abs((p0[1] + 3 * p1[1] + 3 * p2[1] + p3[1]) / 8 - (100 - 50)) < 1e-9);
+  // The arc over the hearing's arrow rises as far above the row at its middle as the arcs below dip
+  // under it, whatever its width.
+  for (const width of [1, 24]) assert.ok(Math.abs(arrow(curve('filed', 'decided', at), width).at(0.5)[1] - (100 - 60)) < 1e-6);
 });
 
 test('arrows start and end clear of their stages, and a move and its reverse sit side by side', () => {
-  const straight = curve('filed', 'hearing', at, sizes);
+  const straight = curve('filed', 'hearing', at);
   const ahead = arrow(straight, 4, 6);
   const back = arrow([...straight].reverse(), 4, 6);
   assert.ok(ahead.at(0.5)[1] < 100 && back.at(0.5)[1] > 100, 'each to the left of its travel');
@@ -142,7 +141,7 @@ test('arrows start and end clear of their stages, and a move and its reverse sit
   const [, tx] = plain.head.match(/^M([-\d.]+),([-\d.]+)/).map(Number);
   assert.equal(tx, at('hearing')[0] - 10);
   // A curve's ends point along it: the drop to a revival leaves the decision downwards.
-  const dip = arrow(curve('decided', 'revived', at, sizes), 4);
+  const dip = arrow(curve('decided', 'revived', at), 4);
   const [x0, y0] = dip.at(0);
   assert.ok(y0 > 100 && Math.hypot(x0 - at('decided')[0], y0 - 100) > 9.9);
 });
