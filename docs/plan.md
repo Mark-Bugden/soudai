@@ -314,6 +314,7 @@ demo/                          the site bundle, built with demo-kit (see the sit
   src/cases.js                 the real past cases: search, random pick, and what happened next
   src/tooltip.js               the charts' tooltip (adapted from doctor-who-ratings')
   src/scores.js                how well it does: the methods' scores and calibration, from the export
+  src/journey.js               the process map's numbers: moves, the commonest route, the curves
   src/views/                   forecast, process map, courts
   src/forecast.js              the network's forward pass, ported from Python, for made-up cases
   src/tank.js                  German tank estimator, ported from Python (only if the demo recomputes it)
@@ -849,7 +850,20 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
     - **Tests:** 6 new node:test tests: every method shown, the scores for all courts at each landmark and for each court, the best with ties, the calibration bands, and the text.
     - **Checked in Edge,** in both themes at 1280 × 800, at 390 px and in a 1100 × 520 window: the switch, a landmark, picking the trees, a calibration horizon, hovering a dot, a court (which turns the landmark switch off), and back to a case. The Forecast tab's earlier checks still pass. No console errors.
 - [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
-- [ ] The Process map tab and its time curves.
+  - Waiting for Mark's copy (2026-11-26). The Process map tab went ahead of it.
+- [x] The Process map tab and its time curves (v0.9.0).
+  - **Found first: moves into "legally final" were missing** from `journey_moves.csv`, which also made other waits too long. Fixed in its own PR, as v0.8.0 (see step 6).
+  - **The map** (`views/map.js`, with the numbers in `journey.js`) has a node per stage, at fixed places: "filed", "hearing", "decided" and "legally final" along the middle, "revived" above, and "suspended", "appeal" and "closed" below. Each node gives the share of cases reaching its stage.
+  - **The arrows.** Each move is an arrow whose width is the share of cases that make it at least once. Each bows to its left, so a move and its reverse (decided → appeal and appeal → decided) don't overlap. Moves made by fewer than 0.5% of cases aren't drawn: that leaves 18 of the country's 37, and the key says so. A hidden table gives screen readers all of them.
+  - **Labels.** Moves made by at least 2% of cases are labelled with their median wait, "same day" for 0, the commonest first. A label that would overlap a stage's or another label is left out. Hovering an arrow gives its share, its median wait and the middle half of its waits, and dims the other arrows.
+  - **For one court,** the map is that court's, so differences show at once: at Hradec Králové the commonest route is filed → decided → legally final (69.4%), since it records a hearing in 22% of cases.
+  - **The curves.** Beside the map, the share of cases not yet decided, and not yet legally final, each month to 24 months after filing, for the court selected in the accent against all courts in the curve colour. Hovering gives the month's values in both panels.
+  - **Above the map,** the court's cases registered and its commonest route, from the journey's paths. The status line stays the court's headline numbers.
+  - **Phones:** the stage grows to fit the map (19rem) and the curves (9rem each), as for the scores, and the stages' shares lose "of cases" so they don't run into each other.
+  - **Charts no longer size their boxes.** Each chart's SVG is taken out of the layout, so a redraw after a resize measures its box afresh. That fixed a chart overflowing in a short window. A legend that's empty stays in the grid, so the curves don't move into its row.
+  - The placeholder view and its styles are gone.
+  - **Tests:** 6 new node:test tests: every stage has a place, the moves and their waits for every court (decided → legally final is the commonest everywhere), the commonest route, the curves, the arrows' bow and ends, and the text.
+  - **Checked in Edge,** in both themes at 1280 × 800, at 390 px and in a 1100 × 520 window: the map for all courts and for Hradec Králové, hovering an arrow and the curves, and back to the Forecast tab. The Forecast tab's checks still pass. No console errors.
 - [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.
 - [ ] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
 
