@@ -29,6 +29,24 @@
   inset: 0;
 }
 
+/* The Forecast tab's tiles and chart say what its status line would, so there the line is for screen
+   readers only, and on wide frames the stage takes its room. */
+[data-demo].sd-hide-status .dk-bar {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@container (min-width: 48rem) {
+  [data-demo].sd-hide-status .dk-stage {
+    height: max(22rem, min(var(--dk-stage-height), var(--dk-fit-height, 100dvh) - 1rem));
+  }
+}
+
 /* Controls that the current tab doesn't use are hidden. */
 [data-demo] .dk-control[hidden] {
   display: none;
@@ -536,7 +554,7 @@
 }
 
 /*
- * The Process map tab: the map of moves between stages, and beside it the share of cases still waiting
+ * The Process map tab: the map of moves between stages, and beside it the share of cases legally final
  * each month after filing, one above the other on narrow stages.
  */
 [data-demo] .sd-map {
@@ -564,18 +582,11 @@
 }
 
 [data-demo] .sd-map-flow {
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 [data-demo] .sd-curves {
-  grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
-}
-
-[data-demo] .sd-curve {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 2px;
-  min-height: 0;
+  grid-template-rows: auto auto minmax(0, 1fr);
 }
 
 [data-demo] .sd-edge-line {
@@ -598,6 +609,10 @@
   fill-opacity: 0.2;
 }
 
+[data-demo] .sd-flow.has-hover .sd-edge-label:not(.is-hover) {
+  opacity: 0.25;
+}
+
 [data-demo] .sd-edge.is-hover .sd-edge-line {
   stroke-opacity: 1;
 }
@@ -613,13 +628,21 @@
 }
 
 [data-demo] .sd-edge-label {
+  pointer-events: none;
+}
+
+[data-demo] .sd-edge-label text {
   fill: var(--color-text);
   font-size: 12px;
   paint-order: stroke;
   stroke: var(--color-surface);
   stroke-width: 4px;
   stroke-linejoin: round;
-  pointer-events: none;
+}
+
+/* A label set into its arrow hides the line behind it. */
+[data-demo] .sd-edge-label-back {
+  fill: var(--color-surface);
 }
 
 [data-demo] .sd-node {
@@ -679,18 +702,20 @@
   }
 
   [data-demo] .sd-map-box {
-    height: 19rem;
+    height: 24rem;
   }
 
   [data-demo] .sd-curves {
-    grid-template-rows: auto 9rem 9rem;
+    grid-template-rows: auto auto 13rem;
   }
 }
 
-/* The map's arrows dim when one is hovered, without a fade under reduced motion. */
+/* The map's arrows and their labels dim when one is hovered, without a fade under reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   [data-demo] .sd-edge-line,
-  [data-demo] .sd-edge-head {
-    transition: stroke-opacity var(--duration-fast) var(--ease-out), fill-opacity var(--duration-fast) var(--ease-out);
+  [data-demo] .sd-edge-head,
+  [data-demo] .sd-edge-label {
+    transition: stroke-opacity var(--duration-fast) var(--ease-out), fill-opacity var(--duration-fast) var(--ease-out),
+      opacity var(--duration-fast) var(--ease-out);
   }
 }

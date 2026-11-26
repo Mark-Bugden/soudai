@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import { prepare } from '../src/data.js';
-import { route, share, wait } from '../src/format.js';
-import { PLACES, commonest, moves, waiting } from '../src/journey.js';
-import { arrow } from '../src/views/map.js';
+import { moveLabel, notDrawn, route, share, wait } from '../src/format.js';
+import { DRAWN, PLACES, commonest, legallyFinal, moves, shape, split } from '../src/journey.js';
+import { arc, line, place } from '../src/views/map.js';
 
 const raw = JSON.parse(readFileSync(new URL('../public/data/soudai.json', import.meta.url), 'utf8'));
 const data = prepare(raw);
@@ -45,23 +45,73 @@ test('the commonest route', () => {
   assert.deepEqual(commonest(data.journey(data.court('OSVYCHK')), data.stages).stages, ['filed', 'decided', 'final']);
 });
 
-test('the share still waiting, month by month', () => {
-  const all = data.journey(null);
-  assert.deepEqual(waiting(all, 0), { decided: 1, final: 1 });
-  assert.deepEqual(waiting(all, 12), { decided: all.notDecided[12], final: all.notFinal[12] });
-  assert.ok(waiting(all, 6).decided < waiting(all, 6).final);
+test('the map draws moves of at least 2% between stages next to each other, and lists the rest', () => {
+  const all = moves(data.journey(null), data.stages);
+  const { drawn, rest } = split(all);
+  assert.deepEqual(drawn.map((m) => `${m.from} ${m.to}`), [
+    'decided final', 'hearing decided', 'filed hearing', 'filed decided', 'decided appeal', 'appeal final',
+    'revived hearing', 'decided revived', 'filed suspended',
+  ]);
+  assert.equal(drawn.length + rest.length, all.length);
+  assert.ok(rest.every((m) => m.share < DRAWN || !shape(m.from, m.to)));
+  // Filing to an appeal would cross the hearing and the decision, so it's listed however common.
+  assert.equal(shape('filed', 'appeal'), null);
+  assert.equal(shape('filed', 'decided'), 'arc');
+  assert.equal(shape('appeal', 'decided'), 'line');
+  assert.equal(shape('decided', 'appeal'), 'line');
+  for (const court of data.courts) {
+    for (const m of split(moves(data.journey(court), data.stages)).drawn) assert.ok(shape(m.from, m.to), court.code);
+  }
+  const lead = 'Not drawn, as under 2% of cases or crossing a stage: ';
+  assert.equal(notDrawn(rest), `${lead}appeal → revived (1.7%), filed → appeal (1.3%), suspended → decided (1.2%) and ${rest.length - 3} more.`);
+  assert.equal(notDrawn(rest.slice(0, 2)), `${lead}appeal → revived (1.7%) and filed → appeal (1.3%).`);
+  assert.equal(notDrawn([]), '');
+  assert.deepEqual(moveLabel(drawn[2]), ['76.1%', '147 days']);
+  assert.deepEqual(moveLabel({ share: 0.03, wait: null }), ['3.0%']);
 });
 
-test('an arrow bows to its left, so a move and its reverse don\'t overlap', () => {
-  const right = arrow([0, 0], [100, 0], 4);
-  const left = arrow([100, 0], [0, 0], 4);
-  assert.ok(right.label[1] < 0, 'rightwards bows up');
-  assert.ok(left.label[1] > 0, 'leftwards bows down');
-  // It starts clear of the stage it leaves, and its head ends clear of the stage it reaches.
-  const [, sx, sy] = right.path.match(/^M([-\d.]+),([-\d.]+)/).map(Number);
-  assert.ok(Math.hypot(sx, sy) >= 9.9);
-  const [, tx, ty] = right.head.match(/^M([-\d.]+),([-\d.]+)/).map(Number);
-  assert.ok(Math.hypot(tx - 100, ty) >= 9.9 && Math.hypot(tx - 100, ty) < 11);
+test('the share legally final, month by month', () => {
+  const all = data.journey(null);
+  const final = legallyFinal(all);
+  assert.equal(final[0], 0);
+  assert.equal(final[12], 1 - all.notFinal[12]);
+  for (let m = 1; m < final.length; m++) assert.ok(final[m] >= final[m - 1]);
+});
+
+test('arrows start and end clear of their stages, and a move and its reverse sit side by side', () => {
+  const ahead = line([0, 0], [100, 0], 4, 6);
+  const back = line([100, 0], [0, 0], 4, 6);
+  assert.ok(ahead.at(0.5)[1] < 0 && back.at(0.5)[1] > 0, 'each to the left of its travel');
+  assert.deepEqual(ahead.left(0.5), [0, -1]);
+  const [, sx] = ahead.path.match(/^M([-\d.]+),([-\d.]+)/).map(Number);
+  assert.equal(sx, 10);
+  const [, tx] = ahead.head.match(/^M([-\d.]+),([-\d.]+)/).map(Number);
+  assert.equal(tx, 90);
+  // The arc rises to its lift at its middle, and its ends point away from and into the stages.
+  const over = arc([0, 100], [200, 100], 6, 60);
+  const [mx, my] = over.at(0.5);
+  assert.ok(Math.abs(mx - 100) < 5, 'near the middle: the line stops at the base of its head');
+  assert.ok(my < 100 - 55 && my > 100 - 65, 'about its lift above the row');
+  assert.ok(over.left(0.5)[1] < -0.99, 'its left is up at the top');
+  assert.ok(over.samples.every(([, y]) => y <= 100));
+});
+
+test('a label goes beside its arrow, clear of what is already placed', () => {
+  const space = { width: 400, height: 300, taken: [], marks: [], measure: (text) => text.length * 6.6 };
+  const flat = line([50, 150], [350, 150], 4);
+  const below = place(['76.1%', '147 days'], 4, flat, space);
+  assert.deepEqual(below.lines, ['76.1% · 147 days']);
+  assert.ok(below.bounds[1] > 150 + 2, 'under the line, the right of its travel');
+  const above = place(['76.1%', '147 days'], 4, flat, { ...space, taken: [below.bounds] });
+  assert.ok(above.bounds[3] < 150 - 2);
+  assert.ok(place(['3.2%', '78 days'], 4, flat, space, { sides: [1, -1] }).bounds[3] < 150, 'the left first, when asked');
+  // Set into its own arrow, but not into another's.
+  const owner = {};
+  const marks = flat.samples.map(([x, y]) => [x, y, 4, owner]);
+  const on = place(['3.2%', '78 days'], 4, flat, { ...space, marks }, { on: true, owner });
+  assert.ok(on.on && on.bounds[1] < 150 && on.bounds[3] > 150);
+  const other = place(['3.2%', '78 days'], 4, flat, { ...space, marks }, { on: true, owner: {} });
+  assert.ok(!other.on && other.bounds[1] > 150);
 });
 
 test('the map\'s text', () => {

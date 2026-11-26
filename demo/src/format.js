@@ -95,3 +95,20 @@ export const route = (stages) => stages.map((stage) => STAGES[stage].toLowerCase
 
 /** A share of cases to one decimal place, for the map: "93.3%", or "<0.1%". */
 export const share = (p) => (p < 0.0005 ? '<0.1%' : `${(p * 100).toFixed(1)}%`);
+
+/** A move between two stages: "decided → legally final". */
+const move = ({ from, to }) => route([from, to]);
+
+/** An arrow's label on the map, as its lines: the share of cases making the move, and its median wait if known. */
+export const moveLabel = (m) => [share(m.share), ...(m.wait ? [wait(m.wait[1])] : [])];
+
+/**
+ * The moves the map leaves out, the commonest few with their shares: "Not drawn, as under 2% of cases or
+ * crossing a stage: a (1.7%), b (1.3%), c (1.2%) and 9 more."
+ */
+export function notDrawn(rest, few = 3) {
+  if (!rest.length) return '';
+  const named = rest.slice(0, few).map((m) => `${move(m)} (${share(m.share)})`);
+  const more = rest.length - named.length;
+  return `Not drawn, as under 2% of cases or crossing a stage: ${more ? `${named.join(', ')} and ${more} more` : list(named)}.`;
+}
