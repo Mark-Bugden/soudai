@@ -44,8 +44,8 @@ export function createMap(host, data) {
     h('div', { class: 'sd-map-flow' },
       h('div', { class: 'sd-case' }, h('p', { class: 'sd-case-title' }, 'Process map'), meta), mapBox, rest),
     h('div', { class: 'sd-curves' },
-      h('p', { class: 'sd-cal-title' }, '% of cases legally final over time'), legend, curveBox,
-      h('p', { class: 'sd-cal-title sd-routes-title', id: 'sd-routes-title' }, 'Most common routes'), routeList),
+      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title' }, '% of cases legally final over time'), legend, curveBox),
+      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title', id: 'sd-routes-title' }, 'Most common routes'), routeList)),
     table);
   host.append(el);
   let curve = null; // what reading the curve needs
@@ -308,8 +308,8 @@ export function createMap(host, data) {
     return { lines, x, y, reading, ticks, left: margin.left, right: width - margin.right };
   }
 
-  // Reading the curve: at the nearest month, a dot on each line and its value on the y axis, with a
-  // faint line between them. The axis's own labels make way.
+  // Reading the curve: at the nearest month, a line up the chart, a dot on each line and its value on the
+  // y axis, with a faint line between them. The axis's own labels make way.
   curveSvg.addEventListener('pointermove', (event) => {
     if (!curve) return;
     const box = curveSvg.getBoundingClientRect();
@@ -321,11 +321,12 @@ export function createMap(host, data) {
     const { x, y, lines, ticks, left } = curve;
     const values = lines.map(({ series, dot }) => ({ value: series[month], at: y(series[month]), dot }));
     const labels = spread(values.map(({ at }) => at), LINE);
-    curve.reading.replaceChildren(...values.flatMap(({ value, at, dot }, i) => [
-      s('line', { class: 'sd-reading-line', x1: left, x2: x(month), y1: at, y2: at }),
-      s('circle', { class: dot, cx: x(month), cy: at, r: 4 }),
-      s('text', { class: 'sd-reading-value', x: left - 8, y: labels[i], dy: '0.32em', 'text-anchor': 'end' }, describe.percent(value)),
-    ]));
+    curve.reading.replaceChildren(
+      s('line', { class: 'sd-cross-line', x1: x(month), x2: x(month), y1: y(1), y2: y(0) }),
+      ...values.map(({ at }) => s('line', { class: 'sd-reading-line', x1: left, x2: x(month), y1: at, y2: at })),
+      ...values.map(({ at, dot }) => s('circle', { class: dot, cx: x(month), cy: at, r: 4 })),
+      ...values.map(({ value }, i) => s('text', { class: 'sd-reading-value', x: left - 8, y: labels[i], dy: '0.32em', 'text-anchor': 'end' }, describe.percent(value))),
+    );
     for (const { tick, at } of ticks) tick.classList.toggle('is-under', labels.some((label) => Math.abs(label - at) < LINE));
   });
   curveSvg.addEventListener('pointerleave', clearReading);

@@ -568,22 +568,24 @@
   min-height: 0;
 }
 
-/* The curve takes what the most common routes leave of the column. */
+/* The curve in the top half of the column, the most common routes in the bottom half, with room to spare. */
 [data-demo] .sd-curves {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  min-width: 0;
+  min-height: 0;
+}
+
+[data-demo] .sd-half {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  min-width: 0;
   min-height: 0;
 }
 
 [data-demo] .sd-curve-box {
   flex: 1 1 0;
-  min-height: 7rem;
-}
-
-[data-demo] .sd-routes-title {
-  margin-top: var(--space-4);
 }
 
 [data-demo] .sd-routes {
@@ -763,6 +765,10 @@
 
   [data-demo] .sd-map-box {
     height: 24rem;
+  }
+
+  [data-demo] .sd-curves {
+    grid-template-rows: auto auto;
   }
 
   [data-demo] .sd-curve-box {
