@@ -74,3 +74,13 @@ test('forecasts are chances, falling month by month', () => {
   });
   assert.deepEqual(within(still, [1, 3]), [1 - still[0], 1 - still[2]]);
 });
+
+test('several courts with weights give their forecasts\' weighted mean', () => {
+  const net = network(data.network);
+  const events = [[data.codes.findIndex((c) => c.code === 'ZAHAJ_RIZ'), 0], [data.codes.findIndex((c) => c.code === 'NAR_JED'), 40]];
+  const a = stillOpen(net, 3, events, 60);
+  const b = stillOpen(net, 50, events, 60);
+  const mixed = stillOpen(net, [[3, 0.25], [50, 0.75]], events, 60);
+  mixed.forEach((value, k) => assert.ok(Math.abs(value - (0.25 * a[k] + 0.75 * b[k])) < 1e-12));
+  assert.deepEqual(stillOpen(net, [[3, 1]], events, 60), a);
+});

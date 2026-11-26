@@ -50,12 +50,20 @@ const mapValues = (object, fn) => Object.fromEntries(Object.entries(object).map(
  * The chance a case is still open 1, 2, ... `horizon` months after day `day`, as a Float64Array, given
  * its court (its row in the network) and its events so far, as [code (its row), days after filing], in
  * order, from its filing on day 0. `day` counts from filing too, and is on or after the last event's.
+ *
+ * `court` may instead be several courts with weights that add up to 1, as [[row, weight], ...]: the
+ * forecast is then their forecasts' weighted mean. The events are read once, since the court only
+ * enters the output layers.
  */
 export function stillOpen(net, court, events, day) {
+  const courts = Array.isArray(court) ? court : [[court, 1]];
   const mean = new Float64Array(net.horizon);
   for (const member of net.members) {
-    const one = forecast(member, court, events, day);
-    for (let k = 0; k < mean.length; k++) mean[k] += one[k] / net.members.length;
+    const { h, previous } = read(member, events);
+    for (const [row, weight] of courts) {
+      const one = head(member, h, row, previous, day);
+      for (let k = 0; k < mean.length; k++) mean[k] += (weight * one[k]) / net.members.length;
+    }
   }
   return mean;
 }
@@ -77,8 +85,8 @@ function affine({ shape: [rows, columns], values: w }, x, bias) {
 // The row of a matrix stored row by row.
 const row = ({ shape: [, columns], values }, i) => values.subarray(i * columns, (i + 1) * columns);
 
-/** One network's forecast. */
-function forecast(m, court, events, day) {
+/** One network's hidden state after the events, and the day of the last. */
+function read(m, events) {
   const size = m['gru.weight_hh_l0'].shape[1];
   let h = new Float64Array(size);
   let previous = 0;
@@ -96,6 +104,11 @@ function forecast(m, court, events, day) {
     h = next;
     previous = when;
   }
+  return { h, previous };
+}
+
+/** One network's forecast from its hidden state, for a court. */
+function head(m, h, court, previous, day) {
   const x = [...h, ...row(m['court.weight'], court), Math.log1p(day - previous), Math.log1p(day)];
   const layer = affine(m['layer.weight'], x, m['layer.bias']).map((v) => Math.max(v, 0));
   const finishing = affine(m['out.weight'], layer, m['out.bias']);

@@ -1,12 +1,15 @@
-// The Forecast tab, for a real past case: its number and court, the chance it ends within 1, 3, 6 and
-// 12 months of the day chosen, and whether it did, over a chart of its life.
+// The Forecast tab, for a real past case or a made-up one: the case, the chance it ends within 1, 3, 6
+// and 12 months of the day chosen, and for a real case whether it did, over a chart of its life.
 //
 // The chart shares one time axis, in months after filing:
 // - above, the case's events, one lane per stage it reached. Those up to the day of the forecast are
 //   what the network reads; those after it, in the curve colour, are what happened next;
 // - below, the forecast: the chance the case has ended, month by month for 12 months from the day of
 //   the forecast, which is the line in the accent across both;
-// - the day the case ended, or its record ran out, as a line in the contrasting highlight.
+// - for a real case, the day it ended, or its record ran out, as a line in the contrasting highlight.
+//
+// A made-up case has no dates, so its days are counted from filing, and it has nothing after the
+// forecast: its axis runs to 12 months after the day of the forecast.
 //
 // Colours come from CSS classes (see demo.css), so a theme change needs no redraw.
 
@@ -57,26 +60,30 @@ export function createForecast(host, data) {
     const so = soFar(item, day);
     const still = forecast(data, item.court, so, day);
     const chances = within(still, data.horizons);
-    const end = ending(item);
+    const end = item.made ? null : ending(item);
 
     title.textContent = item.label;
-    meta.textContent = `${item.court.name} · filed ${describe.date(item.filed)}`;
+    if (item.made) meta.textContent = item.court ? item.court.name : 'All courts, weighted by their cases registered';
+    else meta.textContent = `${item.court.name} · filed ${describe.date(item.filed)}`;
     data.horizons.forEach((months, i) => {
       const tile = tiles[i];
-      const result = outcome(item, day, months);
       tile.label.textContent = describe.months(months);
       tile.value.textContent = describe.percent(chances[i]);
+      tile.result.hidden = Boolean(item.made);
+      if (item.made) return;
+      const result = outcome(item, day, months);
       tile.result.textContent = OUTCOME[result];
       tile.result.dataset.outcome = result;
       tile.result.title = OUTCOME_TITLE[result];
     });
     events.replaceChildren(...item.events.map((event) => h('li', {},
-      `${describe.date(describe.addDays(item.filed, event.day))}, day ${describe.count(event.day)}: ${event.code.gloss}`
-        + (event.day > day ? ' (after the forecast)' : ''))));
+      `${when(item, event.day)}: ${event.code.gloss}${event.day > day ? ' (after the forecast)' : ''}`)));
 
     draw(item, day, still, end);
     tip.hide();
-    return describe.forecastLine(item, day, chances, data.horizons, end);
+    return item.made
+      ? describe.madeUpLine(item, day, chances, data.horizons)
+      : describe.forecastLine(item, day, chances, data.horizons, end);
   }
 
   function draw(item, day, still, end) {
@@ -101,7 +108,7 @@ export function createForecast(host, data) {
     const lanesBottom = top + lanes.length * lane;
     const panelTop = lanesBottom + 26;
     const panelBottom = Math.max(panelTop + 40, height - axisHeight);
-    const last = item.span + AHEAD * MONTH;
+    const last = (item.made ? day : item.span) + AHEAD * MONTH;
     const x = (d) => left + (d / last) * (width - left - right);
     const y = (p) => panelBottom - p * (panelBottom - panelTop);
     const laneY = (stage) => top + (lanes.indexOf(stage) + 0.5) * lane;
@@ -145,14 +152,16 @@ export function createForecast(host, data) {
       nodes.push(s('circle', { class: 'sd-forecast-dot', cx: x(day + months * MONTH), cy: y(1 - still[months - 1]), r: DOT }));
     }
 
-    // The day the case ended, or its record ran out, labelled where the forecast's line isn't.
-    const endX = x(item.span);
-    const reached = item.span <= day + AHEAD * MONTH ? curveAt(points, item.span) : 0;
-    const endLabel = end === 'open' ? 'Record ends' : `Ended, day ${describe.count(item.span)}`;
-    const labelY = reached > 0.5 ? panelBottom - 6 : panelTop + 12;
-    const anchor = endX > width - right - 90 ? 'end' : 'start';
-    nodes.push(s('line', { class: end === 'open' ? 'sd-record-end' : 'sd-ended', x1: endX, x2: endX, y1: panelTop - 4, y2: panelBottom }));
-    labels.push(s('text', { class: 'sd-end-label', x: endX + (anchor === 'start' ? 6 : -6), y: labelY, 'text-anchor': anchor }, endLabel));
+    // The day a real case ended, or its record ran out, labelled where the forecast's line isn't.
+    if (!item.made) {
+      const endX = x(item.span);
+      const reached = item.span <= day + AHEAD * MONTH ? curveAt(points, item.span) : 0;
+      const endLabel = end === 'open' ? 'Record ends' : `Ended, day ${describe.count(item.span)}`;
+      const labelY = reached > 0.5 ? panelBottom - 6 : panelTop + 12;
+      const anchor = endX > width - right - 90 ? 'end' : 'start';
+      nodes.push(s('line', { class: end === 'open' ? 'sd-record-end' : 'sd-ended', x1: endX, x2: endX, y1: panelTop - 4, y2: panelBottom }));
+      labels.push(s('text', { class: 'sd-end-label', x: endX + (anchor === 'start' ? 6 : -6), y: labelY, 'text-anchor': anchor }, endLabel));
+    }
 
     // The day of the forecast, across the lanes and the panel.
     const nowX = x(day);
@@ -200,8 +209,7 @@ export function createForecast(host, data) {
       }
     }
     if (best) {
-      const when = describe.date(describe.addDays(item.filed, best.day));
-      const lines = [`${when}, day ${describe.count(best.day)}`, ...best.events.map((e) => e.code.gloss)];
+      const lines = [when(item, best.day), ...best.events.map((e) => e.code.gloss)];
       if (best.day > day) lines.push('After the forecast');
       tip.show(lines, { x: best.x, y: best.y - DOT });
       return;
@@ -216,8 +224,8 @@ export function createForecast(host, data) {
           s('line', { class: 'sd-cross-line', x1: x(at), x2: x(at), y1: panelTop, y2: panelBottom }),
           s('circle', { class: 'sd-forecast-dot', cx: x(at), cy: y(p), r: DOT }),
         );
-        tip.show([`${describe.percent(p)} within ${describe.months(months)}`,
-          `By ${describe.date(describe.addDays(item.filed, Math.round(at)))}`], { x: x(at), y: y(p) - DOT });
+        const by = item.made ? `day ${describe.count(Math.round(at))}` : describe.date(describe.addDays(item.filed, Math.round(at)));
+        tip.show([`${describe.percent(p)} within ${describe.months(months)}`, `By ${by}`], { x: x(at), y: y(p) - DOT });
         return;
       }
     }
@@ -239,6 +247,12 @@ export function createForecast(host, data) {
       el.remove();
     },
   };
+}
+
+/** "21 March 2024, day 177" for a real case; "Day 177", or "Filing", for a made-up one, which has no dates. */
+function when(item, day) {
+  if (item.made) return day === 0 ? 'Filing' : `Day ${describe.count(day)}`;
+  return `${describe.date(describe.addDays(item.filed, day))}, day ${describe.count(day)}`;
 }
 
 /** The forecast's chance of having ended by day `d`, read off its line between the months. */

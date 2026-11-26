@@ -59,27 +59,42 @@ export function segmented({ label, options, value = options[0].value, showLabel 
 }
 
 /**
- * A button that does something when pressed, such as picking a case at random. Its value counts the
- * presses, and each press notifies.
+ * A row of buttons that each do something when pressed, such as picking a case at random. `options` are
+ * { label, value, icon? }. The value is the last pressed, and each press notifies, even of the same one.
+ * `enable(value, state)` turns one button on or off, and `relabel(value, text)` changes its label.
  */
-export function button({ label, icon: markup }) {
-  const el = h('div', { class: 'dk-control sd-action' });
-  const press = h('button', { type: 'button', class: 'dk-button' }, icon(markup), h('span', {}, label));
-  el.append(press);
+export function actions({ label, options }) {
+  const buttons = new Map(options.map((option) => {
+    const text = h('span', {}, option.label);
+    return [option.value, { el: h('button', { type: 'button', class: 'dk-button' }, icon(option.icon), text), text }];
+  }));
+  const el = h('div', { class: 'dk-control sd-actions', role: 'group', 'aria-label': label }, ...[...buttons.values()].map((b) => b.el));
   const listeners = new Set();
-  let presses = 0;
-  press.addEventListener('click', () => {
-    presses += 1;
-    for (const listener of listeners) listener(presses);
-  });
+  let last = null;
+  for (const [value, { el: press }] of buttons) {
+    press.addEventListener('click', () => {
+      last = value;
+      for (const listener of listeners) listener(value);
+    });
+  }
+  let disabled = false;
   return {
     el,
-    get value() { return presses; },
-    set value(next) { presses = next; },
-    get disabled() { return press.disabled; },
+    get value() { return last; },
+    set value(next) { last = next; },
+    get disabled() { return disabled; },
     set disabled(state) {
-      press.disabled = Boolean(state);
-      el.toggleAttribute('data-disabled', press.disabled);
+      disabled = Boolean(state);
+      for (const { el: press } of buttons.values()) press.disabled = disabled;
+      el.toggleAttribute('data-disabled', disabled);
+    },
+    enable(value, state) {
+      const press = buttons.get(value)?.el;
+      if (press) press.disabled = disabled || !state;
+    },
+    relabel(value, text) {
+      const target = buttons.get(value)?.text;
+      if (target) target.textContent = text;
     },
     onChange(listener) {
       listeners.add(listener);
