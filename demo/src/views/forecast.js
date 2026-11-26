@@ -1,4 +1,4 @@
-// The Forecast tab, for a real past case or a made-up one: the case, the chance it ends within 1, 3, 6
+// The Forecast tab, for a real past case or a custom one: the case, the chance it ends within 1, 3, 6
 // and 12 months of the day chosen, and for a real case whether it did, over a chart of its life.
 //
 // The chart shares one time axis, in months after filing:
@@ -8,8 +8,8 @@
 //   the forecast, which is the line in the accent across both;
 // - for a real case, the day it ended, or its record ran out, as a line in the contrasting highlight.
 //
-// A made-up case has no dates, so its days are counted from filing, and it has nothing after the
-// forecast: its axis runs to 12 months after the day of the forecast.
+// A custom case has nothing after the forecast, so its axis runs to 12 months after the day of the
+// forecast.
 //
 // Colours come from CSS classes (see demo.css), so a theme change needs no redraw.
 
@@ -63,8 +63,7 @@ export function createForecast(host, data) {
     const end = item.made ? null : ending(item);
 
     title.textContent = item.label;
-    if (item.made) meta.textContent = item.court ? item.court.name : 'All courts, weighted by their cases registered';
-    else meta.textContent = `${item.court.name} · filed ${describe.date(item.filed)}`;
+    meta.textContent = `${item.court.name} · filed ${describe.date(item.filed)}`;
     data.horizons.forEach((months, i) => {
       const tile = tiles[i];
       tile.label.textContent = describe.months(months);
@@ -82,7 +81,7 @@ export function createForecast(host, data) {
     draw(item, day, still, end);
     tip.hide();
     return item.made
-      ? describe.madeUpLine(item, day, chances, data.horizons)
+      ? describe.customLine(item, day, chances, data.horizons)
       : describe.forecastLine(item, day, chances, data.horizons, end);
   }
 
@@ -224,7 +223,7 @@ export function createForecast(host, data) {
           s('line', { class: 'sd-cross-line', x1: x(at), x2: x(at), y1: panelTop, y2: panelBottom }),
           s('circle', { class: 'sd-forecast-dot', cx: x(at), cy: y(p), r: DOT }),
         );
-        const by = item.made ? `day ${describe.count(Math.round(at))}` : describe.date(describe.addDays(item.filed, Math.round(at)));
+        const by = describe.date(describe.addDays(item.filed, Math.round(at)));
         tip.show([`${describe.percent(p)} within ${describe.months(months)}`, `By ${by}`], { x: x(at), y: y(p) - DOT });
         return;
       }
@@ -249,9 +248,8 @@ export function createForecast(host, data) {
   };
 }
 
-/** "21 March 2024, day 177" for a real case; "Day 177", or "Filing", for a made-up one, which has no dates. */
+/** "21 March 2024, day 177". */
 function when(item, day) {
-  if (item.made) return day === 0 ? 'Filing' : `Day ${describe.count(day)}`;
   return `${describe.date(describe.addDays(item.filed, day))}, day ${describe.count(day)}`;
 }
 

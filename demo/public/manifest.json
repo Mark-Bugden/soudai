@@ -11,8 +11,26 @@
   "demo": { "entry": "demo.js", "height": 560, "needsWebGL": false },
   "modelCard": {
     "what": "For a civil case at a Czech district court, the chance it ends (becomes legally final) within 1, 3, 6 and 12 months, from its court and the dates and types of the events in its record so far. It's the average of five recurrent neural networks (GRUs) of 7,228 weights each, which the demo runs in your browser.",
-    "data": "Trained on 138,815 civil cases registered in 2020–2023 at the 86 district-level courts, as their records stood on 31 December 2023. Tested on 69,336 cases registered in 2024–2025, followed to November 2026. The cases were drawn at random from infosoud.gov.cz, the courts' public case-tracking service, and weighted to stand for every case registered.",
+    "use": "For exploring how long civil cases at Czech district courts take, on real past cases and on cases described in the demo. Not for any decision about a real case: it isn't legal advice.",
+    "architecture": "Five recurrent neural networks of the GRU type, whose forecasts are averaged. Each reads a case's events in order. An event enters as 10 numbers: its type, one of 28, as 8 learned numbers, and log(1 + days) since the previous event and since filing. A hidden state of 32 numbers is updated once per event. At the forecast, the last hidden state, the court (4 learned numbers for each court) and log(1 + days) since the last event and since filing go through a layer of 32 with ReLU, then one of 36 with a sigmoid: the chance the case ends in each of the next 36 months, if it's still open at the start of that month.",
+    "parameters": "7,228 weights and biases in each network, 36,140 in all: 224 for the event types, 4,224 in the GRU, 344 for the courts and 2,436 in the two layers after it. The demo stores them as 16-bit integers, in 96 KB.",
+    "training": "On cases registered in 2020–2023 as their records stood on 31 December 2023, cut into a forecast at the end of every day with events and every month after filing. Each forecast's weight halves for every year before 1 January 2024, since cases have got faster. Adam, at a learning rate of 0.0005, on batches of 256 cases, with gradients clipped to a norm of 1, until the loss on a held-out 10% of the training cases hadn't improved for 8 passes. The five networks differ only in their random starts.",
+    "data":"Trained on 138,815 civil cases registered in 2020–2023 at the 86 district-level courts, as their records stood on 31 December 2023. Tested on 69,336 cases registered in 2024–2025, followed to November 2026. The cases were drawn at random from infosoud.gov.cz, the courts' public case-tracking service, and weighted to stand for every case registered.",
     "metric": "Given two test cases, it picks the one that ends first 64.7% of the time (concordance 0.647), against 64.3% for gradient-boosted trees, the best of the simpler methods. Its Brier score for ending within 6 months is 0.189, the same as the trees'. It does better than them 1 and 3 months ahead, and slightly worse 12 months ahead.",
+    "comparison": {
+      "groups": [{ "label": "", "span": 2 }, { "label": "Brier score, within", "span": 4 }],
+      "columns": ["Method", "Concordance", "1 month", "3 months", "6 months", "12 months"],
+      "rows": [
+        ["Court average", "0.606", "0.069", "0.172", "0.199", "0.092"],
+        ["Process map", "0.640", "0.043", "0.156", "0.192", "0.089"],
+        ["Cox model", "0.607", "0.058", "0.179", "0.199", "0.095"],
+        ["Boosted trees", "0.643", "0.040", "0.151", "0.189", "0.088"],
+        ["Network on hand-made features", "0.640", "0.042", "0.154", "0.190", "0.089"],
+        ["This model: five GRU networks", "0.647", "0.038", "0.149", "0.189", "0.088"]
+      ],
+      "note": "On 234,784 forecasts on cases registered in 2024–2025, at filing and 1, 3, 6 and 12 months in. Concordance is how often a method puts two cases in the order they ended: higher is better, and 0.5 is a coin toss. The Brier score is the mean squared gap between the forecast chance and what happened: lower is better."
+    },
+    "version": "Trained on 25 November 2026, on case records as they stood on 20–25 November 2026.",
     "limits": [
       "It doesn't clearly beat gradient-boosted trees on hand-made features: it ranks cases better, but its forecasts are no better 6 months ahead, and slightly worse 12 months ahead.",
       "It knows only a case's court and the dates and types of its events: nothing about the parties, the claim, the judge or the law.",

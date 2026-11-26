@@ -1,45 +1,20 @@
-// Court search: finds a court by its name or its area, ignoring diacritics, so "Decin" finds Děčín.
-// No DOM access.
+// The courts by type and place, for the court menus: "Okresní soud", then "Děčín". No DOM access.
 
-/** Lower case, without diacritics or punctuation, so "Děčín" matches "decin". */
-export function normalise(text) {
-  return text
-    .normalize('NFKD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
-/** The courts in order of their areas, as Czech sorts them (Praha 2 before Praha 10), with their search keys. */
-export function searchIndex(courts) {
-  return [...courts]
-    .sort((a, b) => a.area.localeCompare(b.area, 'cs', { numeric: true }))
-    .map((court) => ({ court, area: normalise(court.area), name: normalise(court.name) }));
-}
-
-// How well a key matches a query, best first: the whole key, its start, the start of a word in it,
-// or anywhere in it.
-function closeness(key, query) {
-  if (key === query) return 0;
-  if (key.startsWith(query)) return 1;
-  if (key.includes(` ${query}`)) return 2;
-  if (key.includes(query)) return 3;
-  return null;
-}
+/** The types of court, in the order the menu lists them. A court's name starts with its type. */
+export const TYPES = ['Okresní soud', 'Obvodní soud', 'Městský soud'];
 
 /**
- * The courts that match a query, best first: by their area, then by their full name, each in order of
- * area. An empty query gives every court, in order of area.
+ * The courts grouped by type, in the order of TYPES, as { type, courts: [{ court, place }] }. A court's
+ * place is its name without its type ("Děčín", "Praha 1", "Brno"), and each type's courts are in order
+ * of place, as Czech sorts them: "ch" after "h", and Praha 2 before Praha 10.
  */
-export function matches(index, query) {
-  const key = normalise(query ?? '');
-  if (!key) return index.map((entry) => entry.court);
-  const ranked = Array.from({ length: 8 }, () => []);
-  for (const entry of index) {
-    const byArea = closeness(entry.area, key);
-    const byName = closeness(entry.name, key);
-    const rank = byArea ?? (byName === null ? null : 4 + byName);
-    if (rank !== null) ranked[rank].push(entry.court);
+export function byType(courts) {
+  const groups = TYPES.map((type) => ({ type, courts: [] }));
+  for (const court of courts) {
+    const group = groups.find(({ type }) => court.name.startsWith(`${type} `));
+    if (!group) throw new Error(`${court.name}: not a court of a known type`);
+    group.courts.push({ court, place: court.name.slice(group.type.length + 1) });
   }
-  return ranked.flat();
+  for (const group of groups) group.courts.sort((a, b) => a.place.localeCompare(b.place, 'cs', { numeric: true }));
+  return groups.filter((group) => group.courts.length);
 }

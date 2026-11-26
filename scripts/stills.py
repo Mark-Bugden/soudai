@@ -1,10 +1,11 @@
 """Render the demo's stills from the built demo into demo/public/, in the dark and light themes.
 
-- static.webp and static-light.webp: the opening state, the Forecast tab on 18 C 33/2024 at Jihlava,
-  at filing. Shown while the demo loads, and without JavaScript.
-- thumb.webp and thumb-light.webp: the Process map for all courts, for the project card. The stage is
-  shot small, so its arrows and labels stay readable on the card, and at 16:10, the card's shape, then
-  centred on the theme's page colour at 1200 x 675. The card trims those margins.
+- static.webp and static-light.webp: the opening state, the Process map for all courts. Shown while
+  the demo loads, and without JavaScript.
+- thumb.webp and thumb-light.webp: the same, for the project card. The stage is
+  shot at 720 x 450: small, so its arrows stay readable on the card, but no smaller than the site shows
+  it, so its labels have the room they have there. That's 16:10, the card's shape, centred on the
+  theme's page colour at 1200 x 675. The card trims those margins.
 - og.jpg: the same map at 1200 x 630, dark only, for link previews.
 
 Serves the built demo (demo/dist/, from `npm run build`), opens it in a browser and screenshots the
@@ -52,7 +53,7 @@ def open_page(browser, url, errors):
     page.on("console", lambda message: message.type == "error" and errors.append(message.text))
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(url)
-    page.wait_for_selector(".sd-forecast .sd-chart path")
+    page.wait_for_selector(".sd-flow .sd-node")
     page.evaluate("document.head.append(Object.assign(document.createElement('style'), { id: 'still' }))")
     return page
 
@@ -80,16 +81,9 @@ def render(browser, url, errors):
     page = open_page(browser, url, errors)
     for theme in THEMES:
         stills["static", theme] = shoot(page, theme, 1200, 675)
-    page.close()
-
-    page = open_page(browser, url, errors)
-    page.get_by_role("radio", name="Process map", exact=True).check(
-        force=True
-    )  # each radio sits under its label
-    page.wait_for_selector(".sd-flow path")
     for theme in THEMES:
-        stills["thumb", theme] = shoot(page, theme, 576, 360)
-    stills["og", "dark"] = shoot(page, "dark", 640, 336)
+        stills["thumb", theme] = shoot(page, theme, 720, 450)
+    stills["og", "dark"] = shoot(page, "dark", 800, 420)
     page.close()
     return stills
 

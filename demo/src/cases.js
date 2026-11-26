@@ -1,35 +1,15 @@
-// The cases the Forecast tab shows: the real past cases (finding one by its number, picking one at random,
-// and what happened next) and made-up ones, and the forecast for a case on a day of its life. No DOM
-// access.
+// The cases the Forecast tab shows: the real past cases (in order, picking one at random, and what
+// happened next) and custom ones, and the forecast for a case on a day of its life. No DOM access.
 
 import { MONTH, stillOpen } from './forecast.js';
-import { normalise } from './courts.js';
 
 const FINAL = 'ST_VEC_PUK';
 const CLOSED = 'ST_VEC_ODS';
+const DAY = 864e5;
 
-/** Cases in order: by court (as `courts` lists them), then year, senate and number. */
-export function ordered(cases, courts) {
-  const place = new Map(courts.map((court, i) => [court, i]));
-  return [...cases].sort((a, b) => (place.get(a.court) - place.get(b.court))
-    || a.year - b.year || a.senate - b.senate || a.number - b.number);
-}
-
-/**
- * The cases whose number matches a query, in the order given: "42/2024", "9 C 42" and "9 c 42 2024" all
- * find 9 C 42/2024. A match on whole parts of the number comes first. An empty query gives them all.
- */
-export function findCases(cases, query) {
-  const key = normalise(query ?? '');
-  if (!key) return cases;
-  const whole = [];
-  const part = [];
-  for (const item of cases) {
-    const label = ` ${normalise(item.label)} `;
-    if (label.includes(` ${key} `)) whole.push(item);
-    else if (label.includes(` ${key}`)) part.push(item);
-  }
-  return [...whole, ...part];
+/** Cases in order of year, senate and number. */
+export function ordered(cases) {
+  return [...cases].sort((a, b) => a.year - b.year || a.senate - b.senate || a.number - b.number);
 }
 
 /** A case picked at random from `cases`, other than `current` if there's a choice. */
@@ -41,13 +21,9 @@ export function pick(cases, current = null, random = Math.random) {
 /** The events the network reads for a forecast at the end of day `day`: those on or before it. */
 export const soFar = (item, day) => item.events.filter((event) => event.day <= day && event.day < item.span);
 
-/**
- * The chance a case is still open 1, 2, ... 36 months after the end of day `day`, given its court and its
- * events so far. With no court, it's the courts' forecasts averaged, weighted by their cases registered.
- */
+/** The chance a case is still open 1, 2, ... 36 months after the end of day `day`, given its court and its events so far. */
 export function forecast(data, court, events, day) {
-  const where = court ? court.index : data.courts.map((c) => [c.index, c.journey.registered / data.registered]);
-  return stillOpen(data.network, where, events.map((event) => [event.code.index, event.day]), day);
+  return stillOpen(data.network, court.index, events.map((event) => [event.code.index, event.day]), day);
 }
 
 /** How the case ended: 'final' (legally final), 'closed' (closed in the register without that) or 'open'. */
@@ -68,17 +44,20 @@ export function outcome(item, day, months) {
   return left >= horizon ? 'no' : 'unknown';
 }
 
-/** The most events a made-up case can have (real ones have up to 49 before their end). */
+/** The most events a custom case can have (real ones have up to 49 before their end). */
 export const MOST_EVENTS = 30;
 
-// The events a made-up case can have, in about the order a case meets them: every code the network
+/** The latest a custom case's events and forecast can come, in days after its filing: 36 months. */
+export const LONGEST = 1096;
+
+// The events a custom case can have, in about the order a case meets them: every code the network
 // learned from but the filing (always first), "legally final" and "closed in the register" (each ends
 // a case), and a Supreme Court review (in one training case). A decision and the disposal share a day
 // in 96% of cases, so they're offered together too.
 const OFFERED = [['NAR_JED'], ['VYD_ROZH', 'ST_VEC_VYR'], ['VYD_ROZH'], ['ST_VEC_VYR'], ['POD_OP_PR'], ['ODES_SPIS'],
   ['ODVOLANI'], ['NAD_RIZENI'], ['VYR_OP_PR'], ['VRAC_SPIS'], ['ST_VEC_OBZ'], ['ST_VEC_PRE'], ['ST_VEC_UPR']];
 
-/** The events a made-up case can have, as { label, codes }, each code one of `data.codes`. */
+/** The events a custom case can have, as { label, codes }, each code one of `data.codes`. */
 export function offered(data) {
   const byCode = new Map(data.codes.map((code) => [code.code, code]));
   return OFFERED.map((names) => {
@@ -89,22 +68,46 @@ export function offered(data) {
 }
 
 /**
- * A made-up case: its court (or null, for all courts) and its events, from its filing on day 0, with
- * `added`, how many events each thing added brought, so they can be taken back.
+ * A custom case at `court`, filed on `filed` (a date at midnight UTC), with only its filing. Its events
+ * are { code, day }, in days after filing, as a real case's are, in order of day and then of adding.
  */
-export function madeUp(data, court) {
+export function custom(data, court, filed) {
   const filing = data.codes.find((code) => code.code === 'ZAHAJ_RIZ');
-  return { made: true, label: 'Made-up case', court, events: [{ code: filing, day: 0 }], added: [], span: Infinity, ended: false };
+  return { made: true, label: 'Custom case', court, filed, events: [{ code: filing, day: 0 }], span: Infinity, ended: false };
 }
 
-/** The made-up case with `codes` added on day `day`, if that's on or after its last event's and they fit. */
+/** The custom case with `codes` added on day `day`, after any events on that day, if the day is in range and they fit. */
 export function add(item, codes, day) {
-  if (day < item.events.at(-1).day || item.events.length + codes.length > MOST_EVENTS) return item;
-  return { ...item, events: [...item.events, ...codes.map((code) => ({ code, day }))], added: [...item.added, codes.length] };
+  if (day < 0 || day > LONGEST || item.events.length + codes.length > MOST_EVENTS) return item;
+  const at = item.events.findIndex((event) => event.day > day);
+  const events = [...item.events];
+  events.splice(at < 0 ? events.length : at, 0, ...codes.map((code) => ({ code, day })));
+  return { ...item, events };
 }
 
-/** The made-up case without the last thing added. */
-export function undo(item) {
-  if (!item.added.length) return item;
-  return { ...item, events: item.events.slice(0, -item.added.at(-1)), added: item.added.slice(0, -1) };
+/** The custom case without its event `i`. The filing, event 0, stays. */
+export function remove(item, i) {
+  if (i < 1 || i >= item.events.length) return item;
+  return { ...item, events: item.events.filter((_, j) => j !== i) };
+}
+
+/**
+ * The days on which a custom case's filing can fall, counted from its present filing: no later than its
+ * first event, and no more than LONGEST days before its last. With no events, any day.
+ */
+export function filingRange(item) {
+  if (item.events.length === 1) return [-Infinity, Infinity];
+  return [item.events.at(-1).day - LONGEST, item.events[1].day];
+}
+
+/** The custom case filed `shift` days later (earlier if negative), its events keeping their dates. */
+export function refile(item, shift) {
+  const [earliest, latest] = filingRange(item);
+  const by = Math.min(Math.max(shift, earliest), latest);
+  if (by === 0) return item;
+  return {
+    ...item,
+    filed: new Date(item.filed.getTime() + by * DAY),
+    events: item.events.map((event, i) => (i ? { ...event, day: event.day - by } : event)),
+  };
 }
