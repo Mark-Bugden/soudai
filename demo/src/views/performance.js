@@ -1,15 +1,15 @@
 // The Performance tab: how well the model does on the cases registered in 2024–2025, which it never
-// trained on, over all courts, against the simpler method chosen in the rail, if any.
+// trained on, over all courts.
 //
-// - Calibration: for each band of 10 points, a method's mean forecast that a case is legally final
+// - Calibration: for each band of 10 points, the model's mean forecast that a case is legally final
 //   within the months chosen in the rail, against the share of those cases that were, each dot sized by
 //   its share of the forecasts, with the diagonal where the two agree.
-// - Ranking: how often a method puts two cases in the order they ended (concordance), for forecasts made
-//   at filing and 1, 3, 6 and 12 months after, each line named at its end.
+// - Ranking: how often the model and three simpler methods put two cases in the order they ended
+//   (concordance), for forecasts made at filing and 1, 3, 6 and 12 months after, each line named at its
+//   end. The model is in the accent and the others in the curve colour; the rail says what each is.
 //
-// The model is in the accent and the method it's compared with in grey, on both charts. Hovering either
-// chart reads it off its y axis, as on the Process map's curve, with no tooltips: everything else can be
-// read off the axes or the notes. Hidden tables give both charts to screen readers. Colours come from CSS
+// Hovering either chart reads the model's value off its y axis, as on the Process map's curve, with no
+// tooltips: everything else can be read off the axes or the notes. Hidden tables give both charts to screen readers. Colours come from CSS
 // classes (see demo.css), so a theme change needs no redraw.
 
 import { h, s } from '../dom.js';
@@ -21,18 +21,20 @@ const LINE = 15; // px between the names at the ends of the ranking's lines
 const RANGE = [0.5, 0.8]; // the ranking's axis, from a coin toss
 const DOT = 4; // px, a landmark's dot on the ranking
 
-// A method's line and dots: the model's, or the one it's compared with.
+// A method's line and dots: the model's, or a simpler method's.
 const MARKS = {
   model: { line: 'sd-forecast-line', dot: 'sd-forecast-dot' },
-  compared: { line: 'sd-picked-line', dot: 'sd-picked-dot' },
+  other: { line: 'sd-curve-all', dot: 'sd-curve-dot' },
 };
-const marks = (key) => MARKS[key === MODEL ? 'model' : 'compared'];
+const marks = (key) => MARKS[key === MODEL ? 'model' : 'other'];
 const method = (key) => METHODS.find((m) => m.key === key);
 
 export function createPerformance(host, data) {
   const { forecasts, cases } = counts(data);
 
-  const legend = h('p', { class: 'sd-legend' });
+  const legend = h('p', { class: 'sd-legend' },
+    h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, 'This model'),
+    h('span', { class: 'sd-key sd-key-diagonal' }), 'Simpler methods');
   const calTitle = h('p', { class: 'sd-cal-title' });
   const calNote = h('p', { class: 'sd-note' });
   const calSvg = s('svg', { class: 'sd-chart', 'aria-hidden': 'true' });
@@ -46,15 +48,15 @@ export function createPerformance(host, data) {
       h('p', { class: 'sd-case-title' }, 'How well the model does'),
       h('p', { class: 'sd-case-meta' },
         `Its ${describe.count(forecasts)} forecasts for the ${describe.count(cases)} sampled cases registered in 2024–2025, made `
-        + 'at filing and 1, 3, 6 and 12 months after, against what happened. It was trained on cases registered in 2020–2023.'),
-      legend),
+        + 'at filing and 1, 3, 6 and 12 months after, against what happened. It was trained on cases registered in 2020–2023.')),
     h('div', { class: 'sd-perf-body' },
       h('div', { class: 'sd-half' }, calTitle, calNote, calBox),
       h('div', { class: 'sd-half' },
         h('p', { class: 'sd-cal-title' }, 'Which of two cases ends first'),
         h('p', { class: 'sd-note' },
-          'How often a method puts two cases in the order they ended (its concordance), comparing cases at the same '
+          'How often each method puts two cases in the order they ended (its concordance), comparing cases at the same '
           + 'point after filing. 50% is a coin toss.'),
+        legend,
         rankBox)),
     calTable,
     rankTable);
@@ -63,28 +65,20 @@ export function createPerformance(host, data) {
   let calRead = null; // what reading each chart needs
   let rankRead = null;
 
-  function render({ horizon, compare }) {
-    const keys = compare ? [compare, MODEL] : [MODEL];
-    const series = keys.map((key) => ({ ...method(key), points: calibration(data, key, horizon), gap: gap(data, key, horizon) }));
-    const lines = ranking(data, compare);
-    const [model, other] = [series.at(-1), compare ? series[0] : null];
-
-    legend.hidden = !compare;
-    legend.replaceChildren(...(compare
-      ? [h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, 'This model'),
-        h('span', { class: 'sd-key sd-key-picked' }), h('span', { class: 'sd-legend-name' }, other.name)]
-      : []));
+  function render({ horizon }) {
+    // The calibration is the model's alone (Mark: comparing it there didn't help).
+    const series = [{ ...method(MODEL), points: calibration(data, MODEL, horizon), gap: gap(data, MODEL, horizon) }];
+    const lines = ranking(data);
     calTitle.textContent = `Calibration within ${describe.months(horizon)}`;
     calNote.textContent = 'Whether cases end as often as forecast. The forecasts of being legally final within '
       + `${describe.months(horizon)}, in bands of 10 points, against the share of those cases that were. On the diagonal `
-      + `the two agree, and a larger dot stands for more forecasts. On average the bands are ${describe.points(model.gap)} from it `
-      + `for this model${other ? `, and ${describe.points(other.gap)} for ${other.the}` : ''}.`;
+      + `the two agree, and a larger dot stands for more forecasts. On average the bands are ${describe.points(series[0].gap)} from it.`;
 
     describeCalibration(series, horizon);
     describeRanking(lines);
     calRead = drawCalibration(series);
     rankRead = drawRanking(lines);
-    return describe.performanceLine({ forecasts, cases, horizon, series, lines });
+    return describe.performanceLine({ forecasts, cases, horizon, gap: series[0].gap, lines });
   }
 
   /** The hidden table of the calibration bands, a row per method and band. */
@@ -104,7 +98,7 @@ export function createPerformance(host, data) {
   /** The hidden table of each method's concordance at each landmark. */
   function describeRanking(lines) {
     rankTable.replaceChildren(
-      h('caption', {}, 'How often a method puts two cases in the order they ended, by when the forecast was made'),
+      h('caption', {}, 'How often each method puts two cases in the order they ended, by when the forecast was made'),
       h('thead', {}, h('tr', {},
         h('th', { scope: 'col' }, 'Method'),
         ...LANDMARKS.map((months) => h('th', { scope: 'col' }, months ? `${describe.months(months)} after filing` : 'At filing')))),
@@ -113,7 +107,7 @@ export function createPerformance(host, data) {
         ...line.values.map((v) => h('td', {}, describe.share(v)))))));
   }
 
-  /** The calibration chart, in a square that fits its box: the comparison's dots, then the model's. */
+  /** The calibration chart, in a square that fits its box, with a line of dots per series. */
   function drawCalibration(series) {
     const width = calBox.clientWidth;
     const height = calBox.clientHeight;
@@ -192,7 +186,7 @@ export function createPerformance(host, data) {
     });
     nodes.push(s('text', { class: 'sd-tick', x: x(LANDMARKS.length - 1), y: height - 4, 'text-anchor': 'end' }, 'Forecast made, months after filing'));
 
-    // The comparison first, so the model's line is on top.
+    // The simpler methods first, so the model's line is on top.
     for (const line of lines) {
       const { line: path, dot } = marks(line.key);
       nodes.push(s('path', { class: path, d: polyline(line.values.map((v, i) => [x(i), y(v)])) }));
@@ -213,8 +207,7 @@ export function createPerformance(host, data) {
     return { lines, x, y, reading, ticks, left: margin.left };
   }
 
-  // Reading the calibration off its y axis, at the model's band nearest the pointer, and the comparison's
-  // band of the same forecasts.
+  // Reading the calibration off its y axis, at the model's band nearest the pointer.
   calSvg.addEventListener('pointermove', (event) => {
     if (!calRead) return;
     const px = event.clientX - calSvg.getBoundingClientRect().left;
@@ -232,7 +225,7 @@ export function createPerformance(host, data) {
   });
   calSvg.addEventListener('pointerleave', () => calRead && clearReading(calRead.reading, calRead.ticks));
 
-  // Reading the ranking off its y axis, at the nearest landmark.
+  // Reading the model's ranking off the y axis, at the nearest landmark.
   rankSvg.addEventListener('pointermove', (event) => {
     if (!rankRead) return;
     const px = event.clientX - rankSvg.getBoundingClientRect().left;
@@ -247,7 +240,8 @@ export function createPerformance(host, data) {
       top: y(RANGE[1]),
       bottom: y(RANGE[0]),
       left,
-      values: lines.map((line) => ({ cx: x(i), at: y(line.values[i]), text: describe.share(line.values[i]), dot: marks(line.key).dot })),
+      values: lines.filter((line) => line.key === MODEL)
+        .map((line) => ({ cx: x(i), at: y(line.values[i]), text: describe.share(line.values[i]), dot: marks(line.key).dot })),
       ticks,
     });
   });

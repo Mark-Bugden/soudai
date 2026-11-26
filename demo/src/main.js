@@ -5,8 +5,9 @@
 // module keeps the state they share: the tab, and the court selected, or none for all courts. The
 // Forecast tab always has a court: the one selected, or else the last it had. Its case is one of that
 // court's real past cases, with the day of its forecast, or a custom case, whose filing, events and day
-// of forecast the visitor gives as dates. The Performance tab is for all courts: the method the model
-// is compared with, and the months its calibration is within, are chosen in the rail. The status line
+// of forecast the visitor gives as dates. The Performance tab is for all courts: the months its
+// calibration is within are chosen in the rail, which also says what the simpler methods are. The
+// status line
 // shows what's selected, with its headline numbers.
 
 import manifest from 'virtual:manifest';
@@ -15,12 +16,12 @@ import '@mark-bugden/demo-kit/tokens.scoped.css';
 import '@mark-bugden/demo-kit/frame.css';
 import './demo.css';
 import { LONGEST, MOST_EVENTS, add, custom, filingRange, offered, ordered, pick, refile, remove } from './cases.js';
-import { adder, cascade, dateField, dropdown, iconButton, removable, segmented } from './controls.js';
+import { adder, cascade, dateField, dropdown, iconButton, notes, removable, segmented } from './controls.js';
 import { byType } from './courts.js';
 import { prepare } from './data.js';
 import { h } from './dom.js';
 import * as describe from './format.js';
-import { FIRST, METHODS, MODEL } from './performance.js';
+import { METHODS } from './performance.js';
 import { createForecast } from './views/forecast.js';
 import { createMap } from './views/map.js';
 import { createPerformance } from './views/performance.js';
@@ -100,30 +101,18 @@ async function start(el) {
     dateLabel: 'Date of the event',
   });
   const forecastOn = dateField({ label: 'Forecast on', value: made.filed });
-  // The simpler method the Performance tab compares the model with, or none, with what it is under the menu.
-  const compare = dropdown({
-    label: 'Compare with',
-    options: [{ label: 'None', value: null }, ...METHODS.filter(({ key }) => key !== MODEL).map(({ name, key }) => ({ label: name, value: key }))],
-    value: FIRST,
-  });
-  const about = h('p', { class: 'sd-control-note' });
-  compare.el.append(about);
-  const explain = (key) => {
-    about.hidden = !key;
-    about.textContent = key ? METHODS.find((m) => m.key === key).about : '';
-  };
-  explain(compare.value);
-  compare.onChange(explain);
   const horizon = segmented({
     label: 'Calibration within, months',
     options: data.horizons.map((months) => ({ label: String(months), value: months, title: `Within ${describe.months(months)}` })),
     value: 6,
   });
-  const controls = { tab, court, caseMenu, day, filedOn, eventList, addEvent, forecastOn, compare, horizon };
+  // What the simpler methods on the Performance tab's ranking are.
+  const methods = notes({ label: 'The simpler methods', items: METHODS.slice(1).map(({ name, about }) => ({ term: name, about })) });
+  const controls = { tab, court, caseMenu, day, filedOn, eventList, addEvent, forecastOn, horizon, methods };
   // The controls each tab uses, besides the tab switch.
   const used = () => {
     if (tab.value === 'map') return [court];
-    if (tab.value === 'performance') return [compare, horizon];
+    if (tab.value === 'performance') return [horizon, methods];
     if (caseMenu.value !== CUSTOM) return [court, caseMenu, day];
     return [court, caseMenu, filedOn, ...(made.events.length > 1 ? [eventList] : []), addEvent, forecastOn];
   };
@@ -242,7 +231,6 @@ async function start(el) {
         item: isCustom ? made : item,
         day: isCustom ? daysBetween(made.filed, values.forecastOn) : values.day,
         horizon: values.horizon,
-        compare: values.compare,
       });
       app.status(status ?? describe.headline(values.court, data.journey(values.court), data.courts.length));
     },

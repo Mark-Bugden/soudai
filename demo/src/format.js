@@ -91,19 +91,17 @@ export function customLine(item, day, chances, horizons) {
 export const points = (gap) => `${(gap * 100).toFixed(1)} points`;
 
 /**
- * The status line for the Performance tab: what was scored, and for the model and the method it's
- * compared with, if any, their calibration within `horizon` months (`series`, each with its `gap`) and
- * how often they put two cases in order at filing and 12 months after (`lines`, each with its `values`).
- * Both lists end with the model.
+ * The status line for the Performance tab: what was scored, the model's calibration within `horizon`
+ * months (its mean `gap`), and how often it puts two cases in order at filing and 12 months after
+ * (`lines`, each method with its `values`, ending with the model), against the simplest method's.
  */
-export function performanceLine({ forecasts, cases, horizon, series, lines }) {
-  const [model, other] = [series.at(-1), series.length > 1 ? series[0] : null];
-  const [ranked, otherRanked] = [lines.at(-1), lines.length > 1 ? lines[0] : null];
+export function performanceLine({ forecasts, cases, horizon, gap, lines }) {
+  const [ranked, otherRanked] = [lines.at(-1), lines[0]];
   return `How well the model does: ${count(forecasts)} forecasts for ${count(cases)} cases registered in 2024–2025. `
-    + `Calibration within ${months(horizon)}: the bands of forecasts are ${points(model.gap)} from what happened, on average, `
-    + `for this model${other ? `, and ${points(other.gap)} for ${other.the}` : ''}. It puts two cases in the order they `
+    + `Calibration within ${months(horizon)}: its bands of forecasts are ${points(gap)} from what happened, on average. `
+    + 'It puts two cases in the order they '
     + `ended ${share(ranked.values[0])} of the time at filing, and ${share(ranked.values.at(-1))} 12 months after`
-    + `${otherRanked ? `; ${otherRanked.the}, ${share(otherRanked.values[0])} and ${share(otherRanked.values.at(-1))}` : ''}.`;
+    + `. ${otherRanked.name}: ${share(otherRanked.values[0])} and ${share(otherRanked.values.at(-1))}.`;
 }
 
 /** A wait in days: "same day", "1 day" or "30 days". */
