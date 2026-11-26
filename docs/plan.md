@@ -600,16 +600,23 @@ Built before the run (2026-11-22), with tests on fake dockets:
     | Not decided | 80.1% | 36.0% | 16.7% | 9.7% | 3.3% | 2.0% | 0.9% |
     | Not legally final | 89.5% | 50.7% | 23.4% | 13.1% | 4.3% | 2.6% | 1.3% |
 
-  - **The main moves,** with their share of cases and median wait:
-    - filed → hearing: 76.1%, 148 days;
+  - **The main moves,** with their share of cases and median wait (corrected in step 8, see below):
+    - filed → hearing: 76.1%, 147 days;
     - filed → decided: 19.8%, 79 days;
     - hearing → decided: 79.4%, the same day;
-    - decided → appeal: 5.1%, 58 days;
-    - decided → revived: 2.7%, 155 days;
-    - appeal → revived: 1.7%, 45 days;
-    - filed → suspended: 2.3%, 152 days;
-    - suspended → decided: 1.2%, 656 days.
-  - **Courts differ a lot.** The median from filing to a decision runs from 92 days (Jeseník) and 93 (Prague 5) to 238 (Prague 1 and Litoměřice); the median court takes 144. To legally final, it runs from 127 days (Jeseník) to 293 (Prague 1). Still open: from 0.9% to 5.0% (Městský soud v Brně). 1,087 of the 2,116 court-level moves have enough cases for a wait.
+    - decided → legally final: 93.3%, 30 days;
+    - decided → appeal: 5.1%, 27 days;
+    - appeal → legally final: 3.6%, 92 days;
+    - decided → revived: 2.7%, 62 days;
+    - appeal → revived: 1.7%, 7 days;
+    - filed → suspended: 2.3%, 151 days;
+    - suspended → decided: 1.2%, 650 days.
+  - **Fixed on 2026-11-26 (step 8): moves into "legally final" were left out.** `journey.ENDS`, the ways out of a stage, was the stages but the last plus "closed", so it had "filed" (which no move reaches) and not "legally final". So:
+    - `journey_moves.csv` had no move into "legally final";
+    - a visit that ended there counted as still waiting, so the waits of the other moves from the same stage came out too long, most from "decided" and "appeal", where most visits end that way: decided → appeal was 58 days, decided → revived 155, appeal → revived 45, appeal → decided 172, and decided → closed 218 (now 8).
+    - No share changed, and nor did anything else: the stages, curves, paths and summary, and the model, which doesn't use these tables.
+    - The Process map tab found it. A test now checks a move into "legally final", and another checks a wait against one worked by hand with "legally final" as a way out.
+  - **Courts differ a lot.** The median from filing to a decision runs from 92 days (Jeseník) and 93 (Prague 5) to 238 (Prague 1 and Litoměřice); the median court takes 144. To legally final, it runs from 127 days (Jeseník) to 293 (Prague 1). Still open: from 0.9% to 5.0% (Městský soud v Brně). 1,268 of the 2,506 court-level moves have enough cases for a wait (1,087 of 2,116 before the fix below).
   - **Courts also differ in what their records show.**
     - Hradec Králové records a hearing in only 22% of cases, against 80% nationally: 14–24% in 2020–2024 and 41% in 2025. Chomutov records one in 92%.
     - At Prague 2, 26.5% of cases reach the appeal stage, against 6.3% nationally, and 23.1% go to the appeal court (Městský soud v Praze), against 4.3%.
