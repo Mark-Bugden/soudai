@@ -17,7 +17,7 @@
 
 import { h, s } from '../dom.js';
 import * as describe from '../format.js';
-import { ARCS, PLACES, legallyFinal, moves, mostCommon, shape, split } from '../journey.js';
+import { ARCS, DRAWN, PLACES, legallyFinal, moves, mostCommon, shape, split } from '../journey.js';
 
 const MONTHS = 24; // months after filing on the curve
 const LINE = 15; // px, a label's line height
@@ -59,13 +59,16 @@ export function createMap(host, data) {
     return ruler.measureText(text).width;
   }
 
+  /** An arrow's label's width, bold as it is when lit, so that it fits then too. */
+  const measureLit = (text) => measure(text, true);
+
   function render({ court }) {
     const journey = data.journey(court);
-    meta.textContent = `${court ? court.name : 'All courts'}: ${describe.registered(journey)} in 2020–2025.`;
+    meta.textContent = 'Median time between stages, and percentage of cases following each route.';
     const list = moves(journey, data.stages);
     const { drawn, rest: left } = split(list);
     describeMoves(list);
-    rest.textContent = describe.notShown(left);
+    rest.textContent = describe.notShown(left, DRAWN);
     legend.hidden = !court;
     legend.replaceChildren(...(court
       ? [h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, court.area),
@@ -196,13 +199,13 @@ export function createMap(host, data) {
     // they can't clear.
     const overlap = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
     for (const a of arrows) {
-      const space = { width, height, taken, marks, measure, own: a.id, twin: a.twin };
+      const space = { width, height, taken, marks, measure: measureLit, own: a.id, twin: a.twin };
       a.boxes = place(describe.moveLabel(a.move), a.w, a.geometry, space, { together: a.twin !== null });
       a.extra = !a.boxes.length;
       taken.push(...a.boxes.map(({ bounds: [x0, y0, x1, y1] }) => [x0 - SPACE, y0 - SPACE, x1 + SPACE, y1 + SPACE]));
     }
     for (const a of arrows.filter(({ extra }) => extra)) {
-      const space = { width, height, taken, marks, measure, own: a.id, twin: a.twin };
+      const space = { width, height, taken, marks, measure: measureLit, own: a.id, twin: a.twin };
       const options = { together: a.twin !== null, sure: false };
       a.boxes = [place(describe.moveLabel(a.move), a.w, a.geometry, space, options),
         () => place(describe.moveLabel(a.move), a.w, a.geometry, { ...space, taken: stageBoxes }, options),

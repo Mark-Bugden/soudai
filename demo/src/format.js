@@ -105,5 +105,16 @@ export function routeText({ stages, ending }) {
 /** An arrow's label on the map, as its lines: the share of cases making the move, and its median wait if known. */
 export const moveLabel = (m) => [share(m.share), ...(m.wait ? [wait(m.wait[1])] : [])];
 
-/** The note under the map, if it leaves any moves out (Mark's wording). */
-export const notShown = (rest) => (rest.length ? 'Not shown: paths followed by less than 2% of cases.' : '');
+/** A move between two stages: "decided → legally final". */
+const move = ({ from, to }) => route([from, to]);
+
+/**
+ * The note under the map, if it leaves any moves out: those made by fewer than `least` of cases (2%, in
+ * Mark's words), and by name those made by more that it leaves out because they'd cross another stage.
+ */
+export function notShown(rest, least) {
+  if (!rest.length) return '';
+  const note = 'Not shown: paths followed by less than 2% of cases';
+  const crossing = rest.filter((m) => m.share >= least).map((m) => `${move(m)} (${share(m.share)})`);
+  return crossing.length ? `${note}, and those that would cross another stage: ${list(crossing)}.` : `${note}.`;
+}

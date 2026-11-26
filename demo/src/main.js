@@ -1,8 +1,8 @@
 // The demo's entry point. Vite bundles it with the kit and the CSS into demo.js and demo.css.
 //
 // It loads the data, then mounts the frame with the controls, showing only those the current tab uses.
-// The tabs (views/) draw the stage; this module keeps the state they share: the tab, and the court
-// selected, or none for all courts. The Forecast tab always has a court: the one selected, or else the
+// The tabs (views/) draw the stage, the Process map first; this module keeps the state they share: the
+// tab, and the court selected, or none for all courts. The Forecast tab always has a court: the one selected, or else the
 // last it had. Its case is one of that court's real past cases, with the day of its forecast, or a
 // custom case, whose filing, events and day of forecast the visitor gives as dates. The status line
 // shows what's selected, with its headline numbers.
@@ -33,10 +33,10 @@ const ICONS = {
     + '<circle cx="8.5" cy="15.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/></g>',
 };
 const TABS = {
-  forecast: { label: 'Forecast', create: createForecast },
   map: { label: 'Process map', create: createMap },
+  forecast: { label: 'Forecast', create: createForecast },
 };
-// The case the demo opens on: an ordinary one, with a hearing and a decision.
+// The case the Forecast tab opens on: an ordinary one, with a hearing and a decision.
 const OPENING = { court: 'OSJIMJI', label: '18 C 33/2024' };
 const CUSTOM = 'custom'; // the case menu's value for a custom case
 const DAY = 864e5;
@@ -61,17 +61,16 @@ async function start(el) {
     label: 'View',
     showLabel: false,
     options: Object.entries(TABS).map(([value, { label }]) => ({ label, value, icon: ICONS[value] })),
-    value: 'forecast',
+    value: 'map',
   });
-  // A court's type, then its place. Only the Process map offers all courts.
+  // A court's type, then its place. Only the Process map offers all courts, which it opens on.
   const court = cascade({
     label: 'Court',
     names: ['Court type', 'Location'],
     groups: byType(data.courts).map(({ type, courts }) => ({ label: type, options: courts.map(({ court: c, place }) => ({ label: place, value: c })) })),
-    value: forecastCourt,
+    value: null,
     none: 'All courts',
   });
-  court.offerNone(false);
   // The court's real past cases, and a custom case. The die beside the menu picks a real one at random.
   const random = iconButton({ label: 'Random case', icon: ICONS.random });
   const caseMenu = dropdown({ label: 'Case', beside: random });

@@ -85,8 +85,12 @@ test('the map draws moves of at least 2% between stages next to each other, and 
   for (const court of data.courts) {
     for (const m of split(moves(data.journey(court), data.stages)).drawn) assert.ok(shape(m.from, m.to), court.code);
   }
-  assert.equal(notShown(rest), 'Not shown: paths followed by less than 2% of cases.');
-  assert.equal(notShown([]), '');
+  assert.equal(notShown(rest, DRAWN), 'Not shown: paths followed by less than 2% of cases.');
+  assert.equal(notShown([], DRAWN), '');
+  // At a court where a move of 2% or more would cross another stage, it's named.
+  const deep = { from: 'filed', to: 'appeal', share: 0.025 };
+  assert.equal(notShown([deep, ...rest], DRAWN),
+    'Not shown: paths followed by less than 2% of cases, and those that would cross another stage: filed → appeal (2.5%).');
   assert.deepEqual(moveLabel(drawn[2]), ['76.1%', '147 days']);
   assert.deepEqual(moveLabel({ share: 0.03, wait: null }), ['3.0%']);
 });
