@@ -509,8 +509,8 @@
   color: var(--color-muted);
 }
 
-[data-demo] .sd-curves .sd-legend {
-  min-height: 1.3em;
+[data-demo] .sd-legend[hidden] {
+  display: none;
 }
 
 [data-demo] .sd-legend-name {
@@ -547,44 +547,48 @@
 }
 
 /*
- * The Process map tab: the map of moves between stages, and beside it the share of cases legally final
- * each month after filing, one above the other on narrow stages.
+ * The Process map tab: the map of moves between stages, under its heading, and beside them the share of
+ * cases legally final each month after filing and the most common routes, from the top of the stage; one
+ * above the other on narrow stages.
  */
 [data-demo] .sd-map {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-3);
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: var(--space-5);
   height: 100%;
   padding: var(--space-4) var(--space-4) var(--space-3);
   box-sizing: border-box;
 }
 
-[data-demo] .sd-map-body {
+[data-demo] .sd-map-flow {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
-  gap: var(--space-5);
-  min-height: 0;
-}
-
-[data-demo] .sd-map-flow,
-[data-demo] .sd-curves {
-  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: var(--space-2);
   min-width: 0;
   min-height: 0;
 }
 
-[data-demo] .sd-map-flow {
-  grid-template-rows: auto minmax(0, 1fr) auto;
+/* The curve takes what the most common routes leave of the column. */
+[data-demo] .sd-curves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 0;
 }
 
-/* The curve, then the commonest routes, each in half the column. */
-[data-demo] .sd-curves {
-  grid-template-rows: auto auto minmax(0, 1fr) auto minmax(0, 1fr);
+[data-demo] .sd-curve-box {
+  flex: 1 1 0;
+  min-height: 7rem;
+}
+
+[data-demo] .sd-routes-title {
+  margin-top: var(--space-4);
 }
 
 [data-demo] .sd-routes {
   display: grid;
+  flex: 0 1 auto;
   align-content: start;
   gap: var(--space-2);
   min-height: 0;
@@ -645,6 +649,12 @@
   opacity: 0.25;
 }
 
+/* Labels too crowded to show all the time show only while lit, and hide the labels they'd cover. */
+[data-demo] .sd-flow .sd-edge-label.is-extra:not(.is-hover),
+[data-demo] .sd-flow.has-hover .sd-edge-label.is-covered {
+  opacity: 0;
+}
+
 [data-demo] .sd-edge.is-hover .sd-edge-line {
   stroke-opacity: 1;
 }
@@ -657,6 +667,11 @@
   fill: none;
   stroke: transparent;
   pointer-events: stroke;
+}
+
+[data-demo] .sd-stage-hit {
+  fill: none;
+  pointer-events: fill;
 }
 
 [data-demo] .sd-edge-label {
@@ -712,33 +727,52 @@
   stroke-width: 2;
 }
 
+/* Reading the curve: its value on the y axis, joined to its dot by a faint line. */
+[data-demo] .sd-reading-line {
+  stroke: var(--color-muted);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  opacity: 0.6;
+}
+
+[data-demo] .sd-reading-value {
+  fill: var(--color-text);
+  font-size: 12px;
+  font-weight: var(--weight-strong);
+  font-variant-numeric: tabular-nums;
+  paint-order: stroke;
+  stroke: var(--color-surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+[data-demo] .sd-tick.is-under {
+  opacity: 0;
+}
+
 @container (max-width: 47.99rem) {
-  [data-demo] .dk-stage.sd-fit-content .sd-map,
-  [data-demo] .dk-stage.sd-fit-content .sd-map-body {
+  [data-demo] .dk-stage.sd-fit-content .sd-map {
     height: auto;
-    grid-template-rows: auto;
   }
 
   [data-demo] .sd-map {
-    gap: var(--space-2);
-    padding: var(--space-3);
-  }
-
-  [data-demo] .sd-map-body {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-4);
+    padding: var(--space-3);
   }
 
   [data-demo] .sd-map-box {
     height: 24rem;
   }
 
-  [data-demo] .sd-curves {
-    grid-template-rows: auto auto 13rem auto auto;
+  [data-demo] .sd-curve-box {
+    flex: none;
+    height: 13rem;
   }
 }
 
-/* The map's arrows, labels and stages dim when an arrow is hovered, without a fade under reduced motion. */
+/* The map's arrows, labels and stages dim when an arrow or a stage is hovered, without a fade under reduced
+   motion. */
 @media (prefers-reduced-motion: no-preference) {
   [data-demo] .sd-edge-line,
   [data-demo] .sd-edge-head,

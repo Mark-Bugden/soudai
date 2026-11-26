@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import { prepare } from '../src/data.js';
-import { moveLabel, notDrawn, route, routeText, share, wait } from '../src/format.js';
-import { ARCS, DRAWN, PLACES, commonest, legallyFinal, moves, routes, shape, split } from '../src/journey.js';
-import { arrow, halves, place, route as curve } from '../src/views/map.js';
+import { moveLabel, notShown, route, routeText, share, wait } from '../src/format.js';
+import { ARCS, DRAWN, LISTED, PLACES, commonest, legallyFinal, mostCommon, moves, routes, shape, split } from '../src/journey.js';
+import { arrow, nearer, place, route as curve, spread } from '../src/views/map.js';
 
 const raw = JSON.parse(readFileSync(new URL('../public/data/soudai.json', import.meta.url), 'utf8'));
 const data = prepare(raw);
@@ -44,6 +44,17 @@ test('the commonest routes', () => {
   assert.equal(routeText({ stages: ['filed', 'suspended'], ending: 'open' }), 'filed → suspended, still open');
 });
 
+test('the most common routes: those over 5%, then all the others together', () => {
+  const all = mostCommon(data.journey(null), data.stages);
+  assert.deepEqual(all.list.map(routeText), ['filed → hearing → decided → legally final', 'filed → decided → legally final']);
+  assert.ok(Math.abs(all.others - (1 - 0.7182 - all.list[1].share)) < 1e-9);
+  for (const court of data.courts) {
+    const { list, others } = mostCommon(data.journey(court), data.stages);
+    assert.ok(list.length >= 1 && list.every((r) => r.share > LISTED), court.code);
+    assert.ok(others > 0 && others < 1, court.code);
+  }
+});
+
 test('the commonest route', () => {
   const all = commonest(data.journey(null), data.stages);
   assert.deepEqual(all.stages, ['filed', 'hearing', 'decided', 'final']);
@@ -67,16 +78,15 @@ test('the map draws moves of at least 2% between stages next to each other, and 
   assert.equal(shape('filed', 'decided'), 'over');
   assert.equal(shape('appeal', 'decided'), 'under');
   assert.equal(shape('revived', 'hearing'), 'under');
-  assert.equal(shape('filed', 'suspended'), 'line');
   assert.equal(shape('appeal', 'revived'), 'line');
+  assert.equal(shape('filed', 'suspended'), 'under');
+  assert.equal(shape('suspended', 'hearing'), 'under');
   assert.equal(shape('appeal', 'hearing'), null);
   for (const court of data.courts) {
     for (const m of split(moves(data.journey(court), data.stages)).drawn) assert.ok(shape(m.from, m.to), court.code);
   }
-  const lead = 'Not drawn, as under 2% of cases or crossing a stage: ';
-  assert.equal(notDrawn(rest), `${lead}appeal → revived (1.7%), filed → appeal (1.3%), suspended → decided (1.2%) and ${rest.length - 3} more.`);
-  assert.equal(notDrawn(rest.slice(0, 2)), `${lead}appeal → revived (1.7%) and filed → appeal (1.3%).`);
-  assert.equal(notDrawn([]), '');
+  assert.equal(notShown(rest), 'Not shown: paths followed by less than 2% of cases.');
+  assert.equal(notShown([]), '');
   assert.deepEqual(moveLabel(drawn[2]), ['76.1%', '147 days']);
   assert.deepEqual(moveLabel({ share: 0.03, wait: null }), ['3.0%']);
 });
@@ -94,25 +104,25 @@ const at = (stage) => [PLACES[stage][0] * 300, 100 + PLACES[stage][1] * 60];
 const sizes = { lift: 50, depth: 60 };
 const near = (a, b) => Math.abs(a[0] - b[0]) < 1e-9 && Math.abs(a[1] - b[1]) < 1e-9;
 
-test('the arcs below the row pass through revivals and appeals, and suspensions hang under filing', () => {
+test('the arcs below the row pass through suspensions, revivals and appeals', () => {
   // The arc from the hearing to a decision has its bottom at the revival.
+  assert.deepEqual(Object.keys(ARCS).sort(), ['appeal', 'revived', 'suspended']);
   for (const [bottom, [left, right]] of Object.entries(ARCS)) {
     assert.ok(Math.abs(at(bottom)[0] - (at(left)[0] + at(right)[0]) / 2) < 1e-9, bottom);
     const down = curve(left, bottom, at, sizes);
     const up = curve(bottom, right, at, sizes);
     assert.ok(near(down[0], at(left)) && near(down[3], at(bottom)), `${left} to ${bottom}`);
     assert.ok(near(up[0], at(bottom)) && near(up[3], at(right)), `${bottom} to ${right}`);
-    // Flat at the bottom, so the two halves make one arc.
-    assert.ok(Math.abs(down[2][1] - at(bottom)[1]) < 1e-9 && Math.abs(up[1][1] - at(bottom)[1]) < 1e-9);
+    // Mirror images, each reaching the bottom from above at the same slope, so a line along the bottom
+    // row leaves it clear of them.
+    const slope = (a, b) => (b[1] - a[1]) / (b[0] - a[0]);
+    assert.ok(slope(down[2], down[3]) > 0.3 && Math.abs(slope(down[2], down[3]) + slope(up[0], up[1])) < 1e-9);
     // A move back up the same half is the same curve the other way.
     assert.deepEqual(curve(bottom, left, at, sizes), [...down].reverse());
   }
-  assert.equal(at('suspended')[0], at('filed')[0]);
-  const drop = curve('filed', 'suspended', at, sizes);
-  assert.ok(drop.every(([x]) => x === at('filed')[0]), 'straight down');
   // The arc over the hearing rises its lift at its middle.
-  const [, top] = halves(curve('filed', 'decided', at, sizes))[1][0];
-  assert.ok(Math.abs(top - (100 - 50)) < 1e-9);
+  const [p0, p1, p2, p3] = curve('filed', 'decided', at, sizes);
+  assert.ok(Math.abs((p0[1] + 3 * p1[1] + 3 * p2[1] + p3[1]) / 8 - (100 - 50)) < 1e-9);
 });
 
 test('arrows start and end clear of their stages, and a move and its reverse sit side by side', () => {
@@ -151,6 +161,34 @@ test('an arrow\'s share goes on one side and its wait on the other, clear of wha
   assert.equal(together.length, 1);
   assert.deepEqual(together[0].lines, ['4.4%', '97 days']);
   assert.deepEqual(place(['3.0%'], 4, flat, space).map((b) => b.lines), [['3.0%']]);
+});
+
+test('labels shown all the time are plainly their arrow\'s; the rest wait for a hover', () => {
+  const measure = (text) => text.length * 6.6;
+  const flat = arrow([[50, 150], [150, 150], [250, 150], [350, 150]], 4);
+  const marks = (geometry, w, id) => geometry.samples.map(([x, y]) => [x, y, w / 2 + 2, id]);
+  // Another thin arrow 30 px above and below: too close for a label beside a hairline.
+  const above = arrow([[50, 120], [150, 120], [250, 120], [350, 120]], 2);
+  const below = arrow([[50, 180], [150, 180], [250, 180], [350, 180]], 2);
+  const crowded = { width: 400, height: 300, taken: [], measure, own: 0,
+    marks: [...marks(flat, 2, 0), ...marks(above, 2, 1), ...marks(below, 2, 2)] };
+  assert.deepEqual(place(['2.7%', '62 days'], 2, flat, crowded), []);
+  // On hover, it doesn't need to be.
+  assert.equal(place(['2.7%', '62 days'], 2, flat, crowded, { sure: false }).length, 2);
+  // A thick arrow claims its labels more plainly: with another arrow 50 px above, a label just above a
+  // hairline isn't plainly its own, but one just above an arrow 16 px wide is.
+  const higher = arrow([[50, 100], [150, 100], [250, 100], [350, 100]], 2);
+  const box = [180, 128, 220, 140];
+  assert.equal(nearer(box, [...marks(flat, 2, 0), ...marks(higher, 2, 1)], 0), false);
+  assert.equal(nearer(box, [...marks(flat, 16, 0), ...marks(higher, 2, 1)], 0), true);
+  // The arrow's reverse doesn't count.
+  assert.equal(nearer(box, [...marks(flat, 2, 0), ...marks(higher, 2, 1)], 0, 1), true);
+});
+
+test('values read off the curve are moved apart until they can be read', () => {
+  assert.deepEqual(spread([100, 50], 15), [100, 50]);
+  assert.deepEqual(spread([100, 95], 15), [105, 90]);
+  assert.deepEqual(spread([40], 15), [40]);
 });
 
 test('the map\'s text', () => {

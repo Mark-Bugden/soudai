@@ -1,50 +1,49 @@
 // The process map's numbers, for the whole country or a court: the moves between stages, which of them
-// the map draws and how, the commonest routes, and the share of cases legally final each month after
+// the map draws and how, the most common routes, and the share of cases legally final each month after
 // filing. No DOM access.
 
 /**
  * Where each stage sits on the map, as a fraction of its width and a row: the usual route along the top
- * row (0), and below it (1) suspensions under filing, revivals and appeals each at the bottom of an arc
- * between the two stages they join (see ARCS), and closing in the register under legally final.
+ * row (0), and below it (1) suspensions, revivals and appeals, each at the bottom of an arc between the
+ * two stages they join (see ARCS), and closing in the register under legally final.
  */
 export const PLACES = {
   filed: [0, 0],
   hearing: [0.33, 0],
   decided: [0.66, 0],
   final: [1, 0],
-  suspended: [0, 1],
+  suspended: [0.165, 1],
   revived: [0.495, 1],
   appeal: [0.83, 1],
   closed: [1, 1],
 };
 
 /** The stages at the bottom of an arc below the top row, with the two stages the arc joins. */
-export const ARCS = { revived: ['hearing', 'decided'], appeal: ['decided', 'final'] };
+export const ARCS = { suspended: ['filed', 'hearing'], revived: ['hearing', 'decided'], appeal: ['decided', 'final'] };
 
 /** The share of cases a move needs to be drawn on the map. */
 export const DRAWN = 0.02;
 
-// How the map joins the pairs of stages it can: straight along a row or down from filing; over the
-// hearing, from filing to a decision; along an arc below the row, to and from revivals and appeals;
-// or in a bend, from a suspension to a hearing.
+// How the map joins the pairs of stages it can: straight along a row; over the hearing, from filing to
+// a decision; or along an arc below the row, to and from suspensions, revivals and appeals.
 const JOINS = {
   'filed hearing': 'line',
   'hearing decided': 'line',
   'decided final': 'line',
-  'filed suspended': 'line',
   'suspended revived': 'line',
   'revived appeal': 'line',
   'filed decided': 'over',
+  'filed suspended': 'under',
+  'hearing suspended': 'under',
   'hearing revived': 'under',
   'decided revived': 'under',
   'decided appeal': 'under',
   'final appeal': 'under',
-  'suspended hearing': 'bend',
 };
 
 /**
- * How the map draws a move: 'line', 'over', 'under' or 'bend' (see JOINS), or null for a move between
- * stages it can't join without crossing a stage.
+ * How the map draws a move: 'line', 'over' or 'under' (see JOINS), or null for a move between stages it
+ * can't join without crossing a stage.
  */
 export function shape(from, to) {
   return JOINS[`${from} ${to}`] ?? JOINS[`${to} ${from}`] ?? null;
@@ -78,6 +77,18 @@ export function routes(journey, stages) {
   return journey.paths
     .map(([path, ending, share]) => ({ stages: path.map((i) => stages[i]), ending, share }))
     .sort((a, b) => b.share - a.share);
+}
+
+/** The share of cases a route needs to be listed on its own; the rest are lumped together. */
+export const LISTED = 0.05;
+
+/**
+ * A scope's routes taken by more than LISTED of cases, the commonest first, and the share of cases that
+ * took any other. Each case takes one route, so the shares of all routes add up to 1.
+ */
+export function mostCommon(journey, stages) {
+  const list = routes(journey, stages).filter((route) => route.share > LISTED);
+  return { list, others: Math.max(0, 1 - list.reduce((sum, route) => sum + route.share, 0)) };
 }
 
 /** A scope's commonest route. */
