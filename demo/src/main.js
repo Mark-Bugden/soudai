@@ -2,8 +2,9 @@
 //
 // It loads the data, then mounts the frame with the controls, showing only those the current tab uses.
 // The tabs (views/) draw the stage; this module keeps the state they share: the tab, the court
-// selected (or none, for all courts), and on the Forecast tab the case, real or made up, with the day of
-// its forecast. The status line shows what's selected, with its headline numbers.
+// selected (or none, for all courts), and on the Forecast tab either a case, real or made up, with the
+// day of its forecast, or how well the model does. The status line shows what's selected, with its
+// headline numbers.
 
 import manifest from 'virtual:manifest';
 import { loadJSON, mount, select, slider } from '@mark-bugden/demo-kit';
@@ -16,8 +17,10 @@ import { matches, searchIndex } from './courts.js';
 import { prepare } from './data.js';
 import { h } from './dom.js';
 import * as describe from './format.js';
+import { LANDMARKS } from './scores.js';
 import { createForecast } from './views/forecast.js';
 import { createPlaceholder } from './views/placeholder.js';
+import { createScores } from './views/scores.js';
 
 // The tabs' icons, on a 24 × 24 grid: a curve falling over time, and stages in a row with a loop back.
 const ICONS = {
@@ -31,7 +34,13 @@ const ICONS = {
     + '<circle cx="8.5" cy="15.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/></g>',
 };
 const TABS = {
+  forecast: { label: 'Forecast' },
+  map: { label: 'Process map' },
+};
+// What each tab draws: the Forecast tab shows a case or the scores.
+const VIEWS = {
   forecast: { label: 'Forecast', create: createForecast },
+  scores: { label: 'How well it does', create: createScores },
   map: { label: 'Process map', create: (host) => createPlaceholder(host, 'Process map') },
 };
 // The case the demo opens on: an ordinary one, with a hearing and a decision.
@@ -65,6 +74,11 @@ async function start(el) {
     format: (c) => c.name,
     empty: 'No court by that name',
     browse: true,
+  });
+  const show = segmented({
+    label: 'Show',
+    options: [{ label: 'A case', value: 'case' }, { label: 'How well it does', value: 'scores' }],
+    value: 'case',
   });
   const kind = segmented({
     label: 'Case',
@@ -104,11 +118,22 @@ async function start(el) {
   const event = select({ label: 'Event', options: events.map((option) => ({ label: option.label, value: option })) });
   const addEvent = actions({ label: 'Add the event', options: [{ label: 'Add', value: 'add' }] });
   const edit = actions({ label: 'Change the case', options: [{ label: 'Undo', value: 'undo' }, { label: 'Start again', value: 'reset' }] });
-  const controls = { tab, court, kind, realCase, random, day, madeDay, event, addEvent, edit };
+  const landmark = segmented({
+    label: 'Forecasts made, months after filing',
+    options: LANDMARKS.map((when) => ({ label: when === 'all' ? 'All' : when, value: when, title: when === 'all' ? 'All forecasts together' : describe.landmark(when) })),
+    value: 'all',
+  });
+  const horizon = segmented({
+    label: 'Calibration within, months',
+    options: data.horizons.map((months) => ({ label: String(months), value: months, title: `Within ${describe.months(months)}` })),
+    value: 6,
+  });
+  const controls = { tab, court, show, kind, realCase, random, day, madeDay, event, addEvent, edit, landmark, horizon };
   // The controls each tab uses, besides the tab switch.
   const used = () => {
     if (tab.value === 'map') return [court];
-    return [court, kind, ...(kind.value === 'real' ? [realCase, random, day] : [madeDay, event, addEvent, edit])];
+    if (show.value === 'scores') return [court, show, landmark, horizon];
+    return [court, show, kind, ...(kind.value === 'real' ? [realCase, random, day] : [madeDay, event, addEvent, edit])];
   };
 
   /** Sets a slider's range, keeping its value within it. */
@@ -161,12 +186,18 @@ async function start(el) {
         host = h('div', { class: 'sd-view' });
         stage.append(host);
       }
-      if (current?.name !== values.tab) {
+      const name = values.tab === 'forecast' && values.show === 'scores' ? 'scores' : values.tab;
+      if (current?.name !== name) {
         current?.view.destroy();
-        current = { name: values.tab, view: TABS[values.tab].create(host, data) };
-        stage.setAttribute('aria-label', TABS[values.tab].label);
+        current = { name, view: VIEWS[name].create(host, data) };
+        stage.setAttribute('aria-label', VIEWS[name].label);
+        // On phones the scores' stage grows to fit them (see demo.css).
+        stage.closest('.dk-stage').classList.toggle('sd-fit-content', name === 'scores');
       }
       showControls();
+      // A court's scores are for all its forecasts together.
+      landmark.disabled = Boolean(values.court);
+      if (values.court) landmark.value = 'all';
       const real = values.kind === 'real';
       if (!real) showEditing();
       const status = current.view.render({
@@ -175,6 +206,8 @@ async function start(el) {
         court: values.court,
         item: real ? item : { ...made, court: values.court },
         day: real ? values.day : values.madeDay,
+        landmark: values.landmark,
+        horizon: values.horizon,
       });
       app.status(status ?? describe.headline(values.court, data.journey(values.court), data.courts.length));
     },
