@@ -87,7 +87,7 @@ def render(browser, url, errors):
     page.get_by_role("radio", name="Process map", exact=True).check(
         force=True
     )  # each radio sits under its label
-    page.wait_for_selector(".sd-flow path")
+    page.wait_for_selector(".sd-flow .sd-node")
     for theme in THEMES:
         stills["thumb", theme] = shoot(page, theme, 720, 450)
     stills["og", "dark"] = shoot(page, "dark", 800, 420)

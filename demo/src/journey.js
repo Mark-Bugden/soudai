@@ -1,38 +1,53 @@
 // The process map's numbers, for the whole country or a court: the moves between stages, which of them
-// the map draws, the commonest route, and the share of cases legally final each month after filing.
-// No DOM access.
+// the map draws and how, the commonest routes, and the share of cases legally final each month after
+// filing. No DOM access.
 
 /**
- * Where each stage sits on the map, as fractions of its width and of the height between its two rows:
- * the usual route along the top row, and below it suspensions, revivals and appeals, each between the
- * two stages it most often joins, and closing in the register under legally final.
+ * Where each stage sits on the map, as a fraction of its width and a row: the usual route along the top
+ * row (0), and below it (1) suspensions under filing, revivals and appeals each at the bottom of an arc
+ * between the two stages they join (see ARCS), and closing in the register under legally final.
  */
 export const PLACES = {
   filed: [0, 0],
   hearing: [0.33, 0],
   decided: [0.66, 0],
   final: [1, 0],
-  suspended: [0.165, 1],
+  suspended: [0, 1],
   revived: [0.495, 1],
   appeal: [0.83, 1],
   closed: [1, 1],
 };
 
+/** The stages at the bottom of an arc below the top row, with the two stages the arc joins. */
+export const ARCS = { revived: ['hearing', 'decided'], appeal: ['decided', 'final'] };
+
 /** The share of cases a move needs to be drawn on the map. */
 export const DRAWN = 0.02;
 
-// The pairs of stages next to each other on the map, which a straight arrow joins.
-const NEXT = new Set(['filed hearing', 'hearing decided', 'decided final', 'filed suspended', 'hearing suspended',
-  'hearing revived', 'decided revived', 'decided appeal', 'final appeal', 'final closed', 'suspended revived',
-  'revived appeal', 'appeal closed']);
+// How the map joins the pairs of stages it can: straight along a row or down from filing; over the
+// hearing, from filing to a decision; along an arc below the row, to and from revivals and appeals;
+// or in a bend, from a suspension to a hearing.
+const JOINS = {
+  'filed hearing': 'line',
+  'hearing decided': 'line',
+  'decided final': 'line',
+  'filed suspended': 'line',
+  'suspended revived': 'line',
+  'revived appeal': 'line',
+  'filed decided': 'over',
+  'hearing revived': 'under',
+  'decided revived': 'under',
+  'decided appeal': 'under',
+  'final appeal': 'under',
+  'suspended hearing': 'bend',
+};
 
 /**
- * How the map draws a move: 'line' between stages next to each other, 'arc' from filing to a decision,
- * over the hearing, and null for any other move, which would cross a stage.
+ * How the map draws a move: 'line', 'over', 'under' or 'bend' (see JOINS), or null for a move between
+ * stages it can't join without crossing a stage.
  */
 export function shape(from, to) {
-  if (NEXT.has(`${from} ${to}`) || NEXT.has(`${to} ${from}`)) return 'line';
-  return from === 'filed' && to === 'decided' ? 'arc' : null;
+  return JOINS[`${from} ${to}`] ?? JOINS[`${to} ${from}`] ?? null;
 }
 
 /**
@@ -58,11 +73,15 @@ export function split(list) {
   return { drawn, rest: list.filter((move) => !drawn.includes(move)) };
 }
 
-/** A scope's commonest route from filing to its end, as { stages, ending, share }. */
-export function commonest(journey, stages) {
-  const [path, ending, share] = journey.paths.reduce((best, path) => (path[2] > best[2] ? path : best));
-  return { stages: path.map((i) => stages[i]), ending, share };
+/** A scope's commonest routes from filing to their end, the commonest first, as { stages, ending, share }. */
+export function routes(journey, stages) {
+  return journey.paths
+    .map(([path, ending, share]) => ({ stages: path.map((i) => stages[i]), ending, share }))
+    .sort((a, b) => b.share - a.share);
 }
+
+/** A scope's commonest route. */
+export const commonest = (journey, stages) => routes(journey, stages)[0];
 
 /** The share of cases legally final each month after filing, from 0. */
 export const legallyFinal = (journey) => journey.notFinal.map((open) => 1 - open);

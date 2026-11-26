@@ -96,6 +96,12 @@ export const route = (stages) => stages.map((stage) => STAGES[stage].toLowerCase
 /** A share of cases to one decimal place, for the map: "93.3%", or "<0.1%". */
 export const share = (p) => (p < 0.0005 ? '<0.1%' : `${(p * 100).toFixed(1)}%`);
 
+/** A complete route, with how it ended if not legally final: "filed → decided → closed", "filed → hearing, still open". */
+export function routeText({ stages, ending }) {
+  if (ending === 'closed') return route([...stages, 'closed']);
+  return ending === 'open' ? `${route(stages)}, still open` : route(stages);
+}
+
 /** A move between two stages: "decided → legally final". */
 const move = ({ from, to }) => route([from, to]);
 

@@ -1,27 +1,29 @@
 // The Process map tab: how civil cases move between the stages, for the whole country or the court
-// selected, beside the share of cases legally final each month after filing.
+// selected, beside the share of cases legally final each month after filing and the commonest routes.
 //
 // - The map: a node per stage (see journey.PLACES) and an arrow per move made by at least 2% of cases,
-//   its width that share. Arrows join only stages next to each other, straight, but for the arc from
-//   filing to a decision, over the hearing; a move and its reverse sit side by side. Each arrow is
-//   labelled with its share and median wait: set into the line where it's thin, and beside it where
-//   it's thick, wherever nothing else is (into the line too, if nowhere beside it is clear). The moves not drawn are listed under the map, and a hidden
-//   table gives every move to screen readers. Hovering an arrow dims the others and their labels.
+//   its width that share. Arrows join only stages next to each other: straight along the top row and
+//   down from filing, in an arc over the hearing from filing to a decision, and along arcs below the
+//   row through revivals and appeals. A move and its reverse sit side by side. Each arrow has its share
+//   on one side and its median wait on the other, wherever nothing else is. The moves not drawn are
+//   listed under the map, and a hidden table gives every move to screen readers. Hovering an arrow dims
+//   everything but it, its labels and its two stages.
 // - The curve: the court's, in the accent, against all courts', in the curve colour.
+// - The routes: the commonest complete routes, each with a bar for its share of cases.
 //
 // Colours come from CSS classes (see demo.css), so a theme change needs no redraw.
 
 import { h, s } from '../dom.js';
 import * as describe from '../format.js';
-import { PLACES, commonest, legallyFinal, moves, shape, split } from '../journey.js';
+import { ARCS, PLACES, legallyFinal, moves, routes, shape, split } from '../journey.js';
 import { createTooltip } from '../tooltip.js';
 
 const MONTHS = 24; // months after filing on the curve
+const ROUTES = 5; // the most routes listed, if they fit
 const LINE = 15; // px, a label's line height
 const NODE = 7; // px, a stage's radius
 const GAP = NODE + 3; // px between a stage and the arrows that leave or reach it
 const ARROW = 8; // px, the length of an arrowhead
-const THICK = 10; // px: an arrow at least this wide has its label beside it rather than on it
 const NARROW = 480; // px: on a map narrower than this, a stage's name can take two lines
 
 export function createMap(host, data) {
@@ -33,12 +35,15 @@ export function createMap(host, data) {
   const legend = h('p', { class: 'sd-legend' });
   const curveSvg = s('svg', { class: 'sd-chart', 'aria-hidden': 'true' });
   const curveBox = h('div', { class: 'sd-chart-box' }, curveSvg);
+  const routeList = h('ol', { class: 'sd-routes', 'aria-labelledby': 'sd-routes-title' });
   const table = h('table', { class: 'sd-sr-only' });
   const el = h('div', { class: 'sd-map' },
     h('div', { class: 'sd-case' }, h('p', { class: 'sd-case-title' }, 'Process map'), meta),
     h('div', { class: 'sd-map-body' },
       h('div', { class: 'sd-map-flow' }, key, mapBox, rest),
-      h('div', { class: 'sd-curves' }, h('p', { class: 'sd-cal-title' }, 'Share legally final'), legend, curveBox)),
+      h('div', { class: 'sd-curves' },
+        h('p', { class: 'sd-cal-title' }, 'Share legally final'), legend, curveBox,
+        h('p', { class: 'sd-cal-title', id: 'sd-routes-title' }, 'Commonest routes'), routeList)),
     table);
   host.append(el);
   const tip = createTooltip(curveBox);
@@ -53,18 +58,17 @@ export function createMap(host, data) {
 
   function render({ court }) {
     const journey = data.journey(court);
-    const route = commonest(journey, data.stages);
-    // The status line gives the court and its cases registered.
-    meta.textContent = `Commonest route: ${describe.route(route.stages)}, ${describe.share(route.share)} of cases.`;
+    meta.textContent = `${court ? court.name : 'All courts'}: ${describe.registered(journey)} in 2020–2025.`;
     const list = moves(journey, data.stages);
     const { drawn, rest: left } = split(list);
     describeMoves(list);
     rest.textContent = describe.notDrawn(left);
-    drawMap(journey, drawn);
     legend.replaceChildren(...(court
       ? [h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, court.area),
         h('span', { class: 'sd-key sd-key-diagonal' }), 'All courts']
       : []));
+    listRoutes(journey);
+    drawMap(journey, drawn);
     curve = drawCurve(court, court ? legallyFinal(journey) : null, legallyFinal(data.journey(null)));
     tip.hide();
   }
@@ -82,6 +86,19 @@ export function createMap(host, data) {
         h('td', {}, move.wait ? `${describe.count(move.wait[0])}–${describe.days(move.wait[2])}` : '')))));
   }
 
+  /** The commonest routes, as many as fit, each with a bar as long as its share. */
+  function listRoutes(journey) {
+    routeList.replaceChildren(...routes(journey, data.stages).slice(0, ROUTES).map((route) => {
+      const bar = h('span', { class: 'sd-route-bar' });
+      bar.style.width = `${(route.share * 100).toFixed(2)}%`;
+      return h('li', { class: 'sd-route' },
+        h('span', { class: 'sd-route-name' }, describe.routeText(route)),
+        h('span', { class: 'sd-route-share' }, describe.share(route.share)),
+        h('span', { class: 'sd-route-track' }, bar));
+    }));
+    while (routeList.children.length > 1 && routeList.scrollHeight > routeList.clientHeight + 1) routeList.lastChild.remove();
+  }
+
   function drawMap(journey, drawn) {
     const width = mapBox.clientWidth;
     const height = mapBox.clientHeight;
@@ -94,21 +111,30 @@ export function createMap(host, data) {
     const shareText = (stage) => (shares.get(stage) === null ? null : (shares.get(stage) > 0.9995 ? '100%' : describe.share(shares.get(stage))));
     const widest = Math.max(8, Math.min(24, Math.min(width, height) * 0.05));
     const stroke = (share) => 1 + (widest - 1) * share;
-    const arcWidth = stroke(drawn.find((move) => shape(move.from, move.to) === 'arc')?.share ?? 0);
+    const overWidth = stroke(drawn.find((move) => shape(move.from, move.to) === 'over')?.share ?? 0);
 
-    // The rows: the arc over the hearing clears the hearing's label, with room for its own above it.
-    const lift = Math.max(NODE + 2 * LINE + 10 + arcWidth / 2, 0.2 * height);
+    // The rows. The arc over the hearing rises about a third of its span, and the shorter arcs below
+    // dip half theirs, as far as the height allows, and the drawing is centred in it. The arc over the
+    // hearing always clears the hearing's label, and the arcs below leave room for theirs.
     const pad = {
       left: Math.max(measure('Filed', true), measure(shareText('filed') ?? '')) + NODE + 12,
       right: NODE + 4,
-      top: LINE + 10 + arcWidth / 2 + lift,
-      bottom: NODE + 2 * LINE + 6,
+      top: LINE + 8 + overWidth / 2,
+      bottom: NODE + 4 + 2 * LINE + 2,
     };
-    const at = (stage) => [pad.left + PLACES[stage][0] * (width - pad.left - pad.right), pad.top + PLACES[stage][1] * (height - pad.top - pad.bottom)];
+    const inner = width - pad.left - pad.right;
+    const room = height - pad.top - pad.bottom;
+    const least = { lift: NODE + 2 * LINE + 12 + overWidth / 2, depth: 2 * NODE + 2 * LINE + 4 };
+    const want = { lift: 0.35 * (PLACES.decided[0] - PLACES.filed[0]) * inner, depth: 0.5 * (PLACES.decided[0] - PLACES.hearing[0]) * inner };
+    const fit = Math.min(inner < 400 ? 2 : 1.3, room / (want.lift + want.depth)); // narrow maps need taller arcs for their labels
+    const lift = Math.max(least.lift, want.lift * fit);
+    const depth = Math.max(least.depth, Math.min(want.depth * fit, room - lift));
+    const top = pad.top + Math.max(0, (room - lift - depth) / 2) + lift;
+    const at = (stage) => [pad.left + PLACES[stage][0] * inner, top + PLACES[stage][1] * depth];
 
     // What labels must keep clear of: the stages and their labels, the arrows, and the other labels.
     const taken = [];
-    const nodes = s('g', { class: 'sd-nodes' });
+    const stages = new Map();
     const shown = new Set(drawn.flatMap((move) => [move.from, move.to]));
     for (const stage of data.stages) {
       if (stage === 'closed' && !shown.has('closed')) continue;
@@ -125,41 +151,35 @@ export function createMap(host, data) {
         anchor = 'end';
         box = [x - NODE - 6 - wide, y - LINE, x - NODE - 6, y + LINE];
       } else {
-        const top = PLACES[stage][1] === 0 ? y - NODE - 4 - LINE * lines.length : y + NODE + 4;
+        const labelTop = PLACES[stage][1] === 0 ? y - NODE - 4 - LINE * lines.length : y + NODE + 4;
         anchor = { decided: 'start', final: 'end', closed: 'end' }[stage] ?? 'middle';
         const x0 = { start: x - 3, end: x + NODE - wide, middle: x - wide / 2 }[anchor];
-        box = [x0, top, x0 + wide, top + LINE * lines.length];
+        box = [x0, labelTop, x0 + wide, labelTop + LINE * lines.length];
       }
       const tx = { start: box[0], end: box[2], middle: (box[0] + box[2]) / 2 }[anchor];
-      nodes.append(s('circle', { class: 'sd-node', cx: x, cy: y, r: NODE }));
-      lines.forEach((text, j) => {
-        nodes.append(s('text', { class: j < name.length ? 'sd-node-label' : 'sd-node-share', x: tx, y: box[1] + LINE * j + 11, 'text-anchor': anchor }, text));
-      });
+      const group = s('g', { class: 'sd-stage' }, s('circle', { class: 'sd-node', cx: x, cy: y, r: NODE }),
+        ...lines.map((text, j) => s('text', { class: j < name.length ? 'sd-node-label' : 'sd-node-share', x: tx, y: box[1] + LINE * j + 11, 'text-anchor': anchor }, text)));
+      stages.set(stage, group);
       taken.push([x - NODE, y - NODE, x + NODE, y + NODE], box);
     }
 
     // The arrows, a move and its reverse side by side.
     const arrows = drawn.map((move) => {
       const w = stroke(move.share);
-      const reverse = drawn.some((other) => other.from === move.to && other.to === move.from);
-      const geometry = shape(move.from, move.to) === 'arc'
-        ? arc(at(move.from), at(move.to), w, lift)
-        : line(at(move.from), at(move.to), w, reverse ? head(w) + 1.5 : 0);
-      return { move, w, geometry };
+      const pair = drawn.some((other) => other.from === move.to && other.to === move.from);
+      const points = route(move.from, move.to, at, { lift, depth });
+      return { move, w, pair, geometry: arrow(points, w, pair ? head(w) + 1.5 : 0) };
     });
-    const marks = arrows.flatMap(({ move, w, geometry }) => geometry.samples.map(([x, y]) => [x, y, w / 2 + 2, move]));
+    const marks = arrows.flatMap(({ w, geometry }) => geometry.samples.map(([x, y]) => [x, y, w / 2 + 2]));
 
-    // The labels, the commonest first, each where it clears everything placed so far.
+    // The labels, the commonest first, each where it clears everything placed so far: the share on one
+    // side, the wait on the other, or both on the outside of a move with its reverse beside it.
     const labels = new Map();
-    for (const { move, w, geometry } of arrows) {
-      // Beside an arc, its label goes above it, and beside a line, under or right of it first.
-      const sides = shape(move.from, move.to) === 'arc' ? [1, -1] : [-1, 1];
-      const box = place(describe.moveLabel(move), w, geometry, { width, height, taken, marks, measure }, { sides, on: w < THICK, owner: move });
-      taken.push(box.bounds);
-      const [x0, y0, x1, y1] = box.bounds;
-      labels.set(move, s('g', { class: 'sd-edge-label' },
-        box.on ? s('rect', { class: 'sd-edge-label-back', x: x0, y: y0, width: x1 - x0, height: y1 - y0, rx: 3 }) : null,
-        s('text', { 'text-anchor': 'middle' }, ...box.lines.map((text, j) => s('tspan', { x: box.x, y: y0 + LINE * j + 11 }, text)))));
+    for (const { move, w, pair, geometry } of arrows) {
+      const boxes = place(describe.moveLabel(move), w, geometry, { width, height, taken, marks, measure }, { together: pair });
+      taken.push(...boxes.map((box) => box.bounds));
+      labels.set(move, s('g', { class: 'sd-edge-label' }, ...boxes.map((box) => s('text', { 'text-anchor': 'middle' },
+        ...box.lines.map((text, j) => s('tspan', { x: box.x, y: box.bounds[1] + LINE * j + 12 }, text))))));
     }
 
     const edges = s('g', { class: 'sd-edges' });
@@ -172,19 +192,18 @@ export function createMap(host, data) {
         s('path', { class: 'sd-edge-head', d: geometry.head }));
       edges.append(group);
       const hit = s('path', { class: 'sd-edge-hit', d: geometry.path, 'stroke-width': Math.max(12, w + 6).toFixed(1) });
-      const label = labels.get(move);
-      hit.addEventListener('pointerenter', () => highlight(group, label, true));
-      hit.addEventListener('pointerleave', () => highlight(group, label, false));
+      const lit = [group, labels.get(move), stages.get(move.from), stages.get(move.to)];
+      hit.addEventListener('pointerenter', () => highlight(lit, true));
+      hit.addEventListener('pointerleave', () => highlight(lit, false));
       hits.unshift(hit);
     }
-    mapSvg.replaceChildren(edges, ...labels.values(), nodes, ...hits);
+    mapSvg.replaceChildren(edges, ...labels.values(), ...stages.values(), ...hits);
   }
 
-  /** Hovering an arrow dims the other arrows and their labels. */
-  function highlight(group, label, on) {
+  /** Hovering an arrow dims everything on the map but it, its labels and its two stages. */
+  function highlight(lit, on) {
     mapSvg.classList.toggle('has-hover', on);
-    group.classList.toggle('is-hover', on);
-    label.classList.toggle('is-hover', on);
+    for (const el of lit) el.classList.toggle('is-hover', on);
   }
 
   /** The curve: the court's share legally final, if a court is selected, against all courts'. */
@@ -201,7 +220,7 @@ export function createMap(host, data) {
     const y = (p) => height - margin.bottom - p * (height - margin.top - margin.bottom);
     const path = (series) => series.slice(0, MONTHS + 1).map((v, m) => `${m ? 'L' : 'M'}${x(m).toFixed(1)},${y(v).toFixed(1)}`).join('');
     const nodes = [];
-    for (const p of [0, 0.25, 0.5, 0.75, 1]) {
+    for (const p of [0, 0.5, 1]) {
       nodes.push(
         s('line', { class: p === 0 ? 'sd-axis-line' : 'sd-grid', x1: x(0), x2: x(MONTHS), y1: y(p), y2: y(p) }),
         s('text', { class: 'sd-tick', x: margin.left - 8, y: y(p), dy: '0.32em', 'text-anchor': 'end' }, `${p * 100}%`),
@@ -270,60 +289,76 @@ const unit = (x, y) => {
   return [x / length, y / length];
 };
 
-/** An arrowhead at `tip`, pointing along the unit vector [ux, uy]: its path data. */
-function arrowhead(tip, [ux, uy], width) {
-  const end = [tip[0] - ux * ARROW, tip[1] - uy * ARROW];
-  const half = head(width);
-  const point = ([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
-  return `M${point(tip)}L${point([end[0] + uy * half, end[1] - ux * half])}L${point([end[0] - uy * half, end[1] + ux * half])}Z`;
+const mix = ([ax, ay], [bx, by], t) => [ax + (bx - ax) * t, ay + (by - ay) * t];
+
+/** A cubic Bézier curve, as its four points, split in two halves at its middle. */
+export function halves([p0, p1, p2, p3]) {
+  const [a, b, c] = [mix(p0, p1, 0.5), mix(p1, p2, 0.5), mix(p2, p3, 0.5)];
+  const [d, e] = [mix(a, b, 0.5), mix(b, c, 0.5)];
+  const m = mix(d, e, 0.5);
+  return [[p0, a, d, m], [m, e, c, p3]];
 }
 
 /**
- * A straight arrow from one stage to another, moved `shift` px to the left of travel (y runs down), so
- * that a move and its reverse sit side by side: { path, head, at(t), left(t), samples }, where at(t) is
- * the point a share t of the way along, left(t) the unit vector to its left, and samples points along it.
+ * The curve a move follows on the map, between its stages' centres (`at(stage)`), as a cubic Bézier's
+ * four points: straight for a line; for the arc over the hearing, rising `lift` px at its middle; along
+ * the arc below the row whose bottom is a revival or an appeal, `depth` px below it; or a bend from a
+ * suspension, leaving it sideways and reaching the hearing from below.
  */
-export function line([x0, y0], [x1, y1], width, shift = 0) {
-  const [ux, uy] = unit(x1 - x0, y1 - y0);
-  const [nx, ny] = [uy, -ux];
-  const start = [x0 + ux * GAP + nx * shift, y0 + uy * GAP + ny * shift];
-  const tip = [x1 - ux * GAP + nx * shift, y1 - uy * GAP + ny * shift];
-  const end = [tip[0] - ux * ARROW, tip[1] - uy * ARROW];
-  const at = (t) => [start[0] + (tip[0] - start[0]) * t, start[1] + (tip[1] - start[1]) * t];
-  return {
-    path: `M${start[0].toFixed(1)},${start[1].toFixed(1)}L${end[0].toFixed(1)},${end[1].toFixed(1)}`,
-    head: arrowhead(tip, [ux, uy], width),
-    at,
-    left: () => [nx, ny],
-    samples: Array.from({ length: 25 }, (_, i) => at(i / 24)),
-  };
+export function route(from, to, at, { lift, depth }) {
+  const [p, q] = [at(from), at(to)];
+  const kind = shape(from, to);
+  if (kind === 'line') return [p, mix(p, q, 1 / 3), mix(p, q, 2 / 3), q];
+  if (kind === 'over') {
+    const rise = lift / 0.75; // a cubic's middle reaches 3/4 of the way to its control points
+    return [p, [p[0] + (q[0] - p[0]) / 4, p[1] - rise], [q[0] - (q[0] - p[0]) / 4, q[1] - rise], q];
+  }
+  if (kind === 'under') {
+    const bottom = ARCS[from] ? from : to;
+    const row = bottom === to ? from : to;
+    const [left, right] = ARCS[bottom].map(at);
+    const rise = depth / 0.75;
+    const dx = (right[0] - left[0]) / 4;
+    const [first, second] = halves([left, [left[0] + dx, left[1] + rise], [right[0] - dx, right[1] + rise], right]);
+    // From the row down to the bottom of the arc, then the other way if the move goes up.
+    const down = ARCS[bottom][0] === row ? first : [...second].reverse();
+    return bottom === to ? down : [...down].reverse();
+  }
+  // A bend, from a suspension up to the hearing, or back.
+  const [low, high] = from === 'suspended' ? [p, q] : [q, p];
+  const bend = [low, [low[0] + 0.6 * (high[0] - low[0]), low[1] - 0.15 * (low[1] - high[1])], [high[0], high[1] + 0.6 * (low[1] - high[1])], high];
+  return from === 'suspended' ? bend : [...bend].reverse();
 }
 
-/** An arc from one stage to another on the same row, rising `lift` px above it at its middle: as line(). */
-export function arc([x0, y0], [x1, y1], width, lift) {
-  const rise = lift / 0.75; // a cubic's control points rise 4/3 as far as its middle
-  const c0 = [x0 + (x1 - x0) * 0.25, y0 - rise];
-  const c1 = [x1 - (x1 - x0) * 0.25, y1 - rise];
-  const [sx, sy] = unit(c0[0] - x0, c0[1] - y0);
-  const [ex, ey] = unit(x1 - c1[0], y1 - c1[1]);
-  const start = [x0 + sx * GAP, y0 + sy * GAP];
-  const tip = [x1 - ex * GAP, y1 - ey * GAP];
+/**
+ * An arrow along a cubic Bézier's four points, moved `shift` px to the left of the line between its ends
+ * (y runs down), so that a move and its reverse sit side by side. It starts and ends clear of its
+ * stages. Gives { path, head, at(t), left(t), samples }: the path data of its line and of its head, the
+ * point a share t of the way along, the unit vector to its left there, and points along it.
+ */
+export function arrow(points, width, shift = 0) {
+  const [cx, cy] = unit(points[3][0] - points[0][0], points[3][1] - points[0][1]);
+  const [p0, p1, p2, p3] = points.map(([x, y]) => [x + cy * shift, y - cx * shift]);
+  const [sx, sy] = unit(p1[0] - p0[0], p1[1] - p0[1]);
+  const [ex, ey] = unit(p3[0] - p2[0], p3[1] - p2[1]);
+  const start = [p0[0] + sx * GAP, p0[1] + sy * GAP];
+  const tip = [p3[0] - ex * GAP, p3[1] - ey * GAP];
   const end = [tip[0] - ex * ARROW, tip[1] - ey * ARROW];
-  const points = [start, c0, c1, end];
+  const curve = [start, p1, p2, end];
   const at = (t) => {
     const k = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
-    return [0, 1].map((d) => points.reduce((sum, p, i) => sum + k[i] * p[d], 0));
+    return [0, 1].map((d) => curve.reduce((sum, p, i) => sum + k[i] * p[d], 0));
   };
   const left = (t) => {
     const k = [-3 * (1 - t) ** 2, 3 * (1 - t) ** 2 - 6 * (1 - t) * t, 6 * (1 - t) * t - 3 * t ** 2, 3 * t ** 2];
-    const [dx, dy] = [0, 1].map((d) => points.reduce((sum, p, i) => sum + k[i] * p[d], 0));
-    const [ux, uy] = unit(dx, dy);
+    const [ux, uy] = unit(...[0, 1].map((d) => curve.reduce((sum, p, i) => sum + k[i] * p[d], 0)));
     return [uy, -ux];
   };
   const point = ([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
+  const half = head(width);
   return {
-    path: `M${point(start)}C${point(c0)} ${point(c1)} ${point(end)}`,
-    head: arrowhead(tip, [ex, ey], width),
+    path: `M${point(start)}C${point(p1)} ${point(p2)} ${point(end)}`,
+    head: `M${point(tip)}L${point([end[0] + ey * half, end[1] - ex * half])}L${point([end[0] - ey * half, end[1] + ex * half])}Z`,
     at,
     left,
     samples: Array.from({ length: 41 }, (_, i) => at(i / 40)),
@@ -331,37 +366,61 @@ export function arc([x0, y0], [x1, y1], width, lift) {
 }
 
 /**
- * Where an arrow's label goes, on one line or two, at the first of a few places along it that clears the
- * map's edges, the boxes in `taken` and the other arrows (`marks`, as [x, y, radius, owner]), with text
- * as wide as `measure(text)` gives. It can be set into the arrow (the `owner` of its marks): with `on`,
- * first, and beside it only where that isn't clear; without, only where nothing beside it is clear.
- * `sides` is the order to try its sides in: 1 for the left of travel (y runs down), -1 for the right.
- * If no place is clear, the one with the fewest clashes. Gives { lines, x, bounds, on }.
+ * Where an arrow's labels go: its share on one side and its wait on the other, the share above (or on
+ * the left of an upright arrow) where it can be, each at the first of a few places along it that clears
+ * the map's edges, the boxes in `taken` and the arrows (`marks`, as [x, y, radius]), with text as wide as
+ * `measure(text)` gives. Failing that, or `together`, both on one side, on two lines, the left of travel
+ * first. Failing that, the share alone; and if even that has no clear place, the share where it crosses
+ * fewest arrows, but never over other text or off the map, or else nothing. Gives a list of
+ * { lines, x, bounds }.
  */
-export function place(lines, width, geometry, { width: w, height: h, taken, marks, measure }, { sides = [-1, 1], on = false, owner = null } = {}) {
-  const formats = [[lines.join(' · ')], lines];
-  const placements = on ? [0, ...sides] : [...sides, 0];
-  let best = null;
-  for (const side of placements) {
-    for (const format of formats) {
-      const boxWidth = Math.max(...format.map((text) => measure(text))) + 8;
-      const boxHeight = LINE * format.length + 2;
-      for (const t of [0.5, 0.4, 0.6, 0.3, 0.7]) {
-        const [nx, ny] = geometry.left(t);
-        const reach = side ? width / 2 + 5 + Math.abs(nx) * (boxWidth / 2) + Math.abs(ny) * (boxHeight / 2) : 0;
-        const [px, py] = geometry.at(t);
-        const cx = px + side * nx * reach;
-        const cy = py + side * ny * reach;
-        const bounds = [cx - boxWidth / 2, cy - boxHeight / 2, cx + boxWidth / 2, cy + boxHeight / 2];
-        const clashes = (bounds[0] < 0 || bounds[1] < 0 || bounds[2] > w || bounds[3] > h ? 1 : 0)
-          + taken.filter(([a, b, c, d]) => bounds[0] < c && a < bounds[2] && bounds[1] < d && b < bounds[3]).length
-          + marks.filter(([x, y, r, by]) => (side || by !== owner)
-            && x > bounds[0] - r && x < bounds[2] + r && y > bounds[1] - r && y < bounds[3] + r).length;
-        const candidate = { lines: format, x: cx, bounds, on: !side, clashes };
-        if (!clashes) return candidate;
-        if (!best || clashes < best.clashes) best = candidate;
-      }
+export function place(texts, width, geometry, { width: w, height: h, taken, marks, measure }, { together = false } = {}) {
+  // A box beside the arrow, a little further out if that clears it: inside a bend, the arrow curves
+  // towards it.
+  const box = (lines, t, side, also) => {
+    const [nx, ny] = geometry.left(t);
+    const boxWidth = Math.max(...lines.map((text) => measure(text))) + 8;
+    const boxHeight = LINE * lines.length + 2;
+    const [px, py] = geometry.at(t);
+    let best = null;
+    for (const extra of [0, 5, 10]) {
+      const reach = width / 2 + 4 + extra + Math.abs(nx) * (boxWidth / 2) + Math.abs(ny) * (boxHeight / 2);
+      const [cx, cy] = [px + side * nx * reach, py + side * ny * reach];
+      const bounds = [cx - boxWidth / 2, cy - boxHeight / 2, cx + boxWidth / 2, cy + boxHeight / 2];
+      const outside = bounds[0] < 0 || bounds[1] < 0 || bounds[2] > w || bounds[3] > h ? 1 : 0;
+      const overlaps = [...taken, ...also].filter(([a, b, c, d]) => bounds[0] < c && a < bounds[2] && bounds[1] < d && b < bounds[3]).length;
+      const crossings = marks.filter(([x, y, r]) => x > bounds[0] - r && x < bounds[2] + r && y > bounds[1] - r && y < bounds[3] + r).length;
+      const clashes = outside + overlaps + crossings;
+      if (!best || clashes < best.clashes) best = { lines, x: cx, bounds, clashes, overlaps: overlaps + outside };
+      if (!clashes) break;
+    }
+    return best;
+  };
+  const along = [0.5, 0.4, 0.6, 0.3, 0.7, 0.2, 0.8];
+  const on = (...sides) => sides.flatMap((side) => along.map((t) => [t, side]));
+  let fallback = null;
+  // The first of `places` where `lines` clear everything, and `also` too.
+  const clear = (lines, places, also = []) => {
+    for (const [t, side] of places) {
+      const b = box(lines, t, side, also);
+      if (!b.clashes) return b;
+      if (lines.length === 1 && lines[0] === texts[0] && !b.overlaps && (!fallback || b.clashes < fallback.clashes)) fallback = b;
+    }
+    return null;
+  };
+  const [nx, ny] = geometry.left(0.5);
+  const up = ny < -0.2 || (ny <= 0.2 && nx < 0) ? 1 : -1; // the side above, or on the left of an upright arrow
+  if (!together && texts.length === 2) {
+    for (const side of [up, -up]) {
+      const share = clear([texts[0]], on(side));
+      const wait = share && clear([texts[1]], on(-side), [share.bounds]);
+      if (wait) return [share, wait];
     }
   }
-  return best;
+  if (texts.length === 2) {
+    const both = clear(texts, on(1, -1));
+    if (both) return [both];
+  }
+  const share = clear([texts[0]], on(up, -up)) ?? fallback;
+  return share ? [share] : [];
 }

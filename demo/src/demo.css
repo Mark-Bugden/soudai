@@ -5,15 +5,26 @@
  */
 
 /*
- * Wide frames: the stage keeps the manifest's height, but shrinks so that the stage and the status
- * line below it (4.5rem) fit in the window. On the site, the window is what the page leaves below
- * its title (--dk-fit-height, which the site sets); standalone, it is the whole window. The stage
- * stays at least 22rem tall, about the height of the controls beside it.
+ * Wide frames: the stage keeps the manifest's height, but shrinks to fit in the window, with a little
+ * room below it. On the site, the window is what the page leaves below its title (--dk-fit-height,
+ * which the site sets); standalone, it is the whole window. The stage stays at least 22rem tall,
+ * about the height of the controls beside it.
  */
 @container (min-width: 48rem) {
   [data-demo] .dk-stage {
-    height: max(22rem, min(var(--dk-stage-height), var(--dk-fit-height, 100dvh) - 4.5rem));
+    height: max(22rem, min(var(--dk-stage-height), var(--dk-fit-height, 100dvh) - 1rem));
   }
+}
+
+/* The views say what the status line would, so it's for screen readers only. */
+[data-demo] .dk-bar {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Phones: the kit's 16:9 stage is too short for the tabs, so the stage is taller. */
@@ -27,24 +38,6 @@
 [data-demo] .sd-view {
   position: absolute;
   inset: 0;
-}
-
-/* The Forecast tab's tiles and chart say what its status line would, so there the line is for screen
-   readers only, and on wide frames the stage takes its room. */
-[data-demo].sd-hide-status .dk-bar {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-@container (min-width: 48rem) {
-  [data-demo].sd-hide-status .dk-stage {
-    height: max(22rem, min(var(--dk-stage-height), var(--dk-fit-height, 100dvh) - 1rem));
-  }
 }
 
 /* Controls that the current tab doesn't use are hidden. */
@@ -585,8 +578,46 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
+/* The curve, then the commonest routes, each in half the column. */
 [data-demo] .sd-curves {
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+[data-demo] .sd-routes {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+[data-demo] .sd-route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px var(--space-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+}
+
+[data-demo] .sd-route-share {
+  font-variant-numeric: tabular-nums;
+}
+
+[data-demo] .sd-route-track {
+  grid-column: 1 / -1;
+  height: 4px;
+  background: color-mix(in oklab, var(--color-text) 10%, var(--color-surface));
+  border-radius: 2px;
+}
+
+[data-demo] .sd-route-bar {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 2px;
 }
 
 [data-demo] .sd-edge-line {
@@ -609,7 +640,8 @@
   fill-opacity: 0.2;
 }
 
-[data-demo] .sd-flow.has-hover .sd-edge-label:not(.is-hover) {
+[data-demo] .sd-flow.has-hover .sd-edge-label:not(.is-hover),
+[data-demo] .sd-flow.has-hover .sd-stage:not(.is-hover) {
   opacity: 0.25;
 }
 
@@ -640,10 +672,6 @@
   stroke-linejoin: round;
 }
 
-/* A label set into its arrow hides the line behind it. */
-[data-demo] .sd-edge-label-back {
-  fill: var(--color-surface);
-}
 
 [data-demo] .sd-node {
   fill: var(--color-surface);
@@ -706,15 +734,16 @@
   }
 
   [data-demo] .sd-curves {
-    grid-template-rows: auto auto 13rem;
+    grid-template-rows: auto auto 13rem auto auto;
   }
 }
 
-/* The map's arrows and their labels dim when one is hovered, without a fade under reduced motion. */
+/* The map's arrows, labels and stages dim when an arrow is hovered, without a fade under reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   [data-demo] .sd-edge-line,
   [data-demo] .sd-edge-head,
-  [data-demo] .sd-edge-label {
+  [data-demo] .sd-edge-label,
+  [data-demo] .sd-stage {
     transition: stroke-opacity var(--duration-fast) var(--ease-out), fill-opacity var(--duration-fast) var(--ease-out),
       opacity var(--duration-fast) var(--ease-out);
   }

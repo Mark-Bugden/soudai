@@ -202,10 +202,8 @@ async function start(el) {
         current?.view.destroy();
         current = { name, view: TABS[name].create(host, data) };
         stage.setAttribute('aria-label', TABS[name].label);
-        // On phones the stage grows to fit the map, and the Forecast tab's status line is for screen
-        // readers only (see demo.css).
+        // On phones the stage grows to fit the map (see demo.css).
         stage.closest('.dk-stage').classList.toggle('sd-fit-content', name !== 'forecast');
-        el.classList.toggle('sd-hide-status', name === 'forecast');
       }
       showControls();
       const isCustom = values.caseMenu === CUSTOM;
