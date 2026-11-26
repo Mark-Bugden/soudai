@@ -24,6 +24,7 @@ The project was first planned as purely descriptive. On 2026-11-23 Mark decided 
 4. **One PR per change, and merging it puts it live.** Never push to `main` and never create tags. A PR that changes anything in `demo/` (other than tests and Markdown) bumps `version` in `demo/package.json`, or CI fails. Before opening a PR, run CI's checks locally, because every failed run emails Mark. `CLAUDE.md` lists them: `uv run pytest`, and `npm run build`, `npm test` (since step 8) and `npx demo-kit validate dist/` in `demo/`.
 5. **Long runs** (the scrapes in steps 3–5) run in the background and log to `data/raw/logs/`. Never delete the cache. Never run two scrapers at once: the 1 request per second limit is for the whole project, not per process.
 6. **Copy.** Mark writes the English copy himself: the manifest's tagline and summary, and the write-up. The demos have no "How this works" (`about`) since 2026-11-26 (see step 8). Agents may draft it in `docs/writeup.md` for him to edit. Don't write new prose about Mark or his work.
+   - **Changed on 2026-11-26:** Mark asked for drafts of the manifest's text, the model card and the write-up to go on the site, since he needs to see them there to judge them, and he rewords them as he likes. The drafts keep to facts in this plan and in `docs/`, in a neutral voice, with no framing he hasn't given.
 7. **Other repos.** Read the sibling repos and the site freely, but don't change them. Tell Mark what the site needs (see "For Mark, on the site").
 
 ## What changes from the old project
@@ -849,8 +850,9 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
     - **Phones:** the scores and the chart, one above the other, don't fit a 30rem stage, so for this view the stage grows to fit them, and the chart is 17rem tall. On wide stages, the table's column scrolls if the window is short.
     - **Tests:** 6 new node:test tests: every method shown, the scores for all courts at each landmark and for each court, the best with ties, the calibration bands, and the text.
     - **Checked in Edge,** in both themes at 1280 × 800, at 390 px and in a 1100 × 520 window: the switch, a landmark, picking the trees, a calibration horizon, hovering a dot, a court (which turns the landmark switch off), and back to a case. The Forecast tab's earlier checks still pass. No console errors.
-- [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
-  - Waiting for Mark's copy (2026-11-26). The Process map tab went ahead of it.
+- [x] The model card, from the facts in `docs/model-card.md` (v0.11.0).
+  - Drafted on 2026-11-26 at Mark's request, for him to judge on the site and reword (see "Working on this plan"). It's the manifest's `modelCard`: what it computes, the data, its performance against the gradient-boosted trees, and six known limits, the last that it isn't legal advice.
+  - Its figures are `docs/model-card.md`'s, checked against `model_scores.csv`. At filing, the ensemble's concordance is 0.610 against the court average's 0.608, and its Brier score at 6 months 0.226 against 0.225, so the card says it "does no better than the court's average" there.
 - [x] The Process map tab and its time curves (v0.9.0).
   - **Found first: moves into "legally final" were missing** from `journey_moves.csv`, which also made other waits too long. Fixed in its own PR, as v0.8.0 (see step 6).
   - **The map** (`views/map.js`, with the numbers in `journey.js`) has a node per stage, at fixed places: "filed", "hearing", "decided" and "legally final" along the middle, "revived" above, and "suspended", "appeal" and "closed" below. Each node gives the share of cases reaching its stage.
@@ -885,12 +887,15 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
     - Rerunning it gives the same files, but for a few bytes of `thumb.webp`.
   - The bundle is 883 KB, of 2 MB. `index.html`'s still now has alt text for the new still. Its description is still the old tagline, to change with the manifest.
   - **Checked in Edge,** in both themes at 1280 × 800 and at 390 px: the die picks a case from the court selected and shows it in the box, the suggestions open across the box and the die, "Add on day 1,096" fits its button, and Undo turns off when there's nothing left to undo. No console errors in any tab.
-- [ ] The manifest, in Mark's copy, with `status: "in-progress"`.
-  - Waiting for Mark's copy (2026-11-26): the tagline, summary and tags still describe the old project. `index.html`'s description follows the tagline.
+- [x] The manifest, with `status: "in-progress"` (v0.11.0).
+  - Drafted on 2026-11-26 at Mark's request, for him to reword. The tagline keeps his old one with "civil" added: "Predicting how long civil court cases in the Czech Republic take." The summary is built from the README's sentences. The tags are machine learning, neural networks, survival analysis and data scraping. `index.html`'s description is the tagline.
+  - **The site lists the project** once this release is out and the site's write-up (`content/projects/soudai.md`, in Mark-Bugden.github.io) is out of draft. A site PR does that after this release, with a draft write-up (see step 9). The site's build fails if the write-up is published while the bundle is a stub, so the order matters.
+  - **Previewed** on the site's own build, with this bundle in place: the project is listed first on the Projects page and the home page (they sort by title), the "More info" tab shows the tagline, "In progress", the write-up and the model card, and the site's offline link check passes. The home page now has four cards, so the fourth sits alone on a second row; `order:` in the site's `data/projects.yaml` can change which come first.
 - [ ] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
 
 ### 9. Write-up: release status `live`
 - [ ] Draft the write-up in `docs/writeup.md` for Mark, including a plain statement that nothing here is legal advice.
+  - Changed on 2026-11-26: Mark asked for the draft on the site itself, to judge it there. It goes in `content/projects/soudai.md` in the site repo, in the site's FAQ form, after v0.11.0 is released: what the demo shows (and that it isn't legal advice), the data, how cases are counted, the journey, how the forecast works, how well it does, its limits, and how it was made. English only for now; the Czech and German pages follow once the English settles, as for the other projects.
 - [ ] Set `status: "live"` once Mark agrees, in a PR that bumps the version.
 
 ### 10. The Courts tab (after the demo is live)
@@ -905,8 +910,8 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
 
 ## For Mark, on the site
 
-- **The write-up.** `content/projects/soudai.md` is a draft with a TODO, which asks for a plain statement that the predictions aren't legal advice. The project makes predictions again, since 2026-11-23 (see "The remaining-time model"), so the statement matters.
-- **The copy.** The tagline and summary ("Predicting how long court cases in the Czech Republic take") describe the old project. Mark rewrites them for the manifest and the site.
+- **The write-up.** `content/projects/soudai.md` is a draft with a TODO, which asks for a plain statement that the predictions aren't legal advice. The project makes predictions again, since 2026-11-23 (see "The remaining-time model"), so the statement matters. Since 2026-11-26 an agent drafts it there for Mark to reword (see step 9).
+- **The copy.** The manifest's tagline, summary, tags and model card are drafts since v0.11.0 (see step 8), for Mark to reword.
 - **The README.** Reworded for the three tabs and the model on 2026-11-25, at Mark's request, keeping his wording where it still held. He edits it.
 - **Status.** The site lists the project once a release is `in-progress` or `live` and the write-up is out of draft.
 
