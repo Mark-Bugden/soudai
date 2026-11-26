@@ -4,7 +4,7 @@ An interactive look at how civil cases move through Czech district courts, and w
 
 The project makes no claims about why courts differ, and isn't legal advice.
 
-**Status:** being rebuilt from scratch, as of November 2026. The demo is in progress: the Forecast and Process map tabs work, and the Courts tab comes later. The plan, design decisions and milestones are in [docs/plan.md](docs/plan.md), which records how far the rebuild has got.
+**Status:** being rebuilt from scratch, as of November 2026. The demo is in progress: the Process map, Forecast and Performance tabs work, and the Courts tab comes later. The plan, design decisions and milestones are in [docs/plan.md](docs/plan.md), which records how far the rebuild has got.
 
 ## Repository layout
 

@@ -54,9 +54,11 @@
   white-space: nowrap;
 }
 
-/* A row of buttons for a few choices: radio buttons underneath, on a track like the kit's select. */
+/* A row of buttons for a few choices: radio buttons underneath, on a track like the kit's select. It's
+   never wider than its control: its buttons shrink, and their names end in "…" if they must. */
 [data-demo] .sd-segments {
   display: flex;
+  min-width: 0;
   gap: 2px;
   padding: 3px;
   background: var(--color-bg);
@@ -110,11 +112,18 @@
   text-overflow: ellipsis;
 }
 
-/* The tab switch: an icon over each name, the chosen icon in the accent. */
+/* The tab switch: an icon over each name, the chosen icon in the accent. The names are a little smaller,
+   so that three fit the site's rail, which leaves each about 75 px. */
 [data-demo] .sd-segmented-icons .sd-segment {
   flex-direction: column;
   gap: 3px;
   min-height: 3.5rem;
+  padding: 0 2px;
+}
+
+[data-demo] .sd-segmented-icons .sd-segment-label {
+  max-width: 100%;
+  font-size: 0.6875rem;
 }
 
 [data-demo] .sd-segment-icon,
@@ -435,38 +444,6 @@
 [data-demo] .sd-cross-line {
   stroke: var(--color-muted);
   stroke-width: 1;
-}
-
-/* The tooltip, adapted from doctor-who-ratings'. */
-[data-demo] .sd-tip {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  display: grid;
-  gap: 2px;
-  max-width: min(18rem, calc(100% - 12px));
-  padding: var(--space-2) var(--space-3);
-  color: var(--color-text);
-  font-size: var(--text-xs);
-  line-height: var(--leading-snug);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
-  pointer-events: none;
-}
-
-[data-demo] .sd-tip[hidden] {
-  display: none;
-}
-
-[data-demo] .sd-tip strong {
-  font-size: var(--text-sm);
-}
-
-[data-demo] .sd-tip span {
-  color: var(--color-muted);
 }
 
 @container (max-width: 47.99rem) {
@@ -800,5 +777,88 @@
   [data-demo] .sd-stage {
     transition: stroke-opacity var(--duration-fast) var(--ease-out), fill-opacity var(--duration-fast) var(--ease-out),
       opacity var(--duration-fast) var(--ease-out);
+  }
+}
+
+/*
+ * The Performance tab: its heading, then the calibration and the ranking side by side, each chart taking
+ * the rest of its column; one above the other on narrow stages, where the stage grows to fit them.
+ */
+[data-demo] .sd-perf {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  box-sizing: border-box;
+}
+
+[data-demo] .sd-perf-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  min-height: 0;
+}
+
+[data-demo] .sd-perf-box {
+  flex: 1 1 0;
+}
+
+[data-demo] .sd-diagonal {
+  stroke: var(--color-curve);
+  stroke-width: 1.5;
+}
+
+/* The names at the ends of the ranking's lines, the model's in bold. */
+[data-demo] .sd-end-name {
+  fill: var(--color-muted);
+  font-size: 12px;
+}
+
+[data-demo] .sd-end-name.is-lit {
+  fill: var(--color-text);
+  font-weight: var(--weight-strong);
+}
+
+/* Notes in the rail, such as what the simpler methods are: each name, then what it is. */
+[data-demo] .sd-notes {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+}
+
+[data-demo] .sd-notes dt {
+  font-weight: var(--weight-strong);
+}
+
+[data-demo] .sd-notes dd {
+  margin: 0 0 var(--space-2);
+  color: var(--color-muted);
+}
+
+[data-demo] .sd-notes dd:last-child {
+  margin-bottom: 0;
+}
+
+@container (max-width: 47.99rem) {
+  [data-demo] .dk-stage.sd-fit-content .sd-perf {
+    height: auto;
+  }
+
+  [data-demo] .sd-perf {
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  [data-demo] .sd-perf-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  [data-demo] .sd-perf-box {
+    flex: none;
+    height: 18rem;
   }
 }

@@ -261,6 +261,17 @@ export function dateField({ label, value }) {
 }
 
 /**
+ * Text in the rail under a label, such as what the methods on a chart are: `items` are { term, about }.
+ * It changes nothing, so it has no value and never notifies.
+ */
+export function notes({ label, items }) {
+  const el = h('div', { class: 'dk-control' },
+    h('span', { class: 'dk-control-label' }, label),
+    h('dl', { class: 'sd-notes' }, ...items.flatMap(({ term, about }) => [h('dt', {}, term), h('dd', {}, about)])));
+  return { el, value: null, onChange: () => () => {} };
+}
+
+/**
  * A list whose items each have a button to remove them, with its label for screen readers only. Setting
  * `items` shows { when, what }s; pressing
  * an item's button notifies with its index, and the value is the index last removed. When the items next

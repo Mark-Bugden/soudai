@@ -18,6 +18,7 @@
 import { h, s } from '../dom.js';
 import * as describe from '../format.js';
 import { ARCS, DRAWN, PLACES, legallyFinal, moves, mostCommon, shape, split } from '../journey.js';
+import { clearReading, showReading } from '../reading.js';
 
 const MONTHS = 24; // months after filing on the curve
 const LINE = 15; // px, a label's line height
@@ -45,7 +46,7 @@ export function createMap(host, data) {
     h('div', { class: 'sd-map-flow' },
       h('div', { class: 'sd-case' }, h('p', { class: 'sd-case-title' }, 'Process map'), meta), mapBox, rest),
     h('div', { class: 'sd-curves' },
-      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title' }, 'How quickly cases become legally final'), legend, curveBox),
+      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title' }, 'Share of cases legally final, by months after filing'), legend, curveBox),
       h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title', id: 'sd-routes-title' }, 'Most common routes'), routeList)),
     table);
   host.append(el);
@@ -314,33 +315,29 @@ export function createMap(host, data) {
     return { lines, x, y, reading, ticks, left: margin.left, right: width - margin.right };
   }
 
-  // Reading the curve: at the nearest month, a line up the chart, a dot on each line and its value on the
-  // y axis, with a faint line between them. The axis's own labels make way.
+  // Reading the curve off its y axis, at the nearest month.
   curveSvg.addEventListener('pointermove', (event) => {
     if (!curve) return;
     const box = curveSvg.getBoundingClientRect();
     const month = Math.round(((event.clientX - box.left - curve.left) / (curve.right - curve.left)) * MONTHS);
     if (month < 0 || month > MONTHS) {
-      clearReading();
+      clear();
       return;
     }
     const { x, y, lines, ticks, left } = curve;
-    const values = lines.map(({ series, dot }) => ({ value: series[month], at: y(series[month]), dot }));
-    const labels = spread(values.map(({ at }) => at), LINE);
-    curve.reading.replaceChildren(
-      s('line', { class: 'sd-cross-line', x1: x(month), x2: x(month), y1: y(1), y2: y(0) }),
-      ...values.map(({ at }) => s('line', { class: 'sd-reading-line', x1: left, x2: x(month), y1: at, y2: at })),
-      ...values.map(({ at, dot }) => s('circle', { class: dot, cx: x(month), cy: at, r: 4 })),
-      ...values.map(({ value }, i) => s('text', { class: 'sd-reading-value', x: left - 8, y: labels[i], dy: '0.32em', 'text-anchor': 'end' }, describe.percent(value))),
-    );
-    for (const { tick, at } of ticks) tick.classList.toggle('is-under', labels.some((label) => Math.abs(label - at) < LINE));
+    showReading(curve.reading, {
+      x: x(month),
+      top: y(1),
+      bottom: y(0),
+      left,
+      values: lines.map(({ series, dot }) => ({ cx: x(month), at: y(series[month]), text: describe.percent(series[month]), dot })),
+      ticks,
+    });
   });
-  curveSvg.addEventListener('pointerleave', clearReading);
+  curveSvg.addEventListener('pointerleave', clear);
 
-  function clearReading() {
-    if (!curve) return;
-    curve.reading.replaceChildren();
-    for (const { tick } of curve.ticks) tick.classList.remove('is-under');
+  function clear() {
+    if (curve) clearReading(curve.reading, curve.ticks);
   }
 
   return {
@@ -355,21 +352,6 @@ function size(svg, width, height) {
   svg.setAttribute('width', width);
   svg.setAttribute('height', height);
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-}
-
-/** Positions for labels wanted at `wanted` (px, in any order), moved apart until they're `apart` px apart. */
-export function spread(wanted, apart) {
-  const order = wanted.map((at, i) => i).sort((a, b) => wanted[a] - wanted[b]);
-  const placed = [...wanted];
-  for (let k = 1; k < order.length; k++) {
-    const [above, below] = [order[k - 1], order[k]];
-    const short = apart - (placed[below] - placed[above]);
-    if (short > 0) {
-      placed[above] -= short / 2;
-      placed[below] += short / 2;
-    }
-  }
-  return placed;
 }
 
 /** Half the width of an arrowhead on an arrow `width` px wide. */

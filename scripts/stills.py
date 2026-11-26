@@ -2,11 +2,12 @@
 
 - static.webp and static-light.webp: the opening state, the Process map for all courts. Shown while
   the demo loads, and without JavaScript.
-- thumb.webp and thumb-light.webp: the same, for the project card. The stage is
-  shot at 720 x 450: small, so its arrows stay readable on the card, but no smaller than the site shows
-  it, so its labels have the room they have there. That's 16:10, the card's shape, centred on the
-  theme's page colour at 1200 x 675. The card trims those margins.
-- og.jpg: the same map at 1200 x 630, dark only, for link previews.
+- thumb.webp and thumb-light.webp: the Forecast tab on the case it opens on, for the project card
+  (Mark, 2026-11-26: it looks better there than the map). The stage is shot at 720 x 450: small, so
+  its text stays readable on the card, but no smaller than the site shows it, so its labels have the
+  room they have there. That's 16:10, the card's shape, centred on the theme's page colour at
+  1200 x 675. The card trims those margins.
+- og.jpg: the same forecast at 1200 x 630, dark only, for link previews.
 
 Serves the built demo (demo/dist/, from `npm run build`), opens it in a browser and screenshots the
 stage alone at 2x. Then rebuild, so the bundle carries the new stills.
@@ -76,11 +77,22 @@ def shoot(page, theme, width, height):
     return Image.open(io.BytesIO(png)).convert("RGB"), colour
 
 
+def show_tab(page, label):
+    """Switches to a tab. The rail is hidden for the stills, so its button is pressed from a script."""
+    page.evaluate(
+        "label => [...document.querySelectorAll('.sd-segment')]"
+        ".find((segment) => segment.textContent.trim() === label).querySelector('input').click()",
+        label,
+    )
+
+
 def render(browser, url, errors):
     stills = {}
     page = open_page(browser, url, errors)
     for theme in THEMES:
         stills["static", theme] = shoot(page, theme, 1200, 675)
+    show_tab(page, "Forecast")
+    page.wait_for_selector(".sd-forecast .sd-forecast-line")
     for theme in THEMES:
         stills["thumb", theme] = shoot(page, theme, 720, 450)
     stills["og", "dark"] = shoot(page, "dark", 800, 420)
