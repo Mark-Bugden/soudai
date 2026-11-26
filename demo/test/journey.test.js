@@ -5,7 +5,8 @@ import { test } from 'node:test';
 import { prepare } from '../src/data.js';
 import { moveLabel, notShown, route, routeText, share, wait } from '../src/format.js';
 import { ARCS, DRAWN, LISTED, PLACES, commonest, legallyFinal, mostCommon, moves, routes, shape, split } from '../src/journey.js';
-import { arrow, nearer, place, route as curve, spread } from '../src/views/map.js';
+import { stack } from '../src/reading.js';
+import { arrow, nearer, place, route as curve } from '../src/views/map.js';
 
 const raw = JSON.parse(readFileSync(new URL('../public/data/soudai.json', import.meta.url), 'utf8'));
 const data = prepare(raw);
@@ -197,9 +198,9 @@ test('labels shown all the time are plainly their arrow\'s; the rest wait for a 
 });
 
 test('values read off the curve are moved apart until they can be read', () => {
-  assert.deepEqual(spread([100, 50], 15), [100, 50]);
-  assert.deepEqual(spread([100, 95], 15), [105, 90]);
-  assert.deepEqual(spread([40], 15), [40]);
+  assert.deepEqual(stack([100, 50], 15), [100, 50]);
+  assert.deepEqual(stack([100, 95], 15), [105, 90]);
+  assert.deepEqual(stack([40], 15), [40]);
 });
 
 test('the map\'s text', () => {

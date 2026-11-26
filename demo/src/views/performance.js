@@ -1,41 +1,38 @@
 // The Performance tab: how well the model does on the cases registered in 2024–2025, which it never
-// trained on, over all courts.
+// trained on, over all courts, against the simpler method chosen in the rail, if any.
 //
-// - Calibration, of the method picked in the rail: for each band of 10 points, its mean forecast that a
-//   case is legally final within the months chosen there, against the share of those cases that were,
-//   each dot sized by its share of the forecasts, with the diagonal where the two agree. Hovering a dot
-//   reads it.
-// - Ranking: how often the model and three simpler methods, and the method picked if it isn't one of
-//   them, put two cases in the order they ended (concordance), for forecasts made at filing and 1, 3, 6
-//   and 12 months after, each named at its line's end. Hovering reads a landmark.
+// - Calibration: for each band of 10 points, a method's mean forecast that a case is legally final
+//   within the months chosen in the rail, against the share of those cases that were, each dot sized by
+//   its share of the forecasts, with the diagonal where the two agree.
+// - Ranking: how often a method puts two cases in the order they ended (concordance), for forecasts made
+//   at filing and 1, 3, 6 and 12 months after, each line named at its end.
 //
-// Each method keeps its colour on both charts: the model in the accent, the method picked in the muted
-// text colour, and the others in the curve colour. Hidden tables give both charts to screen readers.
-// Colours come from CSS classes (see demo.css), so a theme change needs no redraw.
+// The model is in the accent and the method it's compared with in grey, on both charts. Hovering either
+// chart reads it off its y axis, as on the Process map's curve, with no tooltips: everything else can be
+// read off the axes or the notes. Hidden tables give both charts to screen readers. Colours come from CSS
+// classes (see demo.css), so a theme change needs no redraw.
 
 import { h, s } from '../dom.js';
 import * as describe from '../format.js';
 import { BINS, LANDMARKS, METHODS, MODEL, calibration, counts, gap, ranking } from '../performance.js';
-import { createTooltip } from '../tooltip.js';
+import { clearReading, showReading, stack } from '../reading.js';
 
-const REACH = 16; // px from a dot within which the pointer finds it
 const LINE = 15; // px between the names at the ends of the ranking's lines
 const RANGE = [0.5, 0.8]; // the ranking's axis, from a coin toss
 const DOT = 4; // px, a landmark's dot on the ranking
 
-// A method's line and dots: the model's, the method picked's, or another's.
+// A method's line and dots: the model's, or the one it's compared with.
 const MARKS = {
   model: { line: 'sd-forecast-line', dot: 'sd-forecast-dot' },
-  picked: { line: 'sd-picked-line', dot: 'sd-picked-dot' },
-  other: { line: 'sd-curve-all', dot: 'sd-curve-dot' },
+  compared: { line: 'sd-picked-line', dot: 'sd-picked-dot' },
 };
+const marks = (key) => MARKS[key === MODEL ? 'model' : 'compared'];
+const method = (key) => METHODS.find((m) => m.key === key);
 
 export function createPerformance(host, data) {
   const { forecasts, cases } = counts(data);
-  let lines = [];
-  let picked = MODEL;
-  const role = (key) => (key === MODEL ? 'model' : key === picked ? 'picked' : 'other');
 
+  const legend = h('p', { class: 'sd-legend' });
   const calTitle = h('p', { class: 'sd-cal-title' });
   const calNote = h('p', { class: 'sd-note' });
   const calSvg = s('svg', { class: 'sd-chart', 'aria-hidden': 'true' });
@@ -44,60 +41,70 @@ export function createPerformance(host, data) {
   const rankBox = h('div', { class: 'sd-chart-box sd-perf-box' }, rankSvg);
   const calTable = h('table', { class: 'sd-sr-only' });
   const rankTable = h('table', { class: 'sd-sr-only' });
-  const legend = h('p', { class: 'sd-legend' });
   const el = h('div', { class: 'sd-perf' },
     h('div', { class: 'sd-case' },
       h('p', { class: 'sd-case-title' }, 'How well the model does'),
       h('p', { class: 'sd-case-meta' },
         `Its ${describe.count(forecasts)} forecasts for the ${describe.count(cases)} sampled cases registered in 2024–2025, made `
-        + 'at filing and 1, 3, 6 and 12 months after, against what happened. It was trained on cases registered in 2020–2023.')),
+        + 'at filing and 1, 3, 6 and 12 months after, against what happened. It was trained on cases registered in 2020–2023.'),
+      legend),
     h('div', { class: 'sd-perf-body' },
       h('div', { class: 'sd-half' }, calTitle, calNote, calBox),
       h('div', { class: 'sd-half' },
         h('p', { class: 'sd-cal-title' }, 'Which of two cases ends first'),
         h('p', { class: 'sd-note' },
-          'How often each method puts two cases in the order they ended (its concordance), comparing cases at the same '
+          'How often a method puts two cases in the order they ended (its concordance), comparing cases at the same '
           + 'point after filing. 50% is a coin toss.'),
-        legend,
         rankBox)),
     calTable,
     rankTable);
   host.append(el);
-  const calTip = createTooltip(calBox);
-  const rankTip = createTooltip(rankBox);
   const ruler = document.createElement('canvas').getContext('2d');
-  let calHover = null;
-  let rankHover = null;
+  let calRead = null; // what reading each chart needs
+  let rankRead = null;
 
-  function render({ horizon, method }) {
-    picked = method;
-    const chosen = METHODS.find((m) => m.key === method);
-    lines = ranking(data, method);
-    const points = calibration(data, method, horizon);
-    const mean = gap(data, method, horizon);
-    calTitle.textContent = `${chosen.name}: calibration within ${describe.months(horizon)}`;
+  function render({ horizon, compare }) {
+    const keys = compare ? [compare, MODEL] : [MODEL];
+    const series = keys.map((key) => ({ ...method(key), points: calibration(data, key, horizon), gap: gap(data, key, horizon) }));
+    const lines = ranking(data, compare);
+    const [model, other] = [series.at(-1), compare ? series[0] : null];
+
+    legend.hidden = !compare;
+    legend.replaceChildren(...(compare
+      ? [h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, 'This model'),
+        h('span', { class: 'sd-key sd-key-picked' }), h('span', { class: 'sd-legend-name' }, other.name)]
+      : []));
+    calTitle.textContent = `Calibration within ${describe.months(horizon)}`;
     calNote.textContent = 'Whether cases end as often as forecast. The forecasts of being legally final within '
       + `${describe.months(horizon)}, in bands of 10 points, against the share of those cases that were. On the diagonal `
-      + `the two agree, and a larger dot stands for more forecasts. On average the bands are ${describe.points(mean)} from it.`;
-    legend.replaceChildren(
-      h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, 'This model'),
-      ...(method === MODEL ? [] : [h('span', { class: 'sd-key sd-key-picked' }), h('span', { class: 'sd-legend-name' }, chosen.name)]),
-      h('span', { class: 'sd-key sd-key-diagonal' }), method === MODEL ? 'Simpler methods' : 'Others');
-    calibrationTable(points, horizon, chosen.name);
-    describeRanking();
-    calHover = drawCalibration(points, horizon, role(method));
-    rankHover = drawRanking();
-    calTip.hide();
-    rankTip.hide();
-    return describe.performanceLine({
-      forecasts, cases, horizon, name: chosen.name, gap: mean, ranking: lines.find((line) => line.key === method).values,
-    });
+      + `the two agree, and a larger dot stands for more forecasts. On average the bands are ${describe.points(model.gap)} from it `
+      + `for this model${other ? `, and ${describe.points(other.gap)} for ${other.the}` : ''}.`;
+
+    describeCalibration(series, horizon);
+    describeRanking(lines);
+    calRead = drawCalibration(series);
+    rankRead = drawRanking(lines);
+    return describe.performanceLine({ forecasts, cases, horizon, series, lines });
+  }
+
+  /** The hidden table of the calibration bands, a row per method and band. */
+  function describeCalibration(series, horizon) {
+    calTable.replaceChildren(
+      h('caption', {}, `Calibration within ${describe.months(horizon)}`),
+      h('thead', {}, h('tr', {}, ...['Method', 'Forecasts', 'Mean forecast', `Share legally final within ${describe.months(horizon)}`, 'Share of the forecasts']
+        .map((name) => h('th', { scope: 'col' }, name)))),
+      h('tbody', {}, ...series.flatMap(({ name, points }) => points.map((point) => h('tr', {},
+        h('th', { scope: 'row' }, name),
+        h('td', {}, band(point.bin)),
+        h('td', {}, describe.share(point.forecast)),
+        h('td', {}, describe.share(point.observed)),
+        h('td', {}, describe.share(point.share)))))));
   }
 
   /** The hidden table of each method's concordance at each landmark. */
-  function describeRanking() {
+  function describeRanking(lines) {
     rankTable.replaceChildren(
-      h('caption', {}, 'How often each method puts two cases in the order they ended, by when the forecast was made'),
+      h('caption', {}, 'How often a method puts two cases in the order they ended, by when the forecast was made'),
       h('thead', {}, h('tr', {},
         h('th', { scope: 'col' }, 'Method'),
         ...LANDMARKS.map((months) => h('th', { scope: 'col' }, months ? `${describe.months(months)} after filing` : 'At filing')))),
@@ -106,21 +113,8 @@ export function createPerformance(host, data) {
         ...line.values.map((v) => h('td', {}, describe.share(v)))))));
   }
 
-  /** The hidden table of the calibration bands. */
-  function calibrationTable(points, horizon, name) {
-    calTable.replaceChildren(
-      h('caption', {}, `${name}: calibration within ${describe.months(horizon)}`),
-      h('thead', {}, h('tr', {}, ...['Forecasts', 'Mean forecast', `Share legally final within ${describe.months(horizon)}`, 'Share of the forecasts']
-        .map((name) => h('th', { scope: 'col' }, name)))),
-      h('tbody', {}, ...points.map((point) => h('tr', {},
-        h('th', { scope: 'row' }, band(point.bin)),
-        h('td', {}, describe.share(point.forecast)),
-        h('td', {}, describe.share(point.observed)),
-        h('td', {}, describe.share(point.share))))));
-  }
-
-  /** The calibration chart, in a square that fits its box, in its method's colour. Returns what hovering it needs. */
-  function drawCalibration(points, horizon, kind) {
+  /** The calibration chart, in a square that fits its box: the comparison's dots, then the model's. */
+  function drawCalibration(series) {
     const width = calBox.clientWidth;
     const height = calBox.clientHeight;
     size(calSvg, width, height);
@@ -136,6 +130,7 @@ export function createPerformance(host, data) {
     const y = (p) => y0 - p * side;
 
     const nodes = [];
+    const ticks = [];
     const labelled = side >= 160 ? [0, 0.25, 0.5, 0.75, 1] : [0, 0.5, 1];
     for (const p of [0, 0.25, 0.5, 0.75, 1]) {
       const kind = p === 0 ? 'sd-axis-line' : 'sd-grid';
@@ -144,26 +139,33 @@ export function createPerformance(host, data) {
         s('line', { class: kind, x1: x(p), x2: x(p), y1: y(0), y2: y(1) }),
       );
       if (!labelled.includes(p)) continue;
-      nodes.push(
-        s('text', { class: 'sd-tick', x: x0 - 8, y: y(p), dy: '0.32em', 'text-anchor': 'end' }, `${p * 100}%`),
-        s('text', { class: 'sd-tick', x: x(p), y: y0 + 16, 'text-anchor': 'middle' }, `${p * 100}%`),
-      );
+      const tick = s('text', { class: 'sd-tick', x: x0 - 8, y: y(p), dy: '0.32em', 'text-anchor': 'end' }, `${p * 100}%`);
+      ticks.push({ tick, at: y(p) });
+      nodes.push(tick, s('text', { class: 'sd-tick', x: x(p), y: y0 + 16, 'text-anchor': 'middle' }, `${p * 100}%`));
     }
     nodes.push(
       s('text', { class: 'sd-tick', x: x(1), y: y0 + 30, 'text-anchor': 'end' }, 'Forecast probability'),
       s('text', { class: 'sd-tick', transform: `translate(12 ${y(1)}) rotate(-90)`, 'text-anchor': 'end' }, 'Share legally final'),
       s('line', { class: 'sd-diagonal', x1: x(0), y1: y(0), x2: x(1), y2: y(1) }),
     );
-    const most = Math.max(...points.map((point) => point.share));
-    const dots = points.map((point) => ({ ...point, cx: x(point.forecast), cy: y(point.observed), r: 3 + 6 * Math.sqrt(point.share / most) }));
-    if (dots.length) nodes.push(s('path', { class: MARKS[kind].line, d: polyline(dots.map((dot) => [dot.cx, dot.cy])) }));
-    for (const dot of dots) nodes.push(s('circle', { class: MARKS[kind].dot, cx: dot.cx, cy: dot.cy, r: dot.r }));
+    // Dots are sized by their share of the forecasts, on one scale for both methods.
+    const most = Math.max(...series.flatMap(({ points }) => points.map((point) => point.share)));
+    const dotted = series.map(({ key, points }) => ({
+      key,
+      dots: points.map((point) => ({ ...point, cx: x(point.forecast), cy: y(point.observed), r: 3 + 6 * Math.sqrt(point.share / most) })),
+    }));
+    for (const { key, dots } of dotted) {
+      if (dots.length) nodes.push(s('path', { class: marks(key).line, d: polyline(dots.map((dot) => [dot.cx, dot.cy])) }));
+      for (const dot of dots) nodes.push(s('circle', { class: marks(key).dot, cx: dot.cx, cy: dot.cy, r: dot.r }));
+    }
+    const reading = s('g', { class: 'sd-reading' });
+    nodes.push(reading);
     calSvg.replaceChildren(...nodes);
-    return { dots, horizon };
+    return { dotted, reading, ticks, x0, y, right: x(1) };
   }
 
   /** The ranking chart: a line per method across the landmarks, named at its end. */
-  function drawRanking() {
+  function drawRanking(lines) {
     const width = rankBox.clientWidth;
     const height = rankBox.clientHeight;
     size(rankSvg, width, height);
@@ -173,132 +175,90 @@ export function createPerformance(host, data) {
     }
     ruler.font = `600 12px ${getComputedStyle(rankSvg).fontFamily}`;
     const names = Math.max(...lines.map((line) => ruler.measureText(line.name).width));
-    const margin = { top: 8, right: names + 16, bottom: 36, left: 40 };
+    const margin = { top: 8, right: names + 16, bottom: 36, left: 52 };
     const x = (i) => margin.left + (i / (LANDMARKS.length - 1)) * (width - margin.left - margin.right);
     const y = (v) => height - margin.bottom - ((v - RANGE[0]) / (RANGE[1] - RANGE[0])) * (height - margin.top - margin.bottom);
 
     const nodes = [];
+    const ticks = [];
     for (let percent = RANGE[0] * 100; percent <= RANGE[1] * 100; percent += 10) {
       const v = percent / 100;
-      nodes.push(
-        s('line', { class: v === RANGE[0] ? 'sd-axis-line' : 'sd-grid', x1: x(0), x2: x(LANDMARKS.length - 1), y1: y(v), y2: y(v) }),
-        s('text', { class: 'sd-tick', x: margin.left - 8, y: y(v), dy: '0.32em', 'text-anchor': 'end' }, `${percent}%`),
-      );
+      const tick = s('text', { class: 'sd-tick', x: margin.left - 8, y: y(v), dy: '0.32em', 'text-anchor': 'end' }, `${percent}%`);
+      ticks.push({ tick, at: y(v) });
+      nodes.push(s('line', { class: v === RANGE[0] ? 'sd-axis-line' : 'sd-grid', x1: x(0), x2: x(LANDMARKS.length - 1), y1: y(v), y2: y(v) }), tick);
     }
     LANDMARKS.forEach((months, i) => {
       nodes.push(s('text', { class: 'sd-tick', x: x(i), y: height - margin.bottom + 16, 'text-anchor': 'middle' }, months ? String(months) : 'Filing'));
     });
     nodes.push(s('text', { class: 'sd-tick', x: x(LANDMARKS.length - 1), y: height - 4, 'text-anchor': 'end' }, 'Forecast made, months after filing'));
 
-    // The others first, then the method picked, so the model's line is on top.
-    const depth = { other: 0, picked: 1, model: 2 };
-    const order = [...lines].sort((a, b) => depth[role(a.key)] - depth[role(b.key)]);
-    for (const line of order) {
-      const marks = MARKS[role(line.key)];
-      nodes.push(s('path', { class: marks.line, d: polyline(line.values.map((v, i) => [x(i), y(v)])) }));
-      line.values.forEach((v, i) => nodes.push(s('circle', { class: marks.dot, cx: x(i), cy: y(v), r: role(line.key) === 'other' ? DOT - 1 : DOT })));
+    // The comparison first, so the model's line is on top.
+    for (const line of lines) {
+      const { line: path, dot } = marks(line.key);
+      nodes.push(s('path', { class: path, d: polyline(line.values.map((v, i) => [x(i), y(v)])) }));
+      line.values.forEach((v, i) => nodes.push(s('circle', { class: dot, cx: x(i), cy: y(v), r: DOT })));
     }
     const ends = stack(lines.map((line) => y(line.values.at(-1))), LINE);
     lines.forEach((line, i) => {
       nodes.push(s('text', {
-        class: role(line.key) === 'other' ? 'sd-end-name' : 'sd-end-name is-lit',
+        class: line.key === MODEL ? 'sd-end-name is-lit' : 'sd-end-name',
         x: x(LANDMARKS.length - 1) + 10,
         y: ends[i],
         dy: '0.32em',
       }, line.name));
     });
-    const cross = s('g', { class: 'sd-cross' });
-    nodes.push(cross);
+    const reading = s('g', { class: 'sd-reading' });
+    nodes.push(reading);
     rankSvg.replaceChildren(...nodes);
-    return { x, y, cross, top: margin.top, bottom: height - margin.bottom };
+    return { lines, x, y, reading, ticks, left: margin.left };
   }
 
-  // Hovering the calibration: the nearest dot's band, its mean forecast and what happened.
+  // Reading the calibration off its y axis, at the model's band nearest the pointer, and the comparison's
+  // band of the same forecasts.
   calSvg.addEventListener('pointermove', (event) => {
-    if (!calHover) return;
-    const box = calSvg.getBoundingClientRect();
-    const px = event.clientX - box.left;
-    const py = event.clientY - box.top;
-    let found = null;
-    let distance = REACH;
-    for (const dot of calHover.dots) {
-      const d = Math.hypot(dot.cx - px, dot.cy - py) - dot.r;
-      if (d < distance) {
-        found = dot;
-        distance = d;
-      }
-    }
-    if (!found) {
-      calTip.hide();
+    if (!calRead) return;
+    const px = event.clientX - calSvg.getBoundingClientRect().left;
+    const { dotted, reading, ticks, x0, y, right } = calRead;
+    const model = dotted.at(-1).dots;
+    if (px < x0 - 8 || px > right + 8 || !model.length) {
+      clearReading(reading, ticks);
       return;
     }
-    calTip.show([
-      `Forecasts of ${band(found.bin)}`,
-      `${describe.percent(found.forecast)} on average`,
-      `${describe.percent(found.observed)} were legally final within ${describe.months(calHover.horizon)}`,
-      `${describe.percent(found.share)} of the forecasts`,
-    ], { x: found.cx, y: found.cy - found.r });
+    const near = model.reduce((best, dot) => (Math.abs(dot.cx - px) < Math.abs(best.cx - px) ? dot : best));
+    const values = dotted.map(({ key, dots }) => [key, dots.find((dot) => dot.bin === near.bin)])
+      .filter(([, dot]) => dot)
+      .map(([key, dot]) => ({ cx: dot.cx, at: dot.cy, r: dot.r, text: describe.percent(dot.observed), dot: marks(key).dot }));
+    showReading(reading, { x: near.cx, top: y(1), bottom: y(0), left: x0, values, ticks });
   });
-  calSvg.addEventListener('pointerleave', () => calTip.hide());
+  calSvg.addEventListener('pointerleave', () => calRead && clearReading(calRead.reading, calRead.ticks));
 
-  // Hovering the ranking: the nearest landmark, with every method's value there.
+  // Reading the ranking off its y axis, at the nearest landmark.
   rankSvg.addEventListener('pointermove', (event) => {
-    if (!rankHover) return;
-    const box = rankSvg.getBoundingClientRect();
-    const px = event.clientX - box.left;
-    const { x, y, cross, top, bottom } = rankHover;
+    if (!rankRead) return;
+    const px = event.clientX - rankSvg.getBoundingClientRect().left;
+    const { lines, x, y, reading, ticks, left } = rankRead;
     const i = Math.round(((px - x(0)) / (x(LANDMARKS.length - 1) - x(0))) * (LANDMARKS.length - 1));
     if (i < 0 || i >= LANDMARKS.length) {
-      clearRanking();
+      clearReading(reading, ticks);
       return;
     }
-    cross.replaceChildren(
-      s('line', { class: 'sd-cross-line', x1: x(i), x2: x(i), y1: top, y2: bottom }),
-      ...lines.map((line) => s('circle', { class: MARKS[role(line.key)].dot, cx: x(i), cy: y(line.values[i]), r: DOT + 1 })),
-    );
-    const sorted = [...lines].sort((a, b) => b.values[i] - a.values[i]);
-    rankTip.show([
-      LANDMARKS[i] ? `Forecasts made ${describe.months(LANDMARKS[i])} after filing` : 'Forecasts made at filing',
-      ...sorted.map((line) => `${line.name}: ${describe.share(line.values[i])}`),
-    ], { x: x(i), y: y(Math.max(...lines.map((line) => line.values[i]))) - DOT });
+    showReading(reading, {
+      x: x(i),
+      top: y(RANGE[1]),
+      bottom: y(RANGE[0]),
+      left,
+      values: lines.map((line) => ({ cx: x(i), at: y(line.values[i]), text: describe.share(line.values[i]), dot: marks(line.key).dot })),
+      ticks,
+    });
   });
-  rankSvg.addEventListener('pointerleave', clearRanking);
-
-  function clearRanking() {
-    rankHover?.cross.replaceChildren();
-    rankTip.hide();
-  }
+  rankSvg.addEventListener('pointerleave', () => rankRead && clearReading(rankRead.reading, rankRead.ticks));
 
   return {
     render,
     destroy() {
-      calTip.destroy();
-      rankTip.destroy();
       el.remove();
     },
   };
-}
-
-/**
- * Places labels as near the positions `wanted` as they can be while at least `apart` px apart, in the same
- * order. Labels that would overlap form a block centred where its labels want to be, on average, and
- * blocks that then overlap merge, so any number of crowded labels come apart.
- */
-export function stack(wanted, apart) {
-  const order = wanted.map((at, i) => i).sort((a, b) => wanted[a] - wanted[b]);
-  const blocks = []; // { members, sum }: a block's first label goes at sum / members.length
-  for (const i of order) {
-    let block = { members: [i], sum: wanted[i] };
-    for (let last = blocks.at(-1); last && last.sum / last.members.length + last.members.length * apart > block.sum / block.members.length; last = blocks.at(-1)) {
-      blocks.pop();
-      // The block's labels each sit `apart` further down than the one before.
-      block = { members: [...last.members, ...block.members], sum: last.sum + block.sum - block.members.length * last.members.length * apart };
-    }
-    blocks.push(block);
-  }
-  const placed = [...wanted];
-  for (const { members, sum } of blocks) members.forEach((i, k) => { placed[i] = sum / members.length + k * apart; });
-  return placed;
 }
 
 /** A calibration band: "70–80%". */

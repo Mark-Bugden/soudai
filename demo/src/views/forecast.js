@@ -9,6 +9,9 @@
 //   the forecast, which is the line in the accent across both;
 // - for a real case, the day it ended, or its record ran out, as a line in the contrasting highlight.
 //
+// Hovering the forecast reads it off its y axis, as on the other charts. There are no tooltips: the
+// events' dates can be read off the time axis, and the hidden list gives them to screen readers.
+//
 // A custom case has nothing after the forecast, so its axis runs to 12 months after the day of the
 // forecast.
 //
@@ -18,7 +21,7 @@ import { ending, forecast, outcome, soFar } from '../cases.js';
 import { h, s } from '../dom.js';
 import { MONTH, within } from '../forecast.js';
 import * as describe from '../format.js';
-import { createTooltip } from '../tooltip.js';
+import { clearReading, showReading } from '../reading.js';
 
 const AHEAD = 12; // months of the forecast drawn
 const OUTCOME = { yes: 'It did', no: 'It didn\'t', unknown: 'Not known' };
@@ -30,7 +33,6 @@ const OUTCOME_TITLE = {
 const LANE = [13, 20]; // px per lane of events, at least and at most
 const PANEL = 110; // px: the forecast's panel is at least this tall, if the lanes can shrink to fit
 const DOT = 4.5; // px, an event's radius
-const REACH = 14; // px from a dot within which the pointer finds it
 const STAGE_ORDER = Object.keys(describe.STAGES);
 
 export function createForecast(host, data) {
@@ -55,9 +57,9 @@ export function createForecast(host, data) {
     chart,
     events);
   host.append(el);
-  const tip = createTooltip(chart);
+  const ruler = document.createElement('canvas').getContext('2d');
 
-  let hover = null; // what the pointer can find: { dots, forecast }
+  let read = null; // what reading the forecast off its y axis needs
 
   function render({ item, day }) {
     const so = soFar(item, day);
@@ -80,7 +82,6 @@ export function createForecast(host, data) {
       `${when(item, event.day)}: ${event.code.gloss}${event.day > day ? ' (after the forecast)' : ''}`)));
 
     draw(item, day, still, end);
-    tip.hide();
     return item.made
       ? describe.customLine(item, day, chances, data.horizons)
       : describe.forecastLine(item, day, chances, data.horizons, end);
@@ -94,7 +95,7 @@ export function createForecast(host, data) {
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
     if (width < 40 || height < 80) {
       svg.replaceChildren();
-      hover = null;
+      read = null;
       return;
     }
 
@@ -124,14 +125,19 @@ export function createForecast(host, data) {
       labels.push(s('text', { class: 'sd-label', x: left - 10, y: laneY(stage), dy: '0.32em', 'text-anchor': 'end' }, describe.STAGES[stage]));
     }
 
-    // The forecast panel: gridlines at 0, 50% and 100%, and its title.
+    // The forecast panel: gridlines at 0, 50% and 100%, and the y axis's title, along it where it fits
+    // and otherwise above it.
+    const ticks = [];
     for (const p of [0, 0.5, 1]) {
-      nodes.push(
-        s('line', { class: p === 0 ? 'sd-axis-line' : 'sd-grid', x1: left, x2: width - right, y1: y(p), y2: y(p) }),
-        s('text', { class: 'sd-tick', x: left - 10, y: y(p), dy: '0.32em', 'text-anchor': 'end' }, `${p * 100}%`),
-      );
+      const tick = s('text', { class: 'sd-tick', x: left - 10, y: y(p), dy: '0.32em', 'text-anchor': 'end' }, `${p * 100}%`);
+      ticks.push({ tick, at: y(p) });
+      nodes.push(s('line', { class: p === 0 ? 'sd-axis-line' : 'sd-grid', x1: left, x2: width - right, y1: y(p), y2: y(p) }), tick);
     }
-    labels.push(s('text', { class: 'sd-label', x: left + 6, y: panelTop - 10 }, 'Probability it is legally final'));
+    ruler.font = `400 12px ${getComputedStyle(svg).fontFamily}`;
+    const yTitle = 'Probability it is legally final';
+    labels.push(ruler.measureText(yTitle).width + 8 <= panelBottom - panelTop
+      ? s('text', { class: 'sd-tick', transform: `translate(12 ${(panelTop + panelBottom) / 2}) rotate(-90)`, 'text-anchor': 'middle' }, yTitle)
+      : s('text', { class: 'sd-label', x: 0, y: panelTop - 10 }, yTitle));
 
     // The time axis: months after filing.
     const step = [1, 2, 3, 6, 12, 24].find((m) => x(m * MONTH) - x(0) >= 44) ?? 24;
@@ -169,7 +175,6 @@ export function createForecast(host, data) {
     labels.push(s('text', { class: 'sd-now-label', x: Math.min(Math.max(nowX, left + 26), width - right - 26), y: top - 8, 'text-anchor': 'middle' }, 'Forecast'));
 
     // Events: one dot per lane and day, those after the forecast in the curve colour.
-    const dots = [];
     const byDot = new Map();
     for (const event of item.events) {
       const key = `${event.code.lane}:${event.day}`;
@@ -178,72 +183,42 @@ export function createForecast(host, data) {
     }
     for (const dot of byDot.values()) {
       if (!lanes.includes(dot.lane)) continue;
-      dot.x = x(dot.day);
-      dot.y = laneY(dot.lane);
-      nodes.push(s('circle', { class: dot.day <= day ? 'sd-event' : 'sd-event is-next', cx: dot.x, cy: dot.y, r: DOT }));
-      dots.push(dot);
+      nodes.push(s('circle', { class: dot.day <= day ? 'sd-event' : 'sd-event is-next', cx: x(dot.day), cy: laneY(dot.lane), r: DOT }));
     }
 
-    const cross = s('g', { class: 'sd-cross' });
-    nodes.push(...labels, cross);
+    const reading = s('g', { class: 'sd-reading' });
+    nodes.push(...labels, reading);
     svg.replaceChildren(...nodes);
-    hover = { item, day, still, dots, x, y, panelTop, panelBottom, cross };
+    read = { day, still, x, y, left, panelTop, panelBottom, reading, ticks };
   }
 
-  // Hover: an event's dot gives its events; the forecast panel gives the chance at the nearest month.
+  // Reading the forecast off its y axis, at the nearest month after the day of the forecast, while the
+  // pointer is over its panel.
   function onMove(event) {
-    if (!hover) return;
+    if (!read) return;
     const box = svg.getBoundingClientRect();
     const px = event.clientX - box.left;
     const py = event.clientY - box.top;
-    const { item, day, still, dots, x, y, panelTop, panelBottom, cross } = hover;
-    cross.replaceChildren();
-
-    let best = null;
-    let bestDistance = REACH;
-    for (const dot of dots) {
-      const distance = Math.hypot(dot.x - px, dot.y - py);
-      if (distance < bestDistance) {
-        best = dot;
-        bestDistance = distance;
-      }
-    }
-    if (best) {
-      const lines = [when(item, best.day), ...best.events.map((e) => e.code.gloss)];
-      if (best.day > day) lines.push('After the forecast');
-      tip.show(lines, { x: best.x, y: best.y - DOT });
+    const { day, still, x, y, left, panelTop, panelBottom, reading, ticks } = read;
+    const months = Math.round((px - x(day)) / (x(day + MONTH) - x(day)));
+    if (py < panelTop - 8 || months < 1 || months > AHEAD) {
+      clearReading(reading, ticks);
       return;
     }
-
-    if (py >= panelTop - 8 && py <= panelBottom + 8) {
-      const months = Math.round(((px - x(day)) / (x(day + MONTH) - x(day))));
-      if (months >= 1 && months <= AHEAD) {
-        const at = day + months * MONTH;
-        const p = 1 - still[months - 1];
-        cross.append(
-          s('line', { class: 'sd-cross-line', x1: x(at), x2: x(at), y1: panelTop, y2: panelBottom }),
-          s('circle', { class: 'sd-forecast-dot', cx: x(at), cy: y(p), r: DOT }),
-        );
-        const by = describe.date(describe.addDays(item.filed, Math.round(at)));
-        tip.show([`${describe.percent(p)} within ${describe.months(months)}`, `By ${by}`], { x: x(at), y: y(p) - DOT });
-        return;
-      }
-    }
-    tip.hide();
-  }
-
-  function onLeave() {
-    hover?.cross.replaceChildren();
-    tip.hide();
+    const at = x(day + months * MONTH);
+    const p = 1 - still[months - 1];
+    showReading(reading, {
+      x: at, top: panelTop, bottom: panelBottom, left, inset: 10, ticks,
+      values: [{ cx: at, at: y(p), text: describe.percent(p), dot: 'sd-forecast-dot', r: DOT }],
+    });
   }
 
   svg.addEventListener('pointermove', onMove);
-  svg.addEventListener('pointerleave', onLeave);
+  svg.addEventListener('pointerleave', () => read && clearReading(read.reading, read.ticks));
 
   return {
     render,
     destroy() {
-      tip.destroy();
       el.remove();
     },
   };

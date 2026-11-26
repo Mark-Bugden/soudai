@@ -5,23 +5,29 @@
 const FEATURES = 'its court and stage, the time since filing, since its last event and in its stage, its number of '
   + 'hearings, and whether it has been decided, appealed or revived';
 
-/** Every method scored, the demo's model first and then from the simplest, with what each one is. */
+/**
+ * Every method scored, the demo's model first and then from the simplest, with its name in running text
+ * (`the`) and what it is (`about`).
+ */
 export const METHODS = [
   {
     key: 'gru ensemble',
     name: 'This model',
+    the: 'this model',
     about: 'Five recurrent neural networks, which read a case\'s events one by one, with their forecasts averaged. It\'s '
       + 'the model on the Forecast tab.',
   },
   {
     key: 'court average',
     name: 'Court average',
+    the: 'the court average',
     about: 'How long the court\'s cases registered in 2020–2023 took to end, counted from the day of the forecast. It '
       + 'knows only the court and the time since filing.',
   },
   {
     key: 'process map',
     name: 'Process map',
+    the: 'the process map',
     about: 'The Process map\'s numbers for a single case: of the court\'s cases registered in 2020–2023 that were in '
       + 'the same stage (such as decided, or on appeal), and had been in it about as long, the share that ended within '
       + 'each time. It knows nothing of how the case got there, or when it was filed.',
@@ -29,16 +35,19 @@ export const METHODS = [
   {
     key: 'cox',
     name: 'Cox model',
+    the: 'the Cox model',
     about: `A Cox proportional hazards model, a standard statistical model of the time until an event, given features of the case chosen by hand: ${FEATURES}.`,
   },
   {
     key: 'trees',
     name: 'Boosted trees',
+    the: 'the boosted trees',
     about: `Gradient-boosted decision trees (LightGBM), a standard machine-learning method for tables of data, given features of the case chosen by hand: ${FEATURES}.`,
   },
   {
     key: 'features network',
     name: 'Network on features',
+    the: 'the network on features',
     about: `The output layers of this model's networks, given features of the case chosen by hand instead of its events: ${FEATURES}.`,
   },
 ];
@@ -46,8 +55,9 @@ export const METHODS = [
 /** The model the demo runs. */
 export const MODEL = 'gru ensemble';
 
-/** The methods always on the ranking chart, from the simplest to the model, besides the one picked. */
-const RANKED = ['court average', 'process map', 'trees', MODEL];
+/** The method the model is compared with at first: the simplest. */
+export const FIRST = 'court average';
+
 /** The landmarks: forecasts made at filing, and this many months after it. */
 export const LANDMARKS = [0, 1, 3, 6, 12];
 
@@ -83,12 +93,11 @@ export function calibration(data, model, horizon) {
 export const gap = (data, model, horizon) => scores(data, model, 'all')(`calibration_${horizon}`);
 
 /**
- * The methods on the ranking chart, from the simplest to the model, each with its concordance at each
- * landmark as `values`, in the order of LANDMARKS: the court average, the process map, the trees and the
- * model, and the method `picked` if it isn't one of them.
+ * The method compared with the model, if any (`compare`, a key or null), and then the model, each with its
+ * concordance at each landmark as `values`, in the order of LANDMARKS.
  */
-export function ranking(data, picked = MODEL) {
-  const keys = RANKED.includes(picked) ? RANKED : [...RANKED.slice(0, -1), picked, MODEL];
+export function ranking(data, compare = null) {
+  const keys = compare ? [compare, MODEL] : [MODEL];
   return keys.map((key) => METHODS.find((method) => method.key === key))
     .map((method) => ({ ...method, values: LANDMARKS.map((when) => scores(data, method.key, when)('concordance')) }));
 }
