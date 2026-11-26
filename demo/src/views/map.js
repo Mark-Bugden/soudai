@@ -64,7 +64,7 @@ export function createMap(host, data) {
 
   function render({ court }) {
     const journey = data.journey(court);
-    meta.textContent = 'Median time between stages, and percentage of cases following each route.';
+    meta.textContent = 'The share of cases making each move, and the median wait between stages.';
     const list = moves(journey, data.stages);
     const { drawn, rest: left } = split(list);
     describeMoves(list);
