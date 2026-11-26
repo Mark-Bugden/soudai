@@ -8,7 +8,7 @@ It is also the handover document. Any agent should be able to read it, find the 
 
 The demo shows how civil cases move through Czech district courts, and how long they take. It has three tabs (settled with Mark on 2026-11-25):
 
-1. **Forecast,** the opening tab. A model gives the chance that a case ends within 1, 3, 6 or 12 months, from its history so far (see "The remaining-time model"). The visitor tries it on a real past case, picked at random or by court and case number, or on a made-up case they describe. The tab also shows how well the model does against simpler methods.
+1. **Forecast,** the opening tab. A model gives the chance that a case ends within 1, 3, 6 or 12 months, from its history so far (see "The remaining-time model"). The visitor tries it on a real past case, picked at random or by court and case number, or on a custom case they describe. The tab showed how well the model does against simpler methods until 2026-11-26, when Mark dropped that from the demo for now (see step 8).
 2. **Process map.** The journey of a civil case from filing to a legally final decision: the routes cases take, how many take each one, and how long each step lasts. A visitor can compare one court with the whole country.
 3. **Courts,** added after the demo goes live. A map of the district courts, coloured by cases registered per year, backlog or typical time to a decision. Beside it, how close an estimate of a court's caseload, made from its published decisions alone (the German tank method), gets to the exact count.
 
@@ -242,8 +242,8 @@ Decided with Mark on 2026-11-23. He wants the portfolio to show more machine lea
   - a transformer as a further comparison.
 - **In the demo** (settled with Mark on 2026-11-25). The model is the opening Forecast tab, and it's built before the backlog.
   - **Real past cases:** 1,720 from the test years, 20 per court (Mark, 2026-11-26), carried in the demo with their histories and what happened next. A visitor picks one at random or by court and case number.
-  - **Made-up cases:** the visitor gives the court and the events so far, and the demo runs the network itself, so its forward pass is ported to JS and checked against the Python.
-  - **How well it does:** the scores of the model and the simpler methods side by side, and its calibration.
+  - **Made-up cases** (custom cases since v0.12.0): the visitor gives the court and the events so far, and the demo runs the network itself, so its forward pass is ported to JS and checked against the Python.
+  - **How well it does:** the scores of the model and the simpler methods side by side, and its calibration. Dropped from the demo on 2026-11-26 (Mark): he may bring it back somewhere else.
 
 ### Backlog
 
@@ -281,11 +281,11 @@ Compare national and court intake with the Ministry of Justice's official statis
 | | |
 | --- | --- |
 | Tabs | Forecast (opening) and Process map, then Courts after the demo goes live (step 10). They're switched with buttons at the top of the controls rail, and the rail shows only the controls the current tab uses. |
-| Forecast | Pick a real past case, at random or by court and case number, or describe a made-up one: its court and its events so far. It shows the case's history so far and the chances it ends within 1, 3, 6 and 12 months. For a real case, it also shows what happened next. |
-| How well it does | A "Show" switch in the rail flips the Forecast tab between a case and how well the model does, since the two don't fit one stage (Mark, 2026-11-26): the scores of the model and the simpler methods side by side, and a calibration chart. |
+| Forecast | Pick a court, then a real past case from its menu (or at random), or "Custom case", and give its filing date, its events and the date of the forecast. It shows the case's history so far and the chances it ends within 1, 3, 6 and 12 months. For a real case, it also shows what happened next. |
+| How well it does | Dropped from the demo on 2026-11-26 (Mark), with the "Show" switch it had: Mark may bring it back somewhere else. The export still carries the scores and calibration. |
 | Process map | A flow diagram of the stages a civil case passes through, with the appeal loop as a side branch. Each edge's thickness is the share of cases that take it, and its label is the median wait. Hovering an edge gives its share, median and interquartile range. |
 | Time to a decision | Beside the diagram: the share of cases not yet decided, and not yet legally final, t months after filing, for the selected court against all courts. |
-| Court selector | All courts, or one court, with search by name. Search ignores diacritics, so "Decin" finds Děčín. The selection is shared by all the tabs. |
+| Court selector | Two drop-downs, with no typing (Mark, 2026-11-26): the type of court (okresní, obvodní or městský soud), then its location, listing only that type's. The Process map also offers all courts; the Forecast tab always has a court. The selection is shared by the tabs. |
 | Courts (step 10) | A map of the district courts (see "Open questions" for areas or seats), coloured by the chosen measure: cases registered per year, backlog, or median time to a decision. Clicking a court selects it. |
 | Court panel (step 10) | For the selected court: exact intake by year beside the German tank estimate and its interval, and its backlog. |
 | Tank explainer (step 10) | Stretch goal: reveal a court's published case numbers a few at a time and watch the estimate close in on the exact count. |
@@ -310,11 +310,10 @@ Compare national and court intake with the Ministry of Justice's official statis
 ```
 demo/                          the site bundle, built with demo-kit (see the site contract)
   src/main.js                  frame, controls, view switching and shared state
-  src/controls.js              the tab switch and the court search (adapted from doctor-who-ratings')
-  src/courts.js, data.js, format.js   court search, lookups over the data, and the status line's text
-  src/cases.js                 the real past cases: search, random pick, and what happened next
+  src/controls.js              the tab switch (adapted from doctor-who-ratings'), drop-downs, dates and the events list
+  src/courts.js, data.js, format.js   the courts by type, lookups over the data, and the status line's text
+  src/cases.js                 the real past cases (random pick, what happened next) and custom cases
   src/tooltip.js               the charts' tooltip (adapted from doctor-who-ratings')
-  src/scores.js                how well it does: the methods' scores and calibration, from the export
   src/journey.js               the process map's numbers: moves, the commonest route, the curves
   src/views/                   forecast, process map, courts
   src/forecast.js              the network's forward pass, ported from Python, for made-up cases
@@ -891,11 +890,27 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - Drafted on 2026-11-26 at Mark's request, for him to reword. The tagline keeps his old one with "civil" added: "Predicting how long civil court cases in the Czech Republic take." The summary is built from the README's sentences. The tags are machine learning, neural networks, survival analysis and data scraping. `index.html`'s description is the tagline.
   - **The site lists the project** once this release is out and the site's write-up (`content/projects/soudai.md`, in Mark-Bugden.github.io) is out of draft. A site PR does that after this release, with a draft write-up (see step 9). The site's build fails if the write-up is published while the bundle is a stub, so the order matters.
   - **Previewed** on the site's own build, with this bundle in place: the project is listed first on the Projects page and the home page (they sort by title), the "More info" tab shows the tagline, "In progress", the write-up and the model card, and the site's offline link check passes. The home page now has four cards, so the fourth sits alone on a second row; `order:` in the site's `data/projects.yaml` can change which come first.
-- [ ] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
+- [x] Tell Mark the release is out, so the project page can be listed once its write-up is out of draft.
+  - v0.11.0 was released on 2026-11-26, and Mark merged site PR #55 (https://github.com/Mark-Bugden/Mark-Bugden.github.io/pull/55) the same day, which took the write-up out of draft. So the project is listed, as in progress.
+- [x] New controls for the Forecast tab, and the model card in a tab of its own on the site (v0.12.0).
+  - **Asked for by Mark on 2026-11-26:** the controls weren't intuitive. The court is chosen from drop-downs only, with no typing; the case from a drop-down of the court's cases, which also offers a custom case; a custom case's events and forecast are given as calendar dates; and the Forecast tab shows only a case. He settled the details that day:
+    - **"How well it does" is dropped** from the demo for now, with the "Show" switch. He may bring it back somewhere else. `scores.js` and its view and tests are gone (they're in v0.11.0), and the export still carries the scores and calibration, unused.
+    - **The court:** "Court" has two drop-downs, the type (Okresní soud, 75 courts; Obvodní soud, Prague's 10; Městský soud, Brno) and then the location, listing only that type's courts, in Czech order. Choosing a type chooses its first location. A location is the court's name without its type: "Děčín", "Praha 1", "Brno" (`courts.byType`).
+    - **The Forecast tab always has a court.** Only the Process map offers "All courts", which hides the location. A court chosen on either tab is the other's too, and the Forecast tab keeps its last court when the map shows all courts. So the forecast averaged over all courts is gone from the demo; `stillOpen` still takes several courts, and its test stays.
+    - **The case** drop-down lists "Custom case", then the court's 20 real past cases under "Real past cases", by year, senate and number. The die beside it stays, and picks one of the court's real cases. The case search box is gone.
+    - **A custom case** (it was "made-up") takes dates, from the browser's own calendar: "Filed on", its events, each listed under it with a button to remove it, "Add an event" (an event and its date, then "Add"), and "Forecast on". It starts filed today, with the forecast today. Events go in order of date, after any on the same day. The filing can't come after the first event or more than 36 months before the last, events go from the filing to 36 months after, and the forecast from the last event to 36 months after the filing. A date outside its range is moved into it, and moving the filing keeps the events' dates (`cases.refile`). Undo and Start again are gone, since each event can be removed.
+    - The forecast view and the status line give a custom case's dates, as a real case's: "Custom case, Okresní soud Děčín, on 1 December 2025, day 215. …"
+  - **The rail.** For a real case it's 401 px tall (469 before). A custom case's is 624 px with no events (529 before, for a made-up one), and each event adds about 30 px, up to 9.5rem, after which the list scrolls. The dates' labels sit beside them, as in the layout Mark picked, and the date goes below its label in a narrow rail. Going by step 8's measurements, a real case now fits the window at all four sizes, and a custom case only at 1920 × 960 with no events; not measured on the site's build.
+  - **The model card** gets a tab of its own beside "More info" on the project page, at Mark's request. The site draws the card from the manifest, so that's a site PR, and only soudai's manifest has a card.
+  - **Tests:** the case search's and the scores' tests are gone, and 6 new: the courts by type and their order, custom cases' events in order of date and their removal, moving the filing, and the status line. 34 in all.
+  - **Checked in Edge,** with the built bundle, in both themes at 1280 × 800 and at 390 px: the type and location menus, a real case from the menu and from the die, the slider, a custom case built with the Děčín case's dates (see below), dates typed out of range, removing an event (the focus stays in the list), the Process map with all courts and with Děčín, and back. No console errors, and no sideways scroll on the phone. The stills shoot only the stage, which hasn't changed, so they stay.
+  - **Mark asked about 22 C 269/2025 at Děčín**, whose decision comes before its hearing: filed 30 April 2025, decision 17 September, remedy filed 30 September, revived 2 October, hearings 26 November and 29 April 2026, legally final 30 May 2026. The first decision was set aside, and the hearings belong to the second round. Weighted, 2.7% of cases have a decision and then a later hearing, and 96% of those were revived in between, none of them by an appeal court. That's step 6's revival pattern, probably a payment order the defendant objected to (inferred). 18.5% of cases have a decision and no hearing at all.
+
 
 ### 9. Write-up: release status `live`
-- [ ] Draft the write-up in `docs/writeup.md` for Mark, including a plain statement that nothing here is legal advice.
+- [x] Draft the write-up in `docs/writeup.md` for Mark, including a plain statement that nothing here is legal advice.
   - Changed on 2026-11-26: Mark asked for the draft on the site itself, to judge it there. It goes in `content/projects/soudai.md` in the site repo, in the site's FAQ form, after v0.11.0 is released: what the demo shows (and that it isn't legal advice), the data, how cases are counted, the journey, how the forecast works, how well it does, its limits, and how it was made. English only for now; the Czech and German pages follow once the English settles, as for the other projects.
+  - **Live since site PR #55** (merged 2026-11-26): the legal disclaimer opens "More info", always visible, above eight questions in the FAQ form, which are a draft for Mark to reword. The site PR that gives the model card its tab (v0.12.0, step 8) also drops the sentence on "How well it does", which the demo no longer has.
 - [ ] Set `status: "live"` once Mark agrees, in a PR that bumps the version.
 
 ### 10. The Courts tab (after the demo is live)
@@ -911,7 +926,8 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
 ## For Mark, on the site
 
 - **The write-up.** `content/projects/soudai.md` is a draft with a TODO, which asks for a plain statement that the predictions aren't legal advice. The project makes predictions again, since 2026-11-23 (see "The remaining-time model"), so the statement matters. Since 2026-11-26 an agent drafts it there for Mark to reword (see step 9).
-- **The copy.** The manifest's tagline, summary, tags and model card are drafts since v0.11.0 (see step 8), for Mark to reword.
+- **The copy.** The manifest's tagline, summary, tags and model card are drafts since v0.11.0 (see step 8), for Mark to reword. The summary and the README still say a visitor can "see how well it does against simpler methods", which the demo no longer shows (since v0.12.0); the model card on the site still compares it with the trees.
+- **The model card's tab.** Since v0.12.0 the project page shows the model card in a tab of its own beside "More info", from a site PR.
 - **The README.** Reworded for the three tabs and the model on 2026-11-25, at Mark's request, keeping his wording where it still held. He edits it.
 - **Status.** The site lists the project once a release is `in-progress` or `live` and the write-up is out of draft.
 

@@ -3,12 +3,11 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import {
-  MOST_EVENTS, add, ending, findCases, forecast, madeUp, offered, ordered, outcome, pick, soFar, undo,
+  LONGEST, MOST_EVENTS, add, custom, ending, filingRange, forecast, offered, ordered, outcome, pick, refile, remove, soFar,
 } from '../src/cases.js';
-import { normalise, searchIndex } from '../src/courts.js';
 import { prepare } from '../src/data.js';
 import { MONTH, stillOpen } from '../src/forecast.js';
-import { addDays, date, forecastLine, madeUpLine, months, next, percent } from '../src/format.js';
+import { addDays, customLine, date, forecastLine, months, next, percent } from '../src/format.js';
 
 const raw = JSON.parse(readFileSync(new URL('../public/data/soudai.json', import.meta.url), 'utf8'));
 const data = prepare(raw);
@@ -41,25 +40,10 @@ test('every event the real cases have is on a lane of the timeline', () => {
 
 test('a court\'s cases are in order of year, senate and number', () => {
   const court = data.court('OSSCEDC');
-  const labels = ordered(court.cases, [court]).map((item) => [item.year, item.senate, item.number]);
+  const labels = ordered(court.cases).map((item) => [item.year, item.senate, item.number]);
   const sorted = [...labels].sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]);
   assert.deepEqual(labels, sorted);
-  const all = ordered(data.cases, searchIndex(data.courts).map((entry) => entry.court));
-  assert.equal(all.length, data.cases.length);
-  assert.equal(all[0].court.area, 'Benešov');
-});
-
-test('finds a case by its number, in whole parts first', () => {
-  const cases = data.court('OSJIMJI').cases;
-  for (const query of ['18 C 33/2024', '18 c 33 2024', '33/2024', '18 C 33']) {
-    assert.equal(findCases(cases, query)[0].label, '18 C 33/2024', query);
-  }
-  // A part of the number that starts with the query, such as 33 in 333/2024, counts too.
-  const found = findCases(cases, '33');
-  assert.ok(found.length >= 1);
-  assert.ok(found.every((item) => ` ${normalise(item.label)}`.includes(' 33')));
-  assert.deepEqual(findCases(cases, 'nothing'), []);
-  assert.equal(findCases(cases, '  ').length, cases.length);
+  assert.equal(labels.length, 20);
 });
 
 test('picks a case at random, never the one shown when there is a choice', () => {
@@ -133,19 +117,7 @@ test('says what happened next, and the status line gives the forecast', () => {
   assert.match(forecastLine(item, 177, [0.5, 0.9, 0.99, 1], [1, 3, 6, 12], 'final'), /, on 21 March 2024, day 177\. /);
 });
 
-test('with no court, a forecast is the courts\' forecasts averaged, weighted by their cases registered', () => {
-  const item = byLabel('OSJIMJI', '18 C 33/2024');
-  const events = soFar(item, 177);
-  const mixed = forecast(data, null, events, 200);
-  const expected = new Float64Array(mixed.length);
-  for (const court of data.courts) {
-    const one = forecast(data, court, events, 200);
-    one.forEach((value, k) => { expected[k] += (value * court.journey.registered) / data.registered; });
-  }
-  mixed.forEach((value, k) => assert.ok(Math.abs(value - expected[k]) < 1e-12, `month ${k + 1}`));
-});
-
-test('a made-up case can have the events the network learned from, but those that end a case', () => {
+test('a custom case can have the events the network learned from, but those that end a case', () => {
   const options = offered(data);
   const codes = new Set(options.flatMap((option) => option.codes.map((code) => code.code)));
   for (const left of ['ZAHAJ_RIZ', 'ST_VEC_PUK', 'ST_VEC_ODS', 'DOVOL_RIZ', 'ZRUS_JED']) assert.ok(!codes.has(left), left);
@@ -158,18 +130,32 @@ test('a made-up case can have the events the network learned from, but those tha
   assert.deepEqual(options[1].codes.map((code) => code.code), ['VYD_ROZH', 'ST_VEC_VYR']);
 });
 
-test('a made-up case gains events in order, and loses the last thing added', () => {
+const FILED = new Date('2025-04-30T00:00:00Z');
+const codes = (item) => item.events.map((e) => [e.code.code, e.day]);
+
+test('a custom case gains events in order of day, and loses any but its filing', () => {
   const [hearing, decision] = offered(data);
-  const start = madeUp(data, null);
-  assert.deepEqual(start.events.map((e) => [e.code.code, e.day]), [['ZAHAJ_RIZ', 0]]);
-  assert.equal(undo(start), start);
+  const start = custom(data, data.court('OSSCEDC'), FILED);
+  assert.deepEqual(codes(start), [['ZAHAJ_RIZ', 0]]);
+  assert.equal(start.filed, FILED);
   const heard = add(start, hearing.codes, 90);
   const decided = add(heard, decision.codes, 90);
-  assert.deepEqual(decided.events.map((e) => [e.code.code, e.day]),
-    [['ZAHAJ_RIZ', 0], ['NAR_JED', 90], ['VYD_ROZH', 90], ['ST_VEC_VYR', 90]]);
-  assert.equal(add(decided, hearing.codes, 89), decided); // before its last event
-  assert.deepEqual(undo(decided).events, heard.events); // both of the decision's events
-  assert.deepEqual(undo(undo(decided)).events, start.events);
+  assert.deepEqual(codes(decided), [['ZAHAJ_RIZ', 0], ['NAR_JED', 90], ['VYD_ROZH', 90], ['ST_VEC_VYR', 90]]);
+  // An event can go before others, and on the same day goes after those already there.
+  const early = add(decided, hearing.codes, 30);
+  assert.deepEqual(codes(early).map(([, day]) => day), [0, 30, 90, 90, 90]);
+  assert.deepEqual(codes(add(early, hearing.codes, 90)).at(-1), ['NAR_JED', 90]);
+  assert.deepEqual(codes(add(start, hearing.codes, 0)), [['ZAHAJ_RIZ', 0], ['NAR_JED', 0]]);
+  // Not before filing, nor more than 36 months after it.
+  assert.equal(add(start, hearing.codes, -1), start);
+  assert.equal(add(start, hearing.codes, LONGEST + 1), start);
+  assert.equal(add(start, hearing.codes, LONGEST).events.length, 2);
+  // Removing an event, but never the filing.
+  assert.deepEqual(codes(remove(early, 1)), codes(decided));
+  assert.deepEqual(codes(remove(decided, 3)), [['ZAHAJ_RIZ', 0], ['NAR_JED', 90], ['VYD_ROZH', 90]]);
+  assert.equal(remove(decided, 0), decided);
+  assert.equal(remove(decided, 4), decided);
+  assert.equal(soFar(decided, 89).length, 1);
   assert.equal(soFar(decided, 90).length, 4);
   let full = start;
   for (let i = 1; i < MOST_EVENTS; i++) full = add(full, hearing.codes, i);
@@ -177,13 +163,32 @@ test('a made-up case gains events in order, and loses the last thing added', () 
   assert.equal(add(full, hearing.codes, 100), full);
 });
 
-test('the status line for a made-up case gives its court, the day, the chances and its last event', () => {
+test('a custom case filed on another day keeps its events\' dates', () => {
+  const [hearing, decision] = offered(data);
+  const start = custom(data, data.court('OSSCEDC'), FILED);
+  // With only its filing, it can move anywhere.
+  assert.deepEqual(filingRange(start), [-Infinity, Infinity]);
+  assert.equal(refile(start, 4000).filed.getTime(), addDays(FILED, 4000).getTime());
+  const heard = add(add(start, hearing.codes, 100), decision.codes, 300);
+  assert.deepEqual(filingRange(heard), [300 - LONGEST, 100]);
+  const later = refile(heard, 40);
+  assert.equal(later.filed.getTime(), addDays(FILED, 40).getTime());
+  assert.deepEqual(codes(later), [['ZAHAJ_RIZ', 0], ['NAR_JED', 60], ['VYD_ROZH', 260], ['ST_VEC_VYR', 260]]);
+  // Not after its first event, nor more than 36 months before its last.
+  assert.deepEqual(codes(refile(heard, 150)).map(([, day]) => day), [0, 0, 200, 200]);
+  assert.deepEqual(codes(refile(heard, -2000)).map(([, day]) => day), [0, LONGEST - 200, LONGEST, LONGEST]);
+  assert.equal(refile(heard, 0), heard);
+});
+
+test('the status line for a custom case gives its court, the date, the chances and its last event', () => {
   const [hearing] = offered(data);
-  const start = madeUp(data, null);
-  assert.equal(madeUpLine(start, 0, [0.01, 0.1, 0.5, 0.9], [1, 3, 6, 12]),
-    'Made-up case, all courts, at filing. Chance it ends: 1% within 1 month, 10% within 3 months, '
+  const start = custom(data, data.court('OSSCEDC'), FILED);
+  assert.equal(customLine(start, 0, [0.01, 0.1, 0.5, 0.9], [1, 3, 6, 12]),
+    'Custom case, Okresní soud Děčín, at filing. Chance it ends: 1% within 1 month, 10% within 3 months, '
       + '50% within 6 months and 90% within 12 months.');
-  const heard = { ...add(start, hearing.codes, 150), court: data.court('OSSCEDC') };
-  assert.match(madeUpLine(heard, 170, [0.05, 0.3, 0.5, 0.7], [1, 3, 6, 12]),
-    /^Made-up case, Okresní soud Děčín, on day 170\. Chance it ends: .*\. Its last event: Hearing, on day 150\.$/);
+  const heard = add(start, hearing.codes, 210);
+  assert.equal(customLine(heard, 215, [0.05, 0.3, 0.5, 0.7], [1, 3, 6, 12]),
+    'Custom case, Okresní soud Děčín, on 1 December 2025, day 215. Chance it ends: 5% within 1 month, '
+      + '30% within 3 months, 50% within 6 months and 70% within 12 months. '
+      + 'Its last event: Hearing, on 26 November 2025, day 210.');
 });

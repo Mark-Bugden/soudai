@@ -2,53 +2,38 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { matches, normalise, searchIndex } from '../src/courts.js';
+import { TYPES, byType } from '../src/courts.js';
 
 const raw = JSON.parse(readFileSync(new URL('../public/data/soudai.json', import.meta.url), 'utf8'));
-const index = searchIndex(raw.courts);
-const names = (query) => matches(index, query).map((court) => court.name);
+const groups = byType(raw.courts);
+const places = (type) => groups.find((group) => group.type === type).courts.map((entry) => entry.place);
 
-test('normalises names for matching, without diacritics', () => {
-  assert.equal(normalise('Děčín'), 'decin');
-  assert.equal(normalise('  Okresní soud Praha-východ '), 'okresni soud praha vychod');
-  assert.equal(normalise('Ústí nad Labem'), 'usti nad labem');
-  assert.equal(normalise('Žďár nad Sázavou'), 'zdar nad sazavou');
+test('every court is in one type, in the order the menu lists them', () => {
+  assert.deepEqual(groups.map((group) => group.type), TYPES);
+  assert.deepEqual(groups.map((group) => group.courts.length), [75, 10, 1]);
+  const all = groups.flatMap((group) => group.courts.map((entry) => entry.court));
+  assert.equal(new Set(all).size, raw.courts.length);
+  for (const { type, courts } of groups) {
+    for (const { court, place } of courts) assert.equal(court.name, `${type} ${place}`);
+  }
 });
 
-test('an empty query lists every court, in order of area, as Czech sorts it', () => {
-  const all = matches(index, '');
-  assert.equal(all.length, 86);
-  assert.equal(all[0].area, 'Benešov');
-  const areas = all.map((court) => court.area);
+test('a court\'s place is its name without its type', () => {
+  assert.deepEqual(places('Městský soud'), ['Brno']);
+  assert.ok(places('Okresní soud').includes('Děčín'));
+  assert.ok(places('Okresní soud').includes('Brno-venkov'));
+  assert.ok(places('Okresní soud').includes('Ostrava'));
+});
+
+test('places are in order as Czech sorts them', () => {
+  const districts = places('Okresní soud');
+  assert.equal(districts[0], 'Benešov');
   // Czech sorts "ch" after "h", and the Prague districts by number.
-  assert.ok(areas.indexOf('Hradec Králové') < areas.indexOf('Chomutov'));
-  assert.ok(areas.indexOf('Praha 2') < areas.indexOf('Praha 10'));
-  assert.deepEqual(matches(index, '   '), all);
+  assert.ok(districts.indexOf('Hradec Králové') < districts.indexOf('Chomutov'));
+  assert.ok(districts.indexOf('Praha-východ') < districts.indexOf('Praha-západ'));
+  assert.deepEqual(places('Obvodní soud'), Array.from({ length: 10 }, (_, i) => `Praha ${i + 1}`));
 });
 
-test('finds a court without its diacritics', () => {
-  assert.deepEqual(names('Decin'), ['Okresní soud Děčín']);
-  assert.deepEqual(names('usti nad orlici'), ['Okresní soud Ústí nad Orlicí']);
-  assert.deepEqual(names('ZDAR'), ['Okresní soud Žďár nad Sázavou']);
-});
-
-test('ranks a match on the area before a match on the full name', () => {
-  const prague = names('praha');
-  assert.equal(prague.length, 12);
-  assert.equal(prague[0], 'Obvodní soud Praha 1');
-  assert.deepEqual(prague.slice(-2), ['Okresní soud Praha-východ', 'Okresní soud Praha-západ']);
-  // "Brno" starts two areas, Brno-město and Brno-venkov.
-  assert.deepEqual(names('brno'), ['Městský soud Brno', 'Okresní soud Brno-venkov']);
-  // The start of a word in the area: "Labem" in Ústí nad Labem, before anything that merely contains it.
-  assert.equal(names('labem')[0], 'Okresní soud Ústí nad Labem');
-});
-
-test('matches the court type in the full name', () => {
-  assert.equal(names('obvodni').length, 10);
-  assert.equal(names('městský').length, 1);
-  assert.equal(names('okresni soud').length, 75);
-});
-
-test('finds nothing for a name that is not a court', () => {
-  assert.deepEqual(names('Vienna'), []);
+test('a court of no known type is refused', () => {
+  assert.throws(() => byType([{ name: 'Krajský soud Brno', area: 'Brno' }]), /not a court of a known type/);
 });

@@ -1,4 +1,4 @@
-// Text for the status line, the court search and the views. No DOM access.
+// Text for the status line, the controls and the views. No DOM access.
 
 const NUMBER = new Intl.NumberFormat('en-GB');
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -80,34 +80,11 @@ export function forecastLine(item, day, chances, horizons, ending) {
     + next(item, ending, day);
 }
 
-/** "at filing", or "on day 120": a day in a made-up case, which has no dates. */
-export const onDay = (day) => (day === 0 ? 'at filing' : `on day ${count(day)}`);
-
-/** The status line for a forecast on a made-up case: its court, the day, the chances, and its last event. */
-export function madeUpLine(item, day, chances, horizons) {
-  const where = item.court ? item.court.name : 'all courts';
+/** The status line for a forecast on a custom case: its court, the day, the chances, and its last event. */
+export function customLine(item, day, chances, horizons) {
   const last = item.events.at(-1);
-  const after = item.events.length > 1 ? ` Its last event: ${last.code.gloss}, ${onDay(last.day)}.` : '';
-  return `Made-up case, ${where}, ${onDay(day)}. ${chancesText(chances, horizons)}${after}`;
-}
-
-/** A score to 3 decimal places: 0.647. */
-export const score = (x) => x.toFixed(3);
-
-/** "made at filing", or "made 3 months after filing", for a landmark ('0', '3', ...). */
-export const landmark = (when) => (when === '0' ? 'made at filing' : `made ${months(Number(when))} after filing`);
-
-/**
- * The status line for the scores: what they cover, and the methods that rank cases best and have the
- * lowest error within `horizon` months (several if they tie to 3 decimal places).
- */
-export function scoresLine(court, when, forecasts, ranking, error, horizon) {
-  const where = court ? court.name : 'All courts';
-  const made = when === 'all' ? '' : `, ${landmark(when)}`;
-  const names = (rows) => list(rows.map((row) => row.name));
-  return `${where}: ${count(forecasts)} forecasts on cases registered in 2024–2025${made}. `
-    + `Best at ranking: ${names(ranking)} (${score(ranking[0].concordance)}). `
-    + `Lowest error within ${months(horizon)}: ${names(error)} (${score(error[0].brier[horizon])}).`;
+  const after = item.events.length > 1 ? ` Its last event: ${last.code.gloss}, ${moment(item.filed, last.day)}.` : '';
+  return `Custom case, ${item.court.name}, ${moment(item.filed, day)}. ${chancesText(chances, horizons)}${after}`;
 }
 
 /** A wait in days: "same day", "1 day" or "30 days". */

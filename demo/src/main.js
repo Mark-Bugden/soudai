@@ -1,26 +1,25 @@
 // The demo's entry point. Vite bundles it with the kit and the CSS into demo.js and demo.css.
 //
 // It loads the data, then mounts the frame with the controls, showing only those the current tab uses.
-// The tabs (views/) draw the stage; this module keeps the state they share: the tab, the court
-// selected (or none, for all courts), and on the Forecast tab either a case, real or made up, with the
-// day of its forecast, or how well the model does. The status line shows what's selected, with its
-// headline numbers.
+// The tabs (views/) draw the stage; this module keeps the state they share: the tab, and the court
+// selected, or none for all courts. The Forecast tab always has a court: the one selected, or else the
+// last it had. Its case is one of that court's real past cases, with the day of its forecast, or a
+// custom case, whose filing, events and day of forecast the visitor gives as dates. The status line
+// shows what's selected, with its headline numbers.
 
 import manifest from 'virtual:manifest';
-import { loadJSON, mount, select, slider } from '@mark-bugden/demo-kit';
+import { loadJSON, mount, slider } from '@mark-bugden/demo-kit';
 import '@mark-bugden/demo-kit/tokens.scoped.css';
 import '@mark-bugden/demo-kit/frame.css';
 import './demo.css';
-import { MOST_EVENTS, add, findCases, madeUp, offered, ordered, pick, undo } from './cases.js';
-import { actions, iconButton, search, segmented } from './controls.js';
-import { matches, searchIndex } from './courts.js';
+import { LONGEST, MOST_EVENTS, add, custom, filingRange, offered, ordered, pick, refile, remove } from './cases.js';
+import { adder, cascade, dateField, dropdown, iconButton, removable, segmented } from './controls.js';
+import { byType } from './courts.js';
 import { prepare } from './data.js';
 import { h } from './dom.js';
 import * as describe from './format.js';
-import { LANDMARKS } from './scores.js';
 import { createForecast } from './views/forecast.js';
 import { createMap } from './views/map.js';
-import { createScores } from './views/scores.js';
 
 // The tabs' icons, on a 24 × 24 grid: a curve falling over time, and stages in a row with a loop back.
 const ICONS = {
@@ -32,33 +31,31 @@ const ICONS = {
   random: '<rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>'
     + '<g fill="currentColor"><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="12" cy="12" r="1.5"/>'
     + '<circle cx="8.5" cy="15.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/></g>',
-  // An arrow turning back, and a circle of arrow.
-  undo: '<path d="M9 14L4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  reset: '<path d="M12 5a7 7 0 1 1-6.06 3.5M14.5 2.5L12 5l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 const TABS = {
-  forecast: { label: 'Forecast' },
-  map: { label: 'Process map' },
-};
-// What each tab draws: the Forecast tab shows a case or the scores.
-const VIEWS = {
   forecast: { label: 'Forecast', create: createForecast },
-  scores: { label: 'How well it does', create: createScores },
   map: { label: 'Process map', create: createMap },
 };
 // The case the demo opens on: an ordinary one, with a hearing and a decision.
 const OPENING = { court: 'OSJIMJI', label: '18 C 33/2024' };
-const MADE_UP_DAYS = 1096; // a made-up case's forecast can be up to 36 months after filing
+const CUSTOM = 'custom'; // the case menu's value for a custom case
+const DAY = 864e5;
+
+/** Today where the visitor is, as a date at midnight UTC. */
+function today() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+}
+
+/** Days from one date at midnight UTC to another. */
+const daysBetween = (from, to) => Math.round((to - from) / DAY);
 
 async function start(el) {
   const data = prepare(await loadJSON('data/soudai.json'));
-  const index = searchIndex(data.courts);
-  // Every real case, by court in order of area, then by number.
-  const allCases = ordered(data.cases, index.map((entry) => entry.court));
-  const casesOf = (court) => (court ? ordered(court.cases, [court]) : allCases);
-  let item = data.court(OPENING.court).cases.find((c) => c.label === OPENING.label) ?? data.cases[0];
-  let made = madeUp(data, null); // its court is the one selected
-  const events = offered(data);
+  let selected = null; // the court selected, or null for all courts
+  let forecastCourt = data.court(OPENING.court); // the Forecast tab's: the one selected, or the last it had
+  let item = forecastCourt.cases.find((c) => c.label === OPENING.label) ?? forecastCourt.cases[0];
+  let made = custom(data, forecastCourt, today());
 
   const tab = segmented({
     label: 'View',
@@ -66,48 +63,18 @@ async function start(el) {
     options: Object.entries(TABS).map(([value, { label }]) => ({ label, value, icon: ICONS[value] })),
     value: 'forecast',
   });
-  const court = search({
+  // A court's type, then its place. Only the Process map offers all courts.
+  const court = cascade({
     label: 'Court',
-    placeholder: 'All courts',
-    // Opened empty, the list starts with all courts, so there's a way back to them besides clearing the box.
-    suggest: (query) => [
-      ...(query ? [] : [{ label: 'All courts', detail: describe.registered(data.journey(null)), value: null }]),
-      ...matches(index, query).map((c) => ({ label: c.name, detail: describe.registered(c.journey), value: c })),
-    ],
-    format: (c) => c.name,
-    empty: 'No court by that name',
-    browse: true,
+    names: ['Court type', 'Location'],
+    groups: byType(data.courts).map(({ type, courts }) => ({ label: type, options: courts.map(({ court: c, place }) => ({ label: place, value: c })) })),
+    value: forecastCourt,
+    none: 'All courts',
   });
-  // The switches' options name themselves, so their labels are for screen readers only, which keeps the
-  // rail short enough to fit the window beside the stage.
-  const show = segmented({
-    label: 'Show',
-    showLabel: false,
-    options: [{ label: 'A case', value: 'case' }, { label: 'How well it does', value: 'scores' }],
-    value: 'case',
-  });
-  const kind = segmented({
-    label: 'Case',
-    showLabel: false,
-    options: [{ label: 'Real case', value: 'real', title: 'A real past case' }, { label: 'Made-up case', value: 'made', title: 'A case you describe' }],
-    value: 'real',
-  });
-  // Picks a case at random, from beside the case search.
+  court.offerNone(false);
+  // The court's real past cases, and a custom case. The die beside the menu picks a real one at random.
   const random = iconButton({ label: 'Random case', icon: ICONS.random });
-  const realCase = search({
-    label: 'Case number',
-    placeholder: 'Case number',
-    // The selected court's cases, or every court's, each with its court or its filing date.
-    suggest: (query) => findCases(casesOf(court.value), query).map((c) => ({
-      label: c.label,
-      detail: court.value ? `Filed ${describe.date(c.filed, true)}` : c.court.name,
-      value: c,
-    })),
-    format: (c) => c.label,
-    empty: 'No case by that number',
-    browse: true,
-    beside: random,
-  });
+  const caseMenu = dropdown({ label: 'Case', beside: random });
   const day = slider({
     label: 'Forecast on',
     min: 0,
@@ -116,39 +83,21 @@ async function start(el) {
     value: 0,
     format: (d) => (d === 0 ? `Filing, ${describe.date(item.filed, true)}` : `Day ${describe.count(d)}, ${describe.date(describe.addDays(item.filed, d), true)}`),
   });
-  const madeDay = slider({
-    label: 'Forecast on',
-    min: 0,
-    max: MADE_UP_DAYS,
-    step: 1,
-    value: 0,
-    format: (d) => (d === 0 ? 'Filing' : `Day ${describe.count(d)}`),
+  const filedOn = dateField({ label: 'Filed on', value: made.filed });
+  const eventList = removable({ label: 'Events' });
+  const addEvent = adder({
+    label: 'Add an event',
+    options: offered(data).map((option) => ({ label: option.label, value: option })),
+    date: made.filed,
+    dateLabel: 'Date of the event',
   });
-  const event = select({ label: 'Event', options: events.map((option) => ({ label: option.label, value: option })) });
-  const edit = actions({
-    label: 'Change the case',
-    options: [
-      { label: 'Add', value: 'add' },
-      { label: 'Undo', value: 'undo', icon: ICONS.undo, iconOnly: true },
-      { label: 'Start again', value: 'reset', icon: ICONS.reset, iconOnly: true },
-    ],
-  });
-  const landmark = segmented({
-    label: 'Forecasts made, months after filing',
-    options: LANDMARKS.map((when) => ({ label: when === 'all' ? 'All' : when, value: when, title: when === 'all' ? 'All forecasts together' : describe.landmark(when) })),
-    value: 'all',
-  });
-  const horizon = segmented({
-    label: 'Calibration within, months',
-    options: data.horizons.map((months) => ({ label: String(months), value: months, title: `Within ${describe.months(months)}` })),
-    value: 6,
-  });
-  const controls = { tab, court, show, kind, realCase, day, madeDay, event, edit, landmark, horizon };
+  const forecastOn = dateField({ label: 'Forecast on', value: made.filed });
+  const controls = { tab, court, caseMenu, day, filedOn, eventList, addEvent, forecastOn };
   // The controls each tab uses, besides the tab switch.
   const used = () => {
     if (tab.value === 'map') return [court];
-    if (show.value === 'scores') return [court, show, landmark, horizon];
-    return [court, show, kind, ...(kind.value === 'real' ? [realCase, day] : [madeDay, event, edit])];
+    if (caseMenu.value !== CUSTOM) return [court, caseMenu, day];
+    return [court, caseMenu, filedOn, ...(made.events.length > 1 ? [eventList] : []), addEvent, forecastOn];
   };
 
   /** Sets a slider's range, keeping its value within it. */
@@ -162,32 +111,75 @@ async function start(el) {
   /** Shows a real case, from its filing. */
   function choose(next) {
     item = next;
-    realCase.value = item;
     day.value = 0;
     range(day, 0, item.span - 1);
   }
 
-  /** Changes the made-up case. Its forecast can't come before its last event. */
-  function change(next) {
-    made = next;
-    range(madeDay, made.events.at(-1).day, MADE_UP_DAYS);
+  /** Lists the Forecast tab's court's cases in the case menu, and shows the case chosen. */
+  function listCases() {
+    caseMenu.setOptions([
+      { label: 'Custom case', value: CUSTOM },
+      { group: 'Real past cases', options: ordered(forecastCourt.cases).map((c) => ({ label: c.label, value: c })) },
+    ], caseMenu.value === CUSTOM ? CUSTOM : item);
   }
+
+  /**
+   * Fits the custom case's controls to it: its filing can't come after its first event or more than 36
+   * months before its last, its events go between its filing and 36 months after, and its forecast
+   * between its last event and 36 months after its filing.
+   */
+  function fitCustom() {
+    const at = (d) => (Number.isFinite(d) ? describe.addDays(made.filed, d) : null);
+    filedOn.range(...filingRange(made).map(at));
+    filedOn.value = made.filed;
+    addEvent.range(made.filed, at(LONGEST));
+    addEvent.enable((option) => made.events.length + option.codes.length <= MOST_EVENTS);
+    forecastOn.range(at(made.events.at(-1).day), at(LONGEST));
+    eventList.items = made.events.slice(1).map((event) => ({ when: describe.date(at(event.day), true), what: event.code.gloss }));
+  }
+
   choose(item);
-  // A court that isn't the case's brings one of its own cases.
-  court.onChange((c) => {
-    if (c && item.court !== c) choose(pick(casesOf(c)));
+  listCases();
+  fitCustom();
+  // The Process map offers all courts, and the Forecast tab shows its own court when none is selected.
+  tab.onChange((name) => {
+    if (name === 'map') {
+      court.offerNone(true);
+      court.value = selected;
+    } else {
+      court.value = forecastCourt;
+      court.offerNone(false);
+    }
   });
-  // Clearing the case box leaves the case as it was.
-  realCase.onChange((c) => (c ? choose(c) : (realCase.value = item)));
+  // A court that isn't the case's brings one of its own cases, and a custom case moves to it.
+  court.onChange((c) => {
+    selected = c;
+    if (!c) return;
+    forecastCourt = c;
+    made = { ...made, court: c };
+    if (item.court !== c) choose(pick(c.cases));
+    listCases();
+  });
+  caseMenu.onChange((value) => {
+    if (value !== CUSTOM) choose(value);
+  });
   // The button isn't one of the frame's controls, so it asks for the redraw itself.
   random.addEventListener('click', () => {
-    choose(pick(casesOf(court.value), item));
+    choose(pick(forecastCourt.cases, caseMenu.value === CUSTOM ? null : item));
+    caseMenu.value = item;
     app.redraw();
   });
-  edit.onChange((action) => {
-    if (action === 'add') change(add(made, event.value.codes, madeDay.value));
-    else change(action === 'undo' ? undo(made) : madeUp(data, null));
-    if (action === 'reset') madeDay.value = 0;
+  filedOn.onChange((date) => {
+    made = refile(made, daysBetween(made.filed, date));
+    fitCustom();
+  });
+  eventList.onChange((i) => {
+    made = remove(made, i + 1);
+    fitCustom();
+  });
+  addEvent.onChange(({ option, date }) => {
+    made = add(made, option.codes, daysBetween(made.filed, date));
+    fitCustom();
   });
 
   let current = null; // { name, view }
@@ -205,28 +197,22 @@ async function start(el) {
         host = h('div', { class: 'sd-view' });
         stage.append(host);
       }
-      const name = values.tab === 'forecast' && values.show === 'scores' ? 'scores' : values.tab;
+      const name = values.tab;
       if (current?.name !== name) {
         current?.view.destroy();
-        current = { name, view: VIEWS[name].create(host, data) };
-        stage.setAttribute('aria-label', VIEWS[name].label);
-        // On phones the stage grows to fit the scores and the map (see demo.css).
+        current = { name, view: TABS[name].create(host, data) };
+        stage.setAttribute('aria-label', TABS[name].label);
+        // On phones the stage grows to fit the map (see demo.css).
         stage.closest('.dk-stage').classList.toggle('sd-fit-content', name !== 'forecast');
       }
       showControls();
-      // A court's scores are for all its forecasts together.
-      landmark.disabled = Boolean(values.court);
-      if (values.court) landmark.value = 'all';
-      const real = values.kind === 'real';
-      if (!real) showEditing();
+      const isCustom = values.caseMenu === CUSTOM;
       const status = current.view.render({
         width,
         height,
         court: values.court,
-        item: real ? item : { ...made, court: values.court },
-        day: real ? values.day : values.madeDay,
-        landmark: values.landmark,
-        horizon: values.horizon,
+        item: isCustom ? made : item,
+        day: isCustom ? daysBetween(made.filed, values.forecastOn) : values.day,
       });
       app.status(status ?? describe.headline(values.court, data.journey(values.court), data.courts.length));
     },
@@ -240,14 +226,6 @@ async function start(el) {
   function showControls() {
     const shown = new Set([tab, ...used()]);
     for (const control of Object.values(controls)) control.el.hidden = !shown.has(control);
-  }
-
-  /** Labels the made-up case's buttons for the day, and turns off those that can't do anything. */
-  function showEditing() {
-    edit.relabel('add', madeDay.value === 0 ? 'Add at filing' : `Add on day ${describe.count(madeDay.value)}`);
-    edit.enable('add', made.events.length + event.value.codes.length <= MOST_EVENTS);
-    edit.enable('undo', made.added.length > 0);
-    edit.enable('reset', made.added.length > 0);
   }
 }
 
