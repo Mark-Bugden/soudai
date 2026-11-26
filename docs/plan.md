@@ -798,7 +798,7 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - **Tests.** `npm test` runs 11 node:test tests on the committed data: the court search, the lookups and the status line. `tests.yml` has a JS job for them, and `CLAUDE.md` lists `npm test` among the checks.
   - **Checked in Edge,** with the built bundle: both themes, at 1280 × 800 and at a phone's 390 px, searching, picking a court and "All courts", switching tabs and clearing the search. No console errors.
 - [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
-  - **In three PRs:** the forward pass and real past cases (v0.5.0), then made-up cases, then how well the model does.
+  - **In three PRs:** the forward pass and real past cases (v0.5.0), made-up cases (v0.6.0), then how well the model does.
   - **First PR (2026-11-26): the forward pass and real past cases.**
     - **The forward pass** (`forecast.js`) is `forward.py` in JavaScript, in 64-bit floats. It decodes the export's 16-bit weights itself. On the fixture's 27 forecasts it gives PyTorch's to 4.3 × 10⁻⁸; numpy's gap is 1.7 × 10⁻⁸, and the rest is PyTorch's 32-bit arithmetic.
     - **Checked against the full weights.** The exported weights decode to `network.json`'s to within half a step. On all 13,827 forecasts on the real cases (every day with events before the end, and each month to 12), the exported ensemble's largest gap from the full one is 0.00008, as in Python. A forecast of all five networks takes about 0.2 ms, so the demo recomputes it on every move of the slider.
@@ -810,6 +810,26 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
     - **Phones:** the stage is 30rem tall (26rem before), and the lanes shrink to fit, so the forecast keeps at least 110 px.
     - **Tests:** 15 new node:test tests: the forward pass against the fixture, the decoding against `network.json`, the real cases, the case search and random pick, what a forecast reads, how a case ended and whether it ended within a time, and the text.
     - **Checked in Edge,** with the built bundle, in both themes at 1280 × 800 and at 390 px: a random case, a court, a case by number, the slider, hovering, and switching tabs. No console errors.
+  - **Second PR (2026-11-26): made-up cases** (v0.6.0).
+    - **A "Case" switch** in the rail, Real or Made up. A made-up case starts filed on day 0, at the court selected.
+    - **Its controls:**
+      - a "Forecast on" slider, from its last event to day 1,096 (36 months);
+      - an event menu, with an "Add on day …" button that adds the event on the slider's day;
+      - "Undo", which takes back the last thing added;
+      - "Start again".
+      - The slider can't go back before the last event, so events stay in order. A case has at most 30 events.
+    - **The events offered** are 12 of the 28 codes, each in the real cases' histories. Left out are:
+      - the filing, which is always first;
+      - "legally final" and "closed in the register", since each ends a case;
+      - "hearing cancelled", which the network never reads, since cancellations are left out;
+      - the Supreme Court review, which is in one training case;
+      - and the 11 codes the sample never uses.
+      - "Decision issued, and case disposed" adds both at once, since they share a day in 96% of cases. Each is offered alone too.
+    - **With all courts selected,** the forecast is the 86 courts' forecasts averaged, weighted by their cases registered, and the stage says so. The network reads the events before it uses the court, so the forward pass reads them once per network and then runs the output layers for each court (`stillOpen` takes [[court, weight], ...]).
+    - **The stage** is the real case's, without dates (days count from filing), outcomes or an end line. Its axis runs to 12 months after the day of the forecast. The status line gives the court, the day, the four chances and the last event.
+    - **For example,** at all courts: at filing, 50% within 6 months. With a hearing on day 150, on day 150: 5% within 1 month and 38% within 3. Add a decision that day, and it's 43% within 1 month and 98% within 3.
+    - **Tests:** 5 new node:test tests: the weighted mean of courts, the events offered (each seen in the real cases before their end), adding and undoing, and the status line.
+    - **Checked in Edge,** in both themes at 1280 × 800 and at 390 px: switching to a made-up case, adding a hearing and then a decision on the same day, the slider refusing to go before the last event, Undo, a court, Start again, and back to a real case. No console errors.
 - [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
 - [ ] The Process map tab and its time curves.
 - [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.

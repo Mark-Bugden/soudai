@@ -68,12 +68,25 @@ const list = (items) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} an
 /** "at filing", or "on 3 June 2024, day 80". */
 export const moment = (filed, day) => (day === 0 ? 'at filing' : `on ${date(addDays(filed, day))}, day ${count(day)}`);
 
+/** "Chance it ends: 1% within 1 month, ... and 92% within 12 months." */
+const chancesText = (chances, horizons) => `Chance it ends: ${list(horizons.map((h, i) => `${percent(chances[i])} within ${months(h)}`))}.`;
+
 /**
  * The status line for a forecast on a real case: the case, the day, the chance it ends within a few
  * months, and what happened next.
  */
 export function forecastLine(item, day, chances, horizons, ending) {
-  const parts = horizons.map((h, i) => `${percent(chances[i])} within ${months(h)}`);
-  return `${item.label}, ${item.court.name}, ${moment(item.filed, day)}. Chance it ends: ${list(parts)}. `
+  return `${item.label}, ${item.court.name}, ${moment(item.filed, day)}. ${chancesText(chances, horizons)} `
     + next(item, ending, day);
+}
+
+/** "at filing", or "on day 120": a day in a made-up case, which has no dates. */
+export const onDay = (day) => (day === 0 ? 'at filing' : `on day ${count(day)}`);
+
+/** The status line for a forecast on a made-up case: its court, the day, the chances, and its last event. */
+export function madeUpLine(item, day, chances, horizons) {
+  const where = item.court ? item.court.name : 'all courts';
+  const last = item.events.at(-1);
+  const after = item.events.length > 1 ? ` Its last event: ${last.code.gloss}, ${onDay(last.day)}.` : '';
+  return `Made-up case, ${where}, ${onDay(day)}. ${chancesText(chances, horizons)}${after}`;
 }

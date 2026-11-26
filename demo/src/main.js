@@ -2,16 +2,16 @@
 //
 // It loads the data, then mounts the frame with the controls, showing only those the current tab uses.
 // The tabs (views/) draw the stage; this module keeps the state they share: the tab, the court
-// selected (or none, for all courts), and the real past case on the Forecast tab, with the day of its
-// forecast. The status line shows what's selected, with its headline numbers.
+// selected (or none, for all courts), and on the Forecast tab the case, real or made up, with the day of
+// its forecast. The status line shows what's selected, with its headline numbers.
 
 import manifest from 'virtual:manifest';
-import { loadJSON, mount, slider } from '@mark-bugden/demo-kit';
+import { loadJSON, mount, select, slider } from '@mark-bugden/demo-kit';
 import '@mark-bugden/demo-kit/tokens.scoped.css';
 import '@mark-bugden/demo-kit/frame.css';
 import './demo.css';
-import { findCases, ordered, pick } from './cases.js';
-import { button, search, segmented } from './controls.js';
+import { MOST_EVENTS, add, findCases, madeUp, offered, ordered, pick, undo } from './cases.js';
+import { actions, search, segmented } from './controls.js';
 import { matches, searchIndex } from './courts.js';
 import { prepare } from './data.js';
 import { h } from './dom.js';
@@ -36,6 +36,7 @@ const TABS = {
 };
 // The case the demo opens on: an ordinary one, with a hearing and a decision.
 const OPENING = { court: 'OSJIMJI', label: '18 C 33/2024' };
+const MADE_UP_DAYS = 1096; // a made-up case's forecast can be up to 36 months after filing
 
 async function start(el) {
   const data = prepare(await loadJSON('data/soudai.json'));
@@ -44,6 +45,8 @@ async function start(el) {
   const allCases = ordered(data.cases, index.map((entry) => entry.court));
   const casesOf = (court) => (court ? ordered(court.cases, [court]) : allCases);
   let item = data.court(OPENING.court).cases.find((c) => c.label === OPENING.label) ?? data.cases[0];
+  let made = madeUp(data, null); // its court is the one selected
+  const events = offered(data);
 
   const tab = segmented({
     label: 'View',
@@ -63,8 +66,13 @@ async function start(el) {
     empty: 'No court by that name',
     browse: true,
   });
-  const realCase = search({
+  const kind = segmented({
     label: 'Case',
+    options: [{ label: 'Real', value: 'real', title: 'A real past case' }, { label: 'Made up', value: 'made', title: 'A case you describe' }],
+    value: 'real',
+  });
+  const realCase = search({
+    label: 'Case number',
     placeholder: 'Case number',
     // The selected court's cases, or every court's, each with its court or its filing date.
     suggest: (query) => findCases(casesOf(court.value), query).map((c) => ({
@@ -76,7 +84,7 @@ async function start(el) {
     empty: 'No case by that number',
     browse: true,
   });
-  const random = button({ label: 'Random case', icon: ICONS.random });
+  const random = actions({ label: 'Pick a case', options: [{ label: 'Random case', value: 'random', icon: ICONS.random }] });
   const day = slider({
     label: 'Forecast on',
     min: 0,
@@ -85,16 +93,44 @@ async function start(el) {
     value: 0,
     format: (d) => (d === 0 ? `Filing, ${describe.date(item.filed, true)}` : `Day ${describe.count(d)}, ${describe.date(describe.addDays(item.filed, d), true)}`),
   });
-  const controls = { tab, court, realCase, random, day };
+  const madeDay = slider({
+    label: 'Forecast on',
+    min: 0,
+    max: MADE_UP_DAYS,
+    step: 1,
+    value: 0,
+    format: (d) => (d === 0 ? 'Filing' : `Day ${describe.count(d)}`),
+  });
+  const event = select({ label: 'Event', options: events.map((option) => ({ label: option.label, value: option })) });
+  const addEvent = actions({ label: 'Add the event', options: [{ label: 'Add', value: 'add' }] });
+  const edit = actions({ label: 'Change the case', options: [{ label: 'Undo', value: 'undo' }, { label: 'Start again', value: 'reset' }] });
+  const controls = { tab, court, kind, realCase, random, day, madeDay, event, addEvent, edit };
   // The controls each tab uses, besides the tab switch.
-  const USED = { forecast: [court, realCase, random, day], map: [court] };
+  const used = () => {
+    if (tab.value === 'map') return [court];
+    return [court, kind, ...(kind.value === 'real' ? [realCase, random, day] : [madeDay, event, addEvent, edit])];
+  };
 
-  /** Shows a case, from its filing. */
+  /** Sets a slider's range, keeping its value within it. */
+  function range(control, min, max) {
+    const input = control.el.querySelector('input');
+    input.min = String(min);
+    input.max = String(max);
+    control.value = Math.min(Math.max(control.value, min), max);
+  }
+
+  /** Shows a real case, from its filing. */
   function choose(next) {
     item = next;
     realCase.value = item;
-    day.el.querySelector('input').max = String(item.span - 1);
     day.value = 0;
+    range(day, 0, item.span - 1);
+  }
+
+  /** Changes the made-up case. Its forecast can't come before its last event. */
+  function change(next) {
+    made = next;
+    range(madeDay, made.events.at(-1).day, MADE_UP_DAYS);
   }
   choose(item);
   // A court that isn't the case's brings one of its own cases.
@@ -104,6 +140,11 @@ async function start(el) {
   // Clearing the case box leaves the case as it was.
   realCase.onChange((c) => (c ? choose(c) : (realCase.value = item)));
   random.onChange(() => choose(pick(casesOf(court.value), item)));
+  addEvent.onChange(() => change(add(made, event.value.codes, madeDay.value)));
+  edit.onChange((action) => {
+    change(action === 'undo' ? undo(made) : madeUp(data, null));
+    if (action === 'reset') madeDay.value = 0;
+  });
 
   let current = null; // { name, view }
   let host = null;
@@ -126,7 +167,15 @@ async function start(el) {
         stage.setAttribute('aria-label', TABS[values.tab].label);
       }
       showControls();
-      const status = current.view.render({ width, height, court: values.court, item, day: values.day });
+      const real = values.kind === 'real';
+      if (!real) showEditing();
+      const status = current.view.render({
+        width,
+        height,
+        court: values.court,
+        item: real ? item : { ...made, court: values.court },
+        day: real ? values.day : values.madeDay,
+      });
       app.status(status ?? describe.headline(values.court, data.journey(values.court), data.courts.length));
     },
   });
@@ -137,8 +186,16 @@ async function start(el) {
 
   /** Shows the controls the tab uses, and hides the rest. */
   function showControls() {
-    const used = new Set([tab, ...USED[tab.value]]);
-    for (const control of Object.values(controls)) control.el.hidden = !used.has(control);
+    const shown = new Set([tab, ...used()]);
+    for (const control of Object.values(controls)) control.el.hidden = !shown.has(control);
+  }
+
+  /** Labels the made-up case's buttons for the day, and turns off those that can't do anything. */
+  function showEditing() {
+    addEvent.relabel('add', madeDay.value === 0 ? 'Add at filing' : `Add on day ${describe.count(madeDay.value)}`);
+    addEvent.enable('add', made.events.length + event.value.codes.length <= MOST_EVENTS);
+    edit.enable('undo', made.added.length > 0);
+    edit.enable('reset', made.added.length > 0);
   }
 }
 

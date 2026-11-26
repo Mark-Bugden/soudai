@@ -2,11 +2,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { ending, findCases, forecast, ordered, outcome, pick, soFar } from '../src/cases.js';
+import {
+  MOST_EVENTS, add, ending, findCases, forecast, madeUp, offered, ordered, outcome, pick, soFar, undo,
+} from '../src/cases.js';
 import { normalise, searchIndex } from '../src/courts.js';
 import { prepare } from '../src/data.js';
 import { MONTH, stillOpen } from '../src/forecast.js';
-import { addDays, date, forecastLine, months, next, percent } from '../src/format.js';
+import { addDays, date, forecastLine, madeUpLine, months, next, percent } from '../src/format.js';
 
 const raw = JSON.parse(readFileSync(new URL('../public/data/soudai.json', import.meta.url), 'utf8'));
 const data = prepare(raw);
@@ -129,4 +131,59 @@ test('says what happened next, and the status line gives the forecast', () => {
       + '48% within 6 months and 92% within 12 months. It became legally final 238 days later.',
   );
   assert.match(forecastLine(item, 177, [0.5, 0.9, 0.99, 1], [1, 3, 6, 12], 'final'), /, on 21 March 2024, day 177\. /);
+});
+
+test('with no court, a forecast is the courts\' forecasts averaged, weighted by their cases registered', () => {
+  const item = byLabel('OSJIMJI', '18 C 33/2024');
+  const events = soFar(item, 177);
+  const mixed = forecast(data, null, events, 200);
+  const expected = new Float64Array(mixed.length);
+  for (const court of data.courts) {
+    const one = forecast(data, court, events, 200);
+    one.forEach((value, k) => { expected[k] += (value * court.journey.registered) / data.registered; });
+  }
+  mixed.forEach((value, k) => assert.ok(Math.abs(value - expected[k]) < 1e-12, `month ${k + 1}`));
+});
+
+test('a made-up case can have the events the network learned from, but those that end a case', () => {
+  const options = offered(data);
+  const codes = new Set(options.flatMap((option) => option.codes.map((code) => code.code)));
+  for (const left of ['ZAHAJ_RIZ', 'ST_VEC_PUK', 'ST_VEC_ODS', 'DOVOL_RIZ', 'ZRUS_JED']) assert.ok(!codes.has(left), left);
+  assert.equal(codes.size, 12);
+  // Each is in the real cases' histories before their end, so the network has seen it.
+  const seen = new Set(data.cases.flatMap((item) => item.events.filter((e) => e.day < item.span).map((e) => e.code.code)));
+  for (const code of codes) assert.ok(seen.has(code), code);
+  assert.equal(options[0].label, 'Hearing');
+  assert.equal(options[1].label, 'Decision issued, and case disposed');
+  assert.deepEqual(options[1].codes.map((code) => code.code), ['VYD_ROZH', 'ST_VEC_VYR']);
+});
+
+test('a made-up case gains events in order, and loses the last thing added', () => {
+  const [hearing, decision] = offered(data);
+  const start = madeUp(data, null);
+  assert.deepEqual(start.events.map((e) => [e.code.code, e.day]), [['ZAHAJ_RIZ', 0]]);
+  assert.equal(undo(start), start);
+  const heard = add(start, hearing.codes, 90);
+  const decided = add(heard, decision.codes, 90);
+  assert.deepEqual(decided.events.map((e) => [e.code.code, e.day]),
+    [['ZAHAJ_RIZ', 0], ['NAR_JED', 90], ['VYD_ROZH', 90], ['ST_VEC_VYR', 90]]);
+  assert.equal(add(decided, hearing.codes, 89), decided); // before its last event
+  assert.deepEqual(undo(decided).events, heard.events); // both of the decision's events
+  assert.deepEqual(undo(undo(decided)).events, start.events);
+  assert.equal(soFar(decided, 90).length, 4);
+  let full = start;
+  for (let i = 1; i < MOST_EVENTS; i++) full = add(full, hearing.codes, i);
+  assert.equal(full.events.length, MOST_EVENTS);
+  assert.equal(add(full, hearing.codes, 100), full);
+});
+
+test('the status line for a made-up case gives its court, the day, the chances and its last event', () => {
+  const [hearing] = offered(data);
+  const start = madeUp(data, null);
+  assert.equal(madeUpLine(start, 0, [0.01, 0.1, 0.5, 0.9], [1, 3, 6, 12]),
+    'Made-up case, all courts, at filing. Chance it ends: 1% within 1 month, 10% within 3 months, '
+      + '50% within 6 months and 90% within 12 months.');
+  const heard = { ...add(start, hearing.codes, 150), court: data.court('OSSCEDC') };
+  assert.match(madeUpLine(heard, 170, [0.05, 0.3, 0.5, 0.7], [1, 3, 6, 12]),
+    /^Made-up case, Okresní soud Děčín, on day 170\. Chance it ends: .*\. Its last event: Hearing, on day 150\.$/);
 });

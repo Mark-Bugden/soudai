@@ -243,10 +243,24 @@
   font-weight: var(--weight-display);
 }
 
-/* A button in the rail, full width, with an icon beside its label. */
-[data-demo] .sd-action .dk-button {
+/* Buttons in the rail, sharing its width, each with an icon beside its label. */
+[data-demo] .sd-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+[data-demo] .sd-actions .dk-button {
+  flex: 1 1 0;
   justify-content: center;
-  width: 100%;
+  min-width: 0;
+  padding: 0 var(--space-3);
+  white-space: nowrap;
+}
+
+[data-demo] .sd-actions .dk-button:disabled {
+  color: var(--color-muted);
+  cursor: default;
+  opacity: 0.6;
 }
 
 /*
@@ -467,4 +481,8 @@
   [data-demo] .sd-tile-value {
     font-size: var(--text-lg);
   }
+}
+
+[data-demo] .sd-tile-outcome[hidden] {
+  display: none;
 }
