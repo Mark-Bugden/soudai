@@ -19,7 +19,7 @@ import { h } from './dom.js';
 import * as describe from './format.js';
 import { LANDMARKS } from './scores.js';
 import { createForecast } from './views/forecast.js';
-import { createPlaceholder } from './views/placeholder.js';
+import { createMap } from './views/map.js';
 import { createScores } from './views/scores.js';
 
 // The tabs' icons, on a 24 × 24 grid: a curve falling over time, and stages in a row with a loop back.
@@ -41,7 +41,7 @@ const TABS = {
 const VIEWS = {
   forecast: { label: 'Forecast', create: createForecast },
   scores: { label: 'How well it does', create: createScores },
-  map: { label: 'Process map', create: (host) => createPlaceholder(host, 'Process map') },
+  map: { label: 'Process map', create: createMap },
 };
 // The case the demo opens on: an ordinary one, with a hearing and a decision.
 const OPENING = { court: 'OSJIMJI', label: '18 C 33/2024' };
@@ -191,8 +191,8 @@ async function start(el) {
         current?.view.destroy();
         current = { name, view: VIEWS[name].create(host, data) };
         stage.setAttribute('aria-label', VIEWS[name].label);
-        // On phones the scores' stage grows to fit them (see demo.css).
-        stage.closest('.dk-stage').classList.toggle('sd-fit-content', name === 'scores');
+        // On phones the stage grows to fit the scores and the map (see demo.css).
+        stage.closest('.dk-stage').classList.toggle('sd-fit-content', name !== 'forecast');
       }
       showControls();
       // A court's scores are for all its forecasts together.

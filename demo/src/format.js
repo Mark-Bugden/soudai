@@ -109,3 +109,12 @@ export function scoresLine(court, when, forecasts, ranking, error, horizon) {
     + `Best at ranking: ${names(ranking)} (${score(ranking[0].concordance)}). `
     + `Lowest error within ${months(horizon)}: ${names(error)} (${score(error[0].brier[horizon])}).`;
 }
+
+/** A wait in days: "same day", "1 day" or "30 days". */
+export const wait = (n) => (n === 0 ? 'same day' : days(n));
+
+/** A route through the stages: "filed → hearing → decided → legally final". */
+export const route = (stages) => stages.map((stage) => STAGES[stage].toLowerCase()).join(' → ');
+
+/** A share of cases to one decimal place, for the map: "93.3%", or "<0.1%". */
+export const share = (p) => (p < 0.0005 ? '<0.1%' : `${(p * 100).toFixed(1)}%`);
