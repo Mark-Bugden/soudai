@@ -281,7 +281,7 @@ Compare national and court intake with the Ministry of Justice's official statis
 | --- | --- |
 | Tabs | Forecast (opening) and Process map, then Courts after the demo goes live (step 10). They're switched with buttons at the top of the controls rail, and the rail shows only the controls the current tab uses. |
 | Forecast | Pick a real past case, at random or by court and case number, or describe a made-up one: its court and its events so far. It shows the case's history so far and the chances it ends within 1, 3, 6 and 12 months. For a real case, it also shows what happened next. |
-| How well it does | Under the forecast: the scores of the model and the simpler methods side by side, and a calibration chart. |
+| How well it does | A "Show" switch in the rail flips the Forecast tab between a case and how well the model does, since the two don't fit one stage (Mark, 2026-11-26): the scores of the model and the simpler methods side by side, and a calibration chart. |
 | Process map | A flow diagram of the stages a civil case passes through, with the appeal loop as a side branch. Each edge's thickness is the share of cases that take it, and its label is the median wait. Hovering an edge gives its share, median and interquartile range. |
 | Time to a decision | Beside the diagram: the share of cases not yet decided, and not yet legally final, t months after filing, for the selected court against all courts. |
 | Court selector | All courts, or one court, with search by name. Search ignores diacritics, so "Decin" finds Děčín. The selection is shared by all the tabs. |
@@ -313,6 +313,7 @@ demo/                          the site bundle, built with demo-kit (see the sit
   src/courts.js, data.js, format.js   court search, lookups over the data, and the status line's text
   src/cases.js                 the real past cases: search, random pick, and what happened next
   src/tooltip.js               the charts' tooltip (adapted from doctor-who-ratings')
+  src/scores.js                how well it does: the methods' scores and calibration, from the export
   src/views/                   forecast, process map, courts
   src/forecast.js              the network's forward pass, ported from Python, for made-up cases
   src/tank.js                  German tank estimator, ported from Python (only if the demo recomputes it)
@@ -797,8 +798,8 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
   - **Fitting the window.** On wide frames the stage is the manifest's 560 px, but shrinks so that it and the status line fit in the window (`--dk-fit-height`, set by the site), and stays at least 22rem tall. On phones it's 26rem tall rather than the kit's 16:9.
   - **Tests.** `npm test` runs 11 node:test tests on the committed data: the court search, the lookups and the status line. `tests.yml` has a JS job for them, and `CLAUDE.md` lists `npm test` among the checks.
   - **Checked in Edge,** with the built bundle: both themes, at 1280 × 800 and at a phone's 390 px, searching, picking a court and "All courts", switching tabs and clearing the search. No console errors.
-- [ ] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
-  - **In three PRs:** the forward pass and real past cases (v0.5.0), made-up cases (v0.6.0), then how well the model does.
+- [x] The Forecast tab: real past cases (random, or by court and case number), made-up cases, and how well the model does (see "The experience"). Test the JS forward pass against the Python fixtures.
+  - **In three PRs:** the forward pass and real past cases (v0.5.0), made-up cases (v0.6.0), and how well the model does (v0.7.0).
   - **First PR (2026-11-26): the forward pass and real past cases.**
     - **The forward pass** (`forecast.js`) is `forward.py` in JavaScript, in 64-bit floats. It decodes the export's 16-bit weights itself. On the fixture's 27 forecasts it gives PyTorch's to 4.3 × 10⁻⁸; numpy's gap is 1.7 × 10⁻⁸, and the rest is PyTorch's 32-bit arithmetic.
     - **Checked against the full weights.** The exported weights decode to `network.json`'s to within half a step. On all 13,827 forecasts on the real cases (every day with events before the end, and each month to 12), the exported ensemble's largest gap from the full one is 0.00008, as in Python. A forecast of all five networks takes about 0.2 ms, so the demo recomputes it on every move of the slider.
@@ -830,6 +831,16 @@ Added with Mark on 2026-11-25, after the first four PRs: weighting recent traini
     - **For example,** at all courts: at filing, 50% within 6 months. With a hearing on day 150, on day 150: 5% within 1 month and 38% within 3. Add a decision that day, and it's 43% within 1 month and 98% within 3.
     - **Tests:** 5 new node:test tests: the weighted mean of courts, the events offered (each seen in the real cases before their end), adding and undoing, and the status line.
     - **Checked in Edge,** in both themes at 1280 × 800 and at 390 px: switching to a made-up case, adding a hearing and then a decision on the same day, the slider refusing to go before the last event, Undo, a court, Start again, and back to a real case. No console errors.
+  - **Third PR (2026-11-26): how well it does** (v0.7.0).
+    - **A "Show" switch** in the rail: "A case" or "How well it does". The two don't fit one stage, and Mark agreed to the switch on 2026-11-26.
+    - **The table** has the six methods, from the court average to the GRU network, with each one's ranking (concordance) and its error (the Brier score) within 1, 3, 6 and 12 months, to 3 decimal places. The best in each column is in bold, and a tie at 3 places is a tie. Within 6 months, the trees and the network both show 0.189. A note under the table says what each score means, and that every method was built on the cases registered in 2020–2023.
+    - **By court.** With a court selected, the table is that court's scores. They're for all its forecasts together, since that's how they were computed, so the "Forecasts made" switch turns off. Within one court the court average ranks at 0.500, a coin toss, since it gives every case the same forecast.
+    - **By how far into a case.** For all courts, "Forecasts made, months after filing" shows the scores at filing or 1, 3, 6 or 12 months in, or all together.
+    - **Calibration.** Each row of the table is a radio button, and the chart shows the method picked: the GRU network at first. The chart plots the mean forecast in each band of 10 points against the share of those cases that ended in time, each dot sized by its share of the forecasts, with the diagonal where the two agree. "Calibration within, months" picks 1, 3, 6 or 12. It's over all courts and forecasts, as computed in step 7, and the note gives the method's mean gap. The text under the table describes the method picked.
+    - **The status line** gives what the scores cover, and the methods best at ranking and with the lowest error within the chosen months. For example: "All courts: 234,784 forecasts on cases registered in 2024–2025. Best at ranking: GRU network (0.647). Lowest error within 6 months: Boosted trees and GRU network (0.189)."
+    - **Phones:** the scores and the chart, one above the other, don't fit a 30rem stage, so for this view the stage grows to fit them, and the chart is 17rem tall. On wide stages, the table's column scrolls if the window is short.
+    - **Tests:** 6 new node:test tests: every method shown, the scores for all courts at each landmark and for each court, the best with ties, the calibration bands, and the text.
+    - **Checked in Edge,** in both themes at 1280 × 800, at 390 px and in a 1100 × 520 window: the switch, a landmark, picking the trees, a calibration horizon, hovering a dot, a court (which turns the landmark switch off), and back to a case. The Forecast tab's earlier checks still pass. No console errors.
 - [ ] The model card, in Mark's copy, from the facts in `docs/model-card.md`.
 - [ ] The Process map tab and its time curves.
 - [ ] The manifest, in Mark's copy, with `status: "in-progress"`. Render the stills. Fit the window.

@@ -90,3 +90,22 @@ export function madeUpLine(item, day, chances, horizons) {
   const after = item.events.length > 1 ? ` Its last event: ${last.code.gloss}, ${onDay(last.day)}.` : '';
   return `Made-up case, ${where}, ${onDay(day)}. ${chancesText(chances, horizons)}${after}`;
 }
+
+/** A score to 3 decimal places: 0.647. */
+export const score = (x) => x.toFixed(3);
+
+/** "made at filing", or "made 3 months after filing", for a landmark ('0', '3', ...). */
+export const landmark = (when) => (when === '0' ? 'made at filing' : `made ${months(Number(when))} after filing`);
+
+/**
+ * The status line for the scores: what they cover, and the methods that rank cases best and have the
+ * lowest error within `horizon` months (several if they tie to 3 decimal places).
+ */
+export function scoresLine(court, when, forecasts, ranking, error, horizon) {
+  const where = court ? court.name : 'All courts';
+  const made = when === 'all' ? '' : `, ${landmark(when)}`;
+  const names = (rows) => list(rows.map((row) => row.name));
+  return `${where}: ${count(forecasts)} forecasts on cases registered in 2024–2025${made}. `
+    + `Best at ranking: ${names(ranking)} (${score(ranking[0].concordance)}). `
+    + `Lowest error within ${months(horizon)}: ${names(error)} (${score(error[0].brier[horizon])}).`;
+}
