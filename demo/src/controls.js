@@ -59,6 +59,36 @@ export function segmented({ label, options, value = options[0].value, showLabel 
 }
 
 /**
+ * A button that does something when pressed, such as picking a case at random. Its value counts the
+ * presses, and each press notifies.
+ */
+export function button({ label, icon: markup }) {
+  const el = h('div', { class: 'dk-control sd-action' });
+  const press = h('button', { type: 'button', class: 'dk-button' }, icon(markup), h('span', {}, label));
+  el.append(press);
+  const listeners = new Set();
+  let presses = 0;
+  press.addEventListener('click', () => {
+    presses += 1;
+    for (const listener of listeners) listener(presses);
+  });
+  return {
+    el,
+    get value() { return presses; },
+    set value(next) { presses = next; },
+    get disabled() { return press.disabled; },
+    set disabled(state) {
+      press.disabled = Boolean(state);
+      el.toggleAttribute('data-disabled', press.disabled);
+    },
+    onChange(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+}
+
+/**
  * A search box that suggests matches as you type. `suggest(query)` returns { label, detail, value }s;
  * `format(value)` gives the text to show for a chosen value. With `browse`, focusing or clicking the
  * empty box lists everything `suggest('')` gives. Picking a suggestion, by click, tap or Enter, makes
