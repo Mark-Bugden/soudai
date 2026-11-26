@@ -1,13 +1,26 @@
 {
   "slug": "soudai",
   "title": "Judging the Journey",
-  "tagline": "Predicting how long court cases in the Czech Republic take.",
-  "summary": "A machine learning project that predicts the duration of court cases in the Czech Republic. It scrapes and cleans public court records from rozhodnuti.justice.cz and infosoud.justice.cz, then trains regression models to predict how long each case takes.",
-  "tags": ["data scraping", "feature engineering", "machine learning", "regression"],
-  "status": "stub",
+  "tagline": "Predicting how long civil court cases in the Czech Republic take.",
+  "summary": "A model forecasts the chance that a civil case at a Czech district court ends within a given time, from its history so far. Try it on a real past case or on one you describe, and see how well it does against simpler methods. Then follow the journey of a civil case from filing to a final decision: the routes cases take, how many take each one, and how long each step lasts.",
+  "tags": ["machine learning", "neural networks", "survival analysis", "data scraping"],
+  "status": "in-progress",
   "repo": "https://github.com/Mark-Bugden/soudai",
   "kitVersion": "0.5.0",
   "built": "2026-11-17",
   "demo": { "entry": "demo.js", "height": 560, "needsWebGL": false },
+  "modelCard": {
+    "what": "For a civil case at a Czech district court, the chance it ends (becomes legally final) within 1, 3, 6 and 12 months, from its court and the dates and types of the events in its record so far. It's the average of five recurrent neural networks (GRUs) of 7,228 weights each, which the demo runs in your browser.",
+    "data": "Trained on 138,815 civil cases registered in 2020–2023 at the 86 district-level courts, as their records stood on 31 December 2023. Tested on 69,336 cases registered in 2024–2025, followed to November 2026. The cases were drawn at random from infosoud.gov.cz, the courts' public case-tracking service, and weighted to stand for every case registered.",
+    "metric": "Given two test cases, it picks the one that ends first 64.7% of the time (concordance 0.647), against 64.3% for gradient-boosted trees, the best of the simpler methods. Its Brier score for ending within 6 months is 0.189, the same as the trees'. It does better than them 1 and 3 months ahead, and slightly worse 12 months ahead.",
+    "limits": [
+      "It doesn't clearly beat gradient-boosted trees on hand-made features: it ranks cases better, but its forecasts are no better 6 months ahead, and slightly worse 12 months ahead.",
+      "It knows only a case's court and the dates and types of its events: nothing about the parties, the claim, the judge or the law.",
+      "Cases have got faster since the training years. Where it gives under a 60% chance of ending within 6 months, 3 to 8 points more cases end than it says.",
+      "Courts record events differently: Okresní soud Hradec Králové records a hearing in 22% of cases, against 80% nationally. So a court's forecasts reflect its record-keeping as well as its pace.",
+      "At filing it knows only the court, and does no better than the court's average.",
+      "It isn't legal advice."
+    ]
+  },
   "writeup": "/projects/soudai/"
 }
