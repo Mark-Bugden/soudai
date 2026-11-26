@@ -802,3 +802,64 @@
       opacity var(--duration-fast) var(--ease-out);
   }
 }
+
+/*
+ * The Performance tab: its heading, then the calibration and the ranking side by side, each chart taking
+ * the rest of its column; one above the other on narrow stages, where the stage grows to fit them.
+ */
+[data-demo] .sd-perf {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  box-sizing: border-box;
+}
+
+[data-demo] .sd-perf-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  min-height: 0;
+}
+
+[data-demo] .sd-perf-box {
+  flex: 1 1 0;
+}
+
+[data-demo] .sd-diagonal {
+  stroke: var(--color-curve);
+  stroke-width: 1.5;
+}
+
+/* The names at the ends of the ranking's lines, the model's in bold. */
+[data-demo] .sd-end-name {
+  fill: var(--color-muted);
+  font-size: 12px;
+}
+
+[data-demo] .sd-end-name.is-model {
+  fill: var(--color-text);
+  font-weight: var(--weight-strong);
+}
+
+@container (max-width: 47.99rem) {
+  [data-demo] .dk-stage.sd-fit-content .sd-perf {
+    height: auto;
+  }
+
+  [data-demo] .sd-perf {
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  [data-demo] .sd-perf-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  [data-demo] .sd-perf-box {
+    flex: none;
+    height: 18rem;
+  }
+}

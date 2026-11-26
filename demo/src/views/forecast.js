@@ -1,5 +1,6 @@
-// The Forecast tab, for a real past case or a custom one: the case, the chance it ends within 1, 3, 6
-// and 12 months of the day chosen, and for a real case whether it did, over a chart of its life.
+// The Forecast tab, for a real past case or a custom one: what the model predicts, then the chance the
+// case ends within 1, 3, 6 and 12 months of the day chosen, and for a real case whether it did, over a
+// chart of its life. The menus in the rail name the court and the case.
 //
 // The chart shares one time axis, in months after filing:
 // - above, the case's events, one lane per stage it reached. Those up to the day of the forecast are
@@ -33,8 +34,10 @@ const REACH = 14; // px from a dot within which the pointer finds it
 const STAGE_ORDER = Object.keys(describe.STAGES);
 
 export function createForecast(host, data) {
-  const title = h('p', { class: 'sd-case-title' });
-  const meta = h('p', { class: 'sd-case-meta' });
+  const title = h('p', { class: 'sd-case-title' }, 'When will this case be legally final?');
+  const meta = h('p', { class: 'sd-case-meta' },
+    `The model predicts the probability that the case will be legally final within the next ${describe.list(data.horizons)} `
+    + 'months, from its history up to the forecast date.');
   const tiles = data.horizons.map(() => {
     const value = h('span', { class: 'sd-tile-value' });
     const result = h('span', { class: 'sd-tile-outcome' });
@@ -47,7 +50,7 @@ export function createForecast(host, data) {
   const el = h('div', { class: 'sd-forecast' },
     h('div', { class: 'sd-case' }, title, meta),
     h('div', { class: 'sd-chances' },
-      h('p', { class: 'sd-chances-label', id: 'sd-chances-label' }, 'Chance it ends within'),
+      h('p', { class: 'sd-chances-label', id: 'sd-chances-label' }, 'Probability it is legally final within'),
       h('div', { class: 'sd-tiles', role: 'list', 'aria-labelledby': 'sd-chances-label' }, ...tiles.map((tile) => tile.el))),
     chart,
     events);
@@ -62,8 +65,6 @@ export function createForecast(host, data) {
     const chances = within(still, data.horizons);
     const end = item.made ? null : ending(item);
 
-    title.textContent = item.label;
-    meta.textContent = `${item.court.name} · filed ${describe.date(item.filed)}`;
     data.horizons.forEach((months, i) => {
       const tile = tiles[i];
       tile.label.textContent = describe.months(months);
@@ -130,7 +131,7 @@ export function createForecast(host, data) {
         s('text', { class: 'sd-tick', x: left - 10, y: y(p), dy: '0.32em', 'text-anchor': 'end' }, `${p * 100}%`),
       );
     }
-    labels.push(s('text', { class: 'sd-label', x: left + 6, y: panelTop - 10 }, 'Chance it has ended'));
+    labels.push(s('text', { class: 'sd-label', x: left + 6, y: panelTop - 10 }, 'Probability it is legally final'));
 
     // The time axis: months after filing.
     const step = [1, 2, 3, 6, 12, 24].find((m) => x(m * MONTH) - x(0) >= 44) ?? 24;

@@ -45,7 +45,7 @@ export function createMap(host, data) {
     h('div', { class: 'sd-map-flow' },
       h('div', { class: 'sd-case' }, h('p', { class: 'sd-case-title' }, 'Process map'), meta), mapBox, rest),
     h('div', { class: 'sd-curves' },
-      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title' }, 'How quickly cases become legally final'), legend, curveBox),
+      h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title' }, 'Share of cases legally final, by months after filing'), legend, curveBox),
       h('div', { class: 'sd-half' }, h('p', { class: 'sd-cal-title', id: 'sd-routes-title' }, 'Most common routes'), routeList)),
     table);
   host.append(el);

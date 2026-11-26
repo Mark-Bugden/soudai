@@ -63,7 +63,7 @@ export function next(item, ending, day) {
 }
 
 /** "a, b, c and d". */
-const list = (items) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0]);
+export const list =(items) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0]);
 
 /** "at filing", or "on 3 June 2024, day 80". */
 export const moment = (filed, day) => (day === 0 ? 'at filing' : `on ${date(addDays(filed, day))}, day ${count(day)}`);
@@ -85,6 +85,20 @@ export function customLine(item, day, chances, horizons) {
   const last = item.events.at(-1);
   const after = item.events.length > 1 ? ` Its last event: ${last.code.gloss}, ${moment(item.filed, last.day)}.` : '';
   return `Custom case, ${item.court.name}, ${moment(item.filed, day)}. ${chancesText(chances, horizons)}${after}`;
+}
+
+/** A gap between two shares, in percentage points to one decimal place: "2.5 points". */
+export const points = (gap) => `${(gap * 100).toFixed(1)} points`;
+
+/**
+ * The status line for the Performance tab: what was scored, the model's calibration within `horizon`
+ * months, and how often it puts two cases in order at filing and 12 months after.
+ */
+export function performanceLine({ forecasts, cases, horizon, gap, ranking }) {
+  return `How well the model does: ${count(forecasts)} forecasts for ${count(cases)} cases registered in 2024–2025. `
+    + `Calibration within ${months(horizon)}: its bands of forecasts are ${points(gap)} from what happened, on average. `
+    + `It puts two cases in the order they ended ${share(ranking[0])} of the time at filing, and ${share(ranking.at(-1))} `
+    + '12 months after.';
 }
 
 /** A wait in days: "same day", "1 day" or "30 days". */

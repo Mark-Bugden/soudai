@@ -1,9 +1,10 @@
 // The demo's entry point. Vite bundles it with the kit and the CSS into demo.js and demo.css.
 //
 // It loads the data, then mounts the frame with the controls, showing only those the current tab uses.
-// The tabs (views/) draw the stage, the Process map first; this module keeps the state they share: the
-// tab, and the court selected, or none for all courts. The Forecast tab always has a court: the one selected, or else the
-// last it had. Its case is one of that court's real past cases, with the day of its forecast, or a
+// The tabs (views/) draw the stage, the Process map first, then the Forecast and Performance tabs; this
+// module keeps the state they share: the tab, and the court selected, or none for all courts. The
+// Forecast tab always has a court: the one selected, or else the last it had. The Performance tab is
+// for all courts, and has only the months its calibration is within. Its case is one of that court's real past cases, with the day of its forecast, or a
 // custom case, whose filing, events and day of forecast the visitor gives as dates. The status line
 // shows what's selected, with its headline numbers.
 
@@ -20,13 +21,18 @@ import { h } from './dom.js';
 import * as describe from './format.js';
 import { createForecast } from './views/forecast.js';
 import { createMap } from './views/map.js';
+import { createPerformance } from './views/performance.js';
 
-// The tabs' icons, on a 24 × 24 grid: a curve falling over time, and stages in a row with a loop back.
+// The tabs' icons, on a 24 × 24 grid: a curve falling over time, stages in a row with a loop back, and
+// dots along a diagonal.
 const ICONS = {
   forecast: '<path d="M4 4v16h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
     + '<path d="M6.5 6.5c3.5 0 4.5 3 6.5 6s3.5 4 6.5 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   map: '<path d="M6.5 15h3M14.5 15h3M20 12c0-7-8-7-8 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
     + '<g fill="currentColor"><circle cx="4" cy="15" r="2.5"/><circle cx="12" cy="15" r="2.5"/><circle cx="20" cy="15" r="2.5"/></g>',
+  performance: '<path d="M4 4v16h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<path d="M7 17L19 5" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.6"/>'
+    + '<g fill="currentColor"><circle cx="8.5" cy="14" r="1.75"/><circle cx="12.5" cy="11" r="1.75"/><circle cx="16.5" cy="7" r="1.75"/></g>',
   // A die showing five.
   random: '<rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>'
     + '<g fill="currentColor"><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="12" cy="12" r="1.5"/>'
@@ -35,6 +41,7 @@ const ICONS = {
 const TABS = {
   map: { label: 'Process map', create: createMap },
   forecast: { label: 'Forecast', create: createForecast },
+  performance: { label: 'Performance', create: createPerformance },
 };
 // The case the Forecast tab opens on: an ordinary one, with a hearing and a decision.
 const OPENING = { court: 'OSJIMJI', label: '18 C 33/2024' };
@@ -91,10 +98,16 @@ async function start(el) {
     dateLabel: 'Date of the event',
   });
   const forecastOn = dateField({ label: 'Forecast on', value: made.filed });
-  const controls = { tab, court, caseMenu, day, filedOn, eventList, addEvent, forecastOn };
+  const horizon = segmented({
+    label: 'Calibration within, months',
+    options: data.horizons.map((months) => ({ label: String(months), value: months, title: `Within ${describe.months(months)}` })),
+    value: 6,
+  });
+  const controls = { tab, court, caseMenu, day, filedOn, eventList, addEvent, forecastOn, horizon };
   // The controls each tab uses, besides the tab switch.
   const used = () => {
     if (tab.value === 'map') return [court];
+    if (tab.value === 'performance') return [horizon];
     if (caseMenu.value !== CUSTOM) return [court, caseMenu, day];
     return [court, caseMenu, filedOn, ...(made.events.length > 1 ? [eventList] : []), addEvent, forecastOn];
   };
@@ -145,7 +158,7 @@ async function start(el) {
     if (name === 'map') {
       court.offerNone(true);
       court.value = selected;
-    } else {
+    } else if (name === 'forecast') {
       court.value = forecastCourt;
       court.offerNone(false);
     }
@@ -201,7 +214,7 @@ async function start(el) {
         current?.view.destroy();
         current = { name, view: TABS[name].create(host, data) };
         stage.setAttribute('aria-label', TABS[name].label);
-        // On phones the stage grows to fit the map (see demo.css).
+        // On phones the stage grows to fit the map's and the Performance tab's charts (see demo.css).
         stage.closest('.dk-stage').classList.toggle('sd-fit-content', name !== 'forecast');
       }
       showControls();
@@ -212,6 +225,7 @@ async function start(el) {
         court: values.court,
         item: isCustom ? made : item,
         day: isCustom ? daysBetween(made.filed, values.forecastOn) : values.day,
+        horizon: values.horizon,
       });
       app.status(status ?? describe.headline(values.court, data.journey(values.court), data.courts.length));
     },
