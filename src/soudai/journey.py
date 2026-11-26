@@ -32,7 +32,7 @@ TOP_PATHS = {"all": 30, "court": 10}
 OUT = {
     name: paths.DERIVED / f"journey_{name}.csv" for name in ["stages", "moves", "curves", "paths", "summary"]
 }
-ENDS = events.STAGES[:-1] + ["closed"]  # the ways out of a stage: the other stages, or closing
+ENDS = events.STAGES[1:] + ["closed"]  # the ways out of a stage: a later stage (never "filed"), or closing
 
 
 def load():

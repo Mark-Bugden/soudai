@@ -111,6 +111,44 @@ def test_move_shares_and_waits(monkeypatch):
     assert pick(moves, scope="OSA", **{"from": "hearing", "to": "decided"})["wait_median"] == 0
 
 
+def test_becoming_legally_final_is_a_move(monkeypatch):
+    moves = tables(monkeypatch)["moves"]
+    final = pick(moves, scope="OSA", **{"from": "decided", "to": "final"})
+    # Three of OSA's four cases (weighing 2 each) became legally final 30 days after their decision.
+    assert final["share"] == pytest.approx(0.75)
+    assert final["sampled"] == 3
+    assert (final["wait_p25"], final["wait_median"], final["wait_p75"]) == (30, 30, 30)
+    assert pick(moves, scope="all", **{"from": "decided", "to": "final"})["share"] == pytest.approx(10 / 12)
+
+
+def test_a_wait_counts_the_other_ways_out_including_legally_final(monkeypatch):
+    """Five visits to "decided": legally final on days 10, 20 and 40, appealed on days 30 and 50. By
+    Aalen–Johansen, 1/5 of visits are appealed on day 30 (3 of 5 still waiting) and 1/5 on day 50, so the
+    median wait to an appeal is 30 days. Counting the legally final visits as still waiting instead would
+    put 1/3 on day 30 and 2/3 on day 50, and the median at 50."""
+    monkeypatch.setattr(journey, "MIN_MOVES", 1)
+    visits = pd.DataFrame(
+        {
+            "court": "OSA",
+            "senate": 1,
+            "number": range(5),
+            "year": 2022,
+            "weight": 1.0,
+            "stage": "decided",
+            "next": ["final", "final", "appeal", "final", "appeal"],
+            "days": [10, 20, 30, 40, 50],
+        }
+    )
+    rows = {row["to"]: row for row in journey.move_rows("all", visits, pd.Series([1.0] * 5))}
+    assert rows["appeal"]["share"] == pytest.approx(0.4)
+    assert (rows["appeal"]["wait_p25"], rows["appeal"]["wait_median"], rows["appeal"]["wait_p75"]) == (
+        30,
+        30,
+        50,
+    )
+    assert rows["final"]["share"] == pytest.approx(0.6) and rows["final"]["wait_median"] == 20
+
+
 def test_moves_with_too_few_cases_get_no_wait(monkeypatch):
     moves = tables(monkeypatch, min_moves=2)["moves"]
     decided = pick(moves, scope="OSA", **{"from": "filed", "to": "decided"})
