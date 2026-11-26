@@ -4,7 +4,8 @@
 // The tabs (views/) draw the stage, the Process map first, then the Forecast and Performance tabs; this
 // module keeps the state they share: the tab, and the court selected, or none for all courts. The
 // Forecast tab always has a court: the one selected, or else the last it had. The Performance tab is
-// for all courts, and has only the months its calibration is within. Its case is one of that court's real past cases, with the day of its forecast, or a
+// for all courts: the method whose calibration it draws, and the months that's within, are chosen in
+// the rail. Its case is one of that court's real past cases, with the day of its forecast, or a
 // custom case, whose filing, events and day of forecast the visitor gives as dates. The status line
 // shows what's selected, with its headline numbers.
 
@@ -19,6 +20,7 @@ import { byType } from './courts.js';
 import { prepare } from './data.js';
 import { h } from './dom.js';
 import * as describe from './format.js';
+import { METHODS, MODEL } from './performance.js';
 import { createForecast } from './views/forecast.js';
 import { createMap } from './views/map.js';
 import { createPerformance } from './views/performance.js';
@@ -98,16 +100,23 @@ async function start(el) {
     dateLabel: 'Date of the event',
   });
   const forecastOn = dateField({ label: 'Forecast on', value: made.filed });
+  // The method whose calibration the Performance tab draws, with what it is under the menu.
+  const method = dropdown({ label: 'Method', options: METHODS.map(({ name, key }) => ({ label: name, value: key })), value: MODEL });
+  const about = h('p', { class: 'sd-control-note' });
+  method.el.append(about);
+  const explain = (key) => { about.textContent = METHODS.find((m) => m.key === key).about; };
+  explain(method.value);
+  method.onChange(explain);
   const horizon = segmented({
     label: 'Calibration within, months',
     options: data.horizons.map((months) => ({ label: String(months), value: months, title: `Within ${describe.months(months)}` })),
     value: 6,
   });
-  const controls = { tab, court, caseMenu, day, filedOn, eventList, addEvent, forecastOn, horizon };
+  const controls = { tab, court, caseMenu, day, filedOn, eventList, addEvent, forecastOn, method, horizon };
   // The controls each tab uses, besides the tab switch.
   const used = () => {
     if (tab.value === 'map') return [court];
-    if (tab.value === 'performance') return [horizon];
+    if (tab.value === 'performance') return [method, horizon];
     if (caseMenu.value !== CUSTOM) return [court, caseMenu, day];
     return [court, caseMenu, filedOn, ...(made.events.length > 1 ? [eventList] : []), addEvent, forecastOn];
   };
@@ -226,6 +235,7 @@ async function start(el) {
         item: isCustom ? made : item,
         day: isCustom ? daysBetween(made.filed, values.forecastOn) : values.day,
         horizon: values.horizon,
+        method: values.method,
       });
       app.status(status ?? describe.headline(values.court, data.journey(values.court), data.courts.length));
     },

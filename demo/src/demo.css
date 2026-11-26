@@ -54,9 +54,11 @@
   white-space: nowrap;
 }
 
-/* A row of buttons for a few choices: radio buttons underneath, on a track like the kit's select. */
+/* A row of buttons for a few choices: radio buttons underneath, on a track like the kit's select. It's
+   never wider than its control: its buttons shrink, and their names end in "…" if they must. */
 [data-demo] .sd-segments {
   display: flex;
+  min-width: 0;
   gap: 2px;
   padding: 3px;
   background: var(--color-bg);
@@ -110,11 +112,18 @@
   text-overflow: ellipsis;
 }
 
-/* The tab switch: an icon over each name, the chosen icon in the accent. */
+/* The tab switch: an icon over each name, the chosen icon in the accent. The names are a little smaller,
+   so that three fit the site's rail, which leaves each about 75 px. */
 [data-demo] .sd-segmented-icons .sd-segment {
   flex-direction: column;
   gap: 3px;
   min-height: 3.5rem;
+  padding: 0 2px;
+}
+
+[data-demo] .sd-segmented-icons .sd-segment-label {
+  max-width: 100%;
+  font-size: 0.6875rem;
 }
 
 [data-demo] .sd-segment-icon,
@@ -832,15 +841,42 @@
   stroke-width: 1.5;
 }
 
-/* The names at the ends of the ranking's lines, the model's in bold. */
+/* The method picked in the rail, when it isn't the model: in the muted text colour, which stands out from
+   the curve colour of the others in both themes. */
+[data-demo] .sd-picked-line {
+  fill: none;
+  stroke: var(--color-muted);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+[data-demo] .sd-picked-dot {
+  fill: var(--color-muted);
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+[data-demo] .sd-key-picked {
+  background: var(--color-muted);
+}
+
+/* The names at the ends of the ranking's lines, the model's and the method picked's in bold. */
 [data-demo] .sd-end-name {
   fill: var(--color-muted);
   font-size: 12px;
 }
 
-[data-demo] .sd-end-name.is-model {
+[data-demo] .sd-end-name.is-lit {
   fill: var(--color-text);
   font-weight: var(--weight-strong);
+}
+
+/* What the method picked in the rail is, under its menu. */
+[data-demo] .sd-control-note {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
 }
 
 @container (max-width: 47.99rem) {

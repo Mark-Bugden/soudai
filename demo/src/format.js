@@ -91,14 +91,15 @@ export function customLine(item, day, chances, horizons) {
 export const points = (gap) => `${(gap * 100).toFixed(1)} points`;
 
 /**
- * The status line for the Performance tab: what was scored, the model's calibration within `horizon`
- * months, and how often it puts two cases in order at filing and 12 months after.
+ * The status line for the Performance tab: what was scored, and for the method picked, `name`, its
+ * calibration within `horizon` months and how often it puts two cases in order at filing and 12 months
+ * after.
  */
-export function performanceLine({ forecasts, cases, horizon, gap, ranking }) {
+export function performanceLine({ forecasts, cases, horizon, name, gap, ranking }) {
   return `How well the model does: ${count(forecasts)} forecasts for ${count(cases)} cases registered in 2024–2025. `
-    + `Calibration within ${months(horizon)}: its bands of forecasts are ${points(gap)} from what happened, on average. `
-    + `It puts two cases in the order they ended ${share(ranking[0])} of the time at filing, and ${share(ranking.at(-1))} `
-    + '12 months after.';
+    + `${name}: calibration within ${months(horizon)}, its bands of forecasts are ${points(gap)} from what happened, on `
+    + `average. It puts two cases in the order they ended ${share(ranking[0])} of the time at filing, and `
+    + `${share(ranking.at(-1))} 12 months after.`;
 }
 
 /** A wait in days: "same day", "1 day" or "30 days". */

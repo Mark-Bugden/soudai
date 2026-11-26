@@ -1,31 +1,40 @@
 // The Performance tab: how well the model does on the cases registered in 2024–2025, which it never
 // trained on, over all courts.
 //
-// - Calibration: for each band of 10 points, the model's mean forecast that a case is legally final
-//   within the months chosen in the rail, against the share of those cases that were, each dot sized by
-//   its share of the forecasts, with the diagonal where the two agree. Hovering a dot reads it.
-// - Ranking: how often the model and three simpler methods put two cases in the order they ended
-//   (concordance), for forecasts made at filing and 1, 3, 6 and 12 months after. The model is in the
-//   accent and the others in the curve colour, each named at its end. Hovering reads a landmark.
+// - Calibration, of the method picked in the rail: for each band of 10 points, its mean forecast that a
+//   case is legally final within the months chosen there, against the share of those cases that were,
+//   each dot sized by its share of the forecasts, with the diagonal where the two agree. Hovering a dot
+//   reads it.
+// - Ranking: how often the model and three simpler methods, and the method picked if it isn't one of
+//   them, put two cases in the order they ended (concordance), for forecasts made at filing and 1, 3, 6
+//   and 12 months after, each named at its line's end. Hovering reads a landmark.
 //
-// Hidden tables give both to screen readers. Colours come from CSS classes (see demo.css), so a theme
-// change needs no redraw.
+// Each method keeps its colour on both charts: the model in the accent, the method picked in the muted
+// text colour, and the others in the curve colour. Hidden tables give both charts to screen readers.
+// Colours come from CSS classes (see demo.css), so a theme change needs no redraw.
 
 import { h, s } from '../dom.js';
 import * as describe from '../format.js';
-import { BINS, LANDMARKS, MODEL, calibration, counts, gap, ranking } from '../performance.js';
+import { BINS, LANDMARKS, METHODS, MODEL, calibration, counts, gap, ranking } from '../performance.js';
 import { createTooltip } from '../tooltip.js';
-import { spread } from './map.js';
 
 const REACH = 16; // px from a dot within which the pointer finds it
 const LINE = 15; // px between the names at the ends of the ranking's lines
 const RANGE = [0.5, 0.8]; // the ranking's axis, from a coin toss
 const DOT = 4; // px, a landmark's dot on the ranking
 
+// A method's line and dots: the model's, the method picked's, or another's.
+const MARKS = {
+  model: { line: 'sd-forecast-line', dot: 'sd-forecast-dot' },
+  picked: { line: 'sd-picked-line', dot: 'sd-picked-dot' },
+  other: { line: 'sd-curve-all', dot: 'sd-curve-dot' },
+};
+
 export function createPerformance(host, data) {
   const { forecasts, cases } = counts(data);
-  const lines = ranking(data);
-  const model = lines.find((line) => line.key === MODEL);
+  let lines = [];
+  let picked = MODEL;
+  const role = (key) => (key === MODEL ? 'model' : key === picked ? 'picked' : 'other');
 
   const calTitle = h('p', { class: 'sd-cal-title' });
   const calNote = h('p', { class: 'sd-note' });
@@ -34,6 +43,8 @@ export function createPerformance(host, data) {
   const rankSvg = s('svg', { class: 'sd-chart', 'aria-hidden': 'true' });
   const rankBox = h('div', { class: 'sd-chart-box sd-perf-box' }, rankSvg);
   const calTable = h('table', { class: 'sd-sr-only' });
+  const rankTable = h('table', { class: 'sd-sr-only' });
+  const legend = h('p', { class: 'sd-legend' });
   const el = h('div', { class: 'sd-perf' },
     h('div', { class: 'sd-case' },
       h('p', { class: 'sd-case-title' }, 'How well the model does'),
@@ -47,12 +58,10 @@ export function createPerformance(host, data) {
         h('p', { class: 'sd-note' },
           'How often each method puts two cases in the order they ended (its concordance), comparing cases at the same '
           + 'point after filing. 50% is a coin toss.'),
-        h('p', { class: 'sd-legend' },
-          h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, 'This model'),
-          h('span', { class: 'sd-key sd-key-diagonal' }), 'Simpler methods'),
+        legend,
         rankBox)),
     calTable,
-    rankingTable(lines));
+    rankTable);
   host.append(el);
   const calTip = createTooltip(calBox);
   const rankTip = createTooltip(rankBox);
@@ -60,25 +69,47 @@ export function createPerformance(host, data) {
   let calHover = null;
   let rankHover = null;
 
-  function render({ horizon }) {
-    const points = calibration(data, MODEL, horizon);
-    const mean = gap(data, MODEL, horizon);
-    calTitle.textContent = `Calibration within ${describe.months(horizon)}`;
+  function render({ horizon, method }) {
+    picked = method;
+    const chosen = METHODS.find((m) => m.key === method);
+    lines = ranking(data, method);
+    const points = calibration(data, method, horizon);
+    const mean = gap(data, method, horizon);
+    calTitle.textContent = `${chosen.name}: calibration within ${describe.months(horizon)}`;
     calNote.textContent = 'Whether cases end as often as forecast. The forecasts of being legally final within '
       + `${describe.months(horizon)}, in bands of 10 points, against the share of those cases that were. On the diagonal `
       + `the two agree, and a larger dot stands for more forecasts. On average the bands are ${describe.points(mean)} from it.`;
-    calibrationTable(points, horizon);
-    calHover = drawCalibration(points, horizon);
+    legend.replaceChildren(
+      h('span', { class: 'sd-key sd-key-model' }), h('span', { class: 'sd-legend-name' }, 'This model'),
+      ...(method === MODEL ? [] : [h('span', { class: 'sd-key sd-key-picked' }), h('span', { class: 'sd-legend-name' }, chosen.name)]),
+      h('span', { class: 'sd-key sd-key-diagonal' }), method === MODEL ? 'Simpler methods' : 'Others');
+    calibrationTable(points, horizon, chosen.name);
+    describeRanking();
+    calHover = drawCalibration(points, horizon, role(method));
     rankHover = drawRanking();
     calTip.hide();
     rankTip.hide();
-    return describe.performanceLine({ forecasts, cases, horizon, gap: mean, ranking: model.values });
+    return describe.performanceLine({
+      forecasts, cases, horizon, name: chosen.name, gap: mean, ranking: lines.find((line) => line.key === method).values,
+    });
+  }
+
+  /** The hidden table of each method's concordance at each landmark. */
+  function describeRanking() {
+    rankTable.replaceChildren(
+      h('caption', {}, 'How often each method puts two cases in the order they ended, by when the forecast was made'),
+      h('thead', {}, h('tr', {},
+        h('th', { scope: 'col' }, 'Method'),
+        ...LANDMARKS.map((months) => h('th', { scope: 'col' }, months ? `${describe.months(months)} after filing` : 'At filing')))),
+      h('tbody', {}, ...lines.map((line) => h('tr', {},
+        h('th', { scope: 'row' }, line.name),
+        ...line.values.map((v) => h('td', {}, describe.share(v)))))));
   }
 
   /** The hidden table of the calibration bands. */
-  function calibrationTable(points, horizon) {
+  function calibrationTable(points, horizon, name) {
     calTable.replaceChildren(
-      h('caption', {}, `Calibration within ${describe.months(horizon)}`),
+      h('caption', {}, `${name}: calibration within ${describe.months(horizon)}`),
       h('thead', {}, h('tr', {}, ...['Forecasts', 'Mean forecast', `Share legally final within ${describe.months(horizon)}`, 'Share of the forecasts']
         .map((name) => h('th', { scope: 'col' }, name)))),
       h('tbody', {}, ...points.map((point) => h('tr', {},
@@ -88,8 +119,8 @@ export function createPerformance(host, data) {
         h('td', {}, describe.share(point.share))))));
   }
 
-  /** The calibration chart, in a square that fits its box. Returns what hovering it needs. */
-  function drawCalibration(points, horizon) {
+  /** The calibration chart, in a square that fits its box, in its method's colour. Returns what hovering it needs. */
+  function drawCalibration(points, horizon, kind) {
     const width = calBox.clientWidth;
     const height = calBox.clientHeight;
     size(calSvg, width, height);
@@ -125,8 +156,8 @@ export function createPerformance(host, data) {
     );
     const most = Math.max(...points.map((point) => point.share));
     const dots = points.map((point) => ({ ...point, cx: x(point.forecast), cy: y(point.observed), r: 3 + 6 * Math.sqrt(point.share / most) }));
-    if (dots.length) nodes.push(s('path', { class: 'sd-forecast-line', d: polyline(dots.map((dot) => [dot.cx, dot.cy])) }));
-    for (const dot of dots) nodes.push(s('circle', { class: 'sd-forecast-dot', cx: dot.cx, cy: dot.cy, r: dot.r }));
+    if (dots.length) nodes.push(s('path', { class: MARKS[kind].line, d: polyline(dots.map((dot) => [dot.cx, dot.cy])) }));
+    for (const dot of dots) nodes.push(s('circle', { class: MARKS[kind].dot, cx: dot.cx, cy: dot.cy, r: dot.r }));
     calSvg.replaceChildren(...nodes);
     return { dots, horizon };
   }
@@ -159,17 +190,18 @@ export function createPerformance(host, data) {
     });
     nodes.push(s('text', { class: 'sd-tick', x: x(LANDMARKS.length - 1), y: height - 4, 'text-anchor': 'end' }, 'Forecast made, months after filing'));
 
-    // The simpler methods first, so the model's line is on top.
-    const order = [...lines].sort((a, b) => (a.key === MODEL) - (b.key === MODEL));
+    // The others first, then the method picked, so the model's line is on top.
+    const depth = { other: 0, picked: 1, model: 2 };
+    const order = [...lines].sort((a, b) => depth[role(a.key)] - depth[role(b.key)]);
     for (const line of order) {
-      const isModel = line.key === MODEL;
-      nodes.push(s('path', { class: isModel ? 'sd-forecast-line' : 'sd-curve-all', d: polyline(line.values.map((v, i) => [x(i), y(v)])) }));
-      line.values.forEach((v, i) => nodes.push(s('circle', { class: isModel ? 'sd-forecast-dot' : 'sd-curve-dot', cx: x(i), cy: y(v), r: isModel ? DOT : DOT - 1 })));
+      const marks = MARKS[role(line.key)];
+      nodes.push(s('path', { class: marks.line, d: polyline(line.values.map((v, i) => [x(i), y(v)])) }));
+      line.values.forEach((v, i) => nodes.push(s('circle', { class: marks.dot, cx: x(i), cy: y(v), r: role(line.key) === 'other' ? DOT - 1 : DOT })));
     }
-    const ends = spread(lines.map((line) => y(line.values.at(-1))), LINE);
+    const ends = stack(lines.map((line) => y(line.values.at(-1))), LINE);
     lines.forEach((line, i) => {
       nodes.push(s('text', {
-        class: line.key === MODEL ? 'sd-end-name is-model' : 'sd-end-name',
+        class: role(line.key) === 'other' ? 'sd-end-name' : 'sd-end-name is-lit',
         x: x(LANDMARKS.length - 1) + 10,
         y: ends[i],
         dy: '0.32em',
@@ -222,7 +254,7 @@ export function createPerformance(host, data) {
     }
     cross.replaceChildren(
       s('line', { class: 'sd-cross-line', x1: x(i), x2: x(i), y1: top, y2: bottom }),
-      ...lines.map((line) => s('circle', { class: line.key === MODEL ? 'sd-forecast-dot' : 'sd-curve-dot', cx: x(i), cy: y(line.values[i]), r: DOT + 1 })),
+      ...lines.map((line) => s('circle', { class: MARKS[role(line.key)].dot, cx: x(i), cy: y(line.values[i]), r: DOT + 1 })),
     );
     const sorted = [...lines].sort((a, b) => b.values[i] - a.values[i]);
     rankTip.show([
@@ -247,16 +279,26 @@ export function createPerformance(host, data) {
   };
 }
 
-/** The hidden table of each method's concordance at each landmark. */
-function rankingTable(lines) {
-  return h('table', { class: 'sd-sr-only' },
-    h('caption', {}, 'How often each method puts two cases in the order they ended, by when the forecast was made'),
-    h('thead', {}, h('tr', {},
-      h('th', { scope: 'col' }, 'Method'),
-      ...LANDMARKS.map((months) => h('th', { scope: 'col' }, months ? `${describe.months(months)} after filing` : 'At filing')))),
-    h('tbody', {}, ...lines.map((line) => h('tr', {},
-      h('th', { scope: 'row' }, line.name),
-      ...line.values.map((v) => h('td', {}, describe.share(v)))))));
+/**
+ * Places labels as near the positions `wanted` as they can be while at least `apart` px apart, in the same
+ * order. Labels that would overlap form a block centred where its labels want to be, on average, and
+ * blocks that then overlap merge, so any number of crowded labels come apart.
+ */
+export function stack(wanted, apart) {
+  const order = wanted.map((at, i) => i).sort((a, b) => wanted[a] - wanted[b]);
+  const blocks = []; // { members, sum }: a block's first label goes at sum / members.length
+  for (const i of order) {
+    let block = { members: [i], sum: wanted[i] };
+    for (let last = blocks.at(-1); last && last.sum / last.members.length + last.members.length * apart > block.sum / block.members.length; last = blocks.at(-1)) {
+      blocks.pop();
+      // The block's labels each sit `apart` further down than the one before.
+      block = { members: [...last.members, ...block.members], sum: last.sum + block.sum - block.members.length * last.members.length * apart };
+    }
+    blocks.push(block);
+  }
+  const placed = [...wanted];
+  for (const { members, sum } of blocks) members.forEach((i, k) => { placed[i] = sum / members.length + k * apart; });
+  return placed;
 }
 
 /** A calibration band: "70–80%". */
