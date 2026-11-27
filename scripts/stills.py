@@ -5,7 +5,8 @@
 - thumb.webp and thumb-light.webp: the Forecast tab's chart on the case it opens on, for the project
   card (Mark, 2026-11-26: it looks better there than the map). It has no text (Mark, 2026-11-26:
   "the thumbnails should show no text and only visual indications of the demo itself"): no heading
-  or boxes, and none of the chart's labels, so the chart fills the stage. The stage is shot at
+  or boxes, and none of the chart's labels, so the chart fills the stage. It ends where the forecast
+  does, a year after filing (Mark, 2026-11-27: the empty right side looked strange). The stage is shot at
   720 x 450, 16:10, the card's shape, centred on the theme's page colour at 1200 x 675. The card
   trims those margins.
 - og.jpg: the Forecast tab, with its text, at 1200 x 630, dark only, for link previews.
@@ -63,6 +64,21 @@ ROOM = """() => {
     height - axis.y1.baseVal.value - now.y1.baseVal.value];
 }"""
 REACH = "[data-demo] .sd-forecast .sd-chart-box { margin: 0 0 -%.1fpx -%.1fpx; }"
+
+# The time axis runs to a year after the case ended, but a forecast at filing covers only its first
+# year, which would leave the right of the thumbnail empty. So the chart is drawn wider, by as much as
+# brings the forecast's last dot, whole, to where the lanes end, and cut there.
+CROP = """() => {
+  const svg = document.querySelector('.sd-forecast .sd-chart');
+  const lane = svg.querySelector('.sd-lane');
+  const [left, right] = [lane.x1.baseVal.value, lane.x2.baseVal.value];
+  const last = [...svg.querySelectorAll('.sd-forecast-dot')].at(-1);
+  const end = last.cx.baseVal.value;
+  const size = last.r.baseVal.value + parseFloat(getComputedStyle(last).strokeWidth);
+  const wider = (right - left) * ((right - left - size) / (end - left) - 1);
+  return [wider, wider + svg.width.baseVal.value - right];
+}"""
+CUT = "[data-demo] .sd-forecast .sd-chart-box { margin-right: -%.1fpx; clip-path: inset(0 %.1fpx 0 0); }"
 
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
@@ -122,9 +138,12 @@ def render(browser, url, errors):
     show_tab(page, "Forecast")
     page.wait_for_selector(".sd-forecast .sd-forecast-line")
     stills["og", "dark"] = shoot(page, "dark", 800, 420)
-    # The frame redraws only when the stage changes size, so the room is measured on the link
-    # preview's chart, which keeps the same, and the thumbnail's size brings the redraw.
+    # The frame redraws only when the stage changes size, so each step changes it: the room is
+    # measured on the link preview's chart, which keeps the same, and the crop a pixel short of the
+    # thumbnail's height, which leaves its widths as they'll be.
     bare = BARE + REACH % tuple(reversed(page.evaluate(ROOM)))
+    style(page, "dark", CSS % (720, 449) + bare)
+    bare += CUT % tuple(page.evaluate(CROP))
     for theme in THEMES:
         stills["thumb", theme] = shoot(page, theme, 720, 450, bare)
     page.close()
