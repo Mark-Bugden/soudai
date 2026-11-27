@@ -2,12 +2,13 @@
 
 - static.webp and static-light.webp: the opening state, the Process map for all courts. Shown while
   the demo loads, and without JavaScript.
-- thumb.webp and thumb-light.webp: the Forecast tab on the case it opens on, for the project card
-  (Mark, 2026-11-26: it looks better there than the map). The stage is shot at 720 x 450: small, so
-  its text stays readable on the card, but no smaller than the site shows it, so its labels have the
-  room they have there. That's 16:10, the card's shape, centred on the theme's page colour at
-  1200 x 675. The card trims those margins.
-- og.jpg: the same forecast at 1200 x 630, dark only, for link previews.
+- thumb.webp and thumb-light.webp: the Forecast tab's chart on the case it opens on, for the project
+  card (Mark, 2026-11-26: it looks better there than the map). It has no text (Mark, 2026-11-26:
+  "the thumbnails should show no text and only visual indications of the demo itself"): no heading
+  or boxes, and none of the chart's labels, so the chart fills the stage. The stage is shot at
+  720 x 450, 16:10, the card's shape, centred on the theme's page colour at 1200 x 675. The card
+  trims those margins.
+- og.jpg: the Forecast tab, with its text, at 1200 x 630, dark only, for link previews.
 
 Serves the built demo (demo/dist/, from `npm run build`), opens it in a browser and screenshots the
 stage alone at 2x. Then rebuild, so the bundle carries the new stills.
@@ -41,6 +42,28 @@ CSS = """
 [data-demo] .dk-stage { width: %dpx; height: %dpx !important; aspect-ratio: auto !important; }
 """
 
+# For the thumbnail: the forecast's chart alone, filling the stage, with none of its text.
+BARE = """
+[data-demo] .sd-forecast { grid-template-rows: minmax(0, 1fr); padding: var(--space-4); }
+[data-demo] .sd-forecast .sd-case, [data-demo] .sd-forecast .sd-chances,
+[data-demo] .sd-forecast .sd-chart text { display: none !important; }
+"""
+
+# The room the chart keeps for its labels beyond what it keeps on the opposite side: on the left for
+# the lanes' names and the ticks, against the right; below for the time axis, against the line of the
+# day of the forecast at the top. The thumbnail's chart box reaches that far past the stage's padding,
+# so the drawing sits evenly in it.
+ROOM = """() => {
+  const svg = document.querySelector('.sd-forecast .sd-chart');
+  const lane = svg.querySelector('.sd-lane');
+  const axis = svg.querySelector('.sd-axis-line');
+  const now = svg.querySelector('.sd-now');
+  const [width, height] = [svg.width.baseVal.value, svg.height.baseVal.value];
+  return [lane.x1.baseVal.value - (width - lane.x2.baseVal.value),
+    height - axis.y1.baseVal.value - now.y1.baseVal.value];
+}"""
+REACH = "[data-demo] .sd-forecast .sd-chart-box { margin: 0 0 -%.1fpx -%.1fpx; }"
+
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args):
@@ -59,18 +82,23 @@ def open_page(browser, url, errors):
     return page
 
 
-def shoot(page, theme, width, height):
-    """Screenshots the stage at width x height CSS px in the theme.
-
-    Returns the image, with the page's colour as (r, g, b).
-    """
+def style(page, theme, css):
+    """Sets the theme and the still's CSS, and waits for the frame to redraw."""
     page.evaluate(
         "([theme, css]) => { document.documentElement.dataset.theme = theme;"
         " document.getElementById('still').textContent = css; }",
-        [theme, CSS % (width, height)],
+        [theme, css],
     )
     page.mouse.move(0, 0)
     page.wait_for_timeout(500)  # the frame redraws on the resize
+
+
+def shoot(page, theme, width, height, extra=""):
+    """Screenshots the stage at width x height CSS px in the theme, with `extra` CSS.
+
+    Returns the image, with the page's colour as (r, g, b).
+    """
+    style(page, theme, CSS % (width, height) + extra)
     png = page.locator(".dk-stage").screenshot()
     background = page.evaluate("getComputedStyle(document.body).backgroundColor")
     colour = tuple(int(c) for c in re.findall(r"\d+", background)[:3])
@@ -93,9 +121,12 @@ def render(browser, url, errors):
         stills["static", theme] = shoot(page, theme, 1200, 675)
     show_tab(page, "Forecast")
     page.wait_for_selector(".sd-forecast .sd-forecast-line")
-    for theme in THEMES:
-        stills["thumb", theme] = shoot(page, theme, 720, 450)
     stills["og", "dark"] = shoot(page, "dark", 800, 420)
+    # The frame redraws only when the stage changes size, so the room is measured on the link
+    # preview's chart, which keeps the same, and the thumbnail's size brings the redraw.
+    bare = BARE + REACH % tuple(reversed(page.evaluate(ROOM)))
+    for theme in THEMES:
+        stills["thumb", theme] = shoot(page, theme, 720, 450, bare)
     page.close()
     return stills
 
